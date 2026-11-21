@@ -20,6 +20,11 @@ A lightweight, browser-based 3D voxel sandbox game built with [Three.js](https:/
 - **Cross-Platform Controls & Haptics**:
   - **Desktop**: WASD to move, Space to jump/swim, Shift to sprint, Mouse look, Left click to break, Right click to place, Number keys (1-8) or mouse scroll for hotbar selection.
   - **Mobile / Touch**: Virtual joystick, dedicated Jump, Break, Place buttons, touch-to-look camera controls, and subtle tactile haptic vibration feedback.
+- **Progressive Web App (PWA) & Fullscreen**:
+  - Installable to Home Screen on mobile and desktop as a standalone app.
+  - Automatically opens in immersive fullscreen mode (no browser address bars or navigation chrome).
+  - Offline gameplay via Service Worker asset caching.
+  - Dedicated fullscreen toggle button (`⛶`) on the HUD.
 - **Persistent Save System**: Automatically persists world modifications and player coordinates to browser `localStorage`.
 
 ## Running Locally

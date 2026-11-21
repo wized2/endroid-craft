@@ -1,8 +1,15 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#87ceeb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Endroid Craft">
 <title>Endroid Craft</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
 <style>
 html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font-family:system-ui,-apple-system,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 canvas{display:block;touch-action:none}
@@ -17,15 +24,31 @@ canvas{display:block;touch-action:none}
 .slot{width:min(44px,10.5vw);height:min(44px,10.5vw);border:3px solid #555;background:rgba(0,0,0,.4);box-sizing:border-box;border-radius:4px;padding:2px;cursor:pointer}
 .slot.sel{border-color:#fff;transform:scale(1.12)}
 .slot i{display:block;width:100%;height:100%}
-#joy,#btns,#pause,#snd{display:none;position:fixed;z-index:3}
+#joy,#btns,#pause,#snd,#fs{display:none;position:fixed;z-index:3}
 .touch #joy{display:block;left:24px;bottom:84px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.35)}
 #knob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none}
 .touch #btns{display:block;right:14px;bottom:84px;width:170px;height:150px}
 #btns button{position:absolute;width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:14px;font-weight:700;touch-action:none}
 #bJump{right:0;bottom:0}#bBreak{right:76px;bottom:4px}#bPlace{right:34px;bottom:78px}
-#pause,#snd{display:block;top:10px;width:40px;height:40px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#pause,#snd,#fs{display:block;top:10px;width:40px;height:40px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 #pause{right:10px}
 #snd{right:58px}
+#fs{right:106px}
+#menu{position:fixed;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:5;padding:16px;box-sizing:border-box}
+#menu h1{font-size:clamp(32px,9vw,54px);margin:0 0 6px;letter-spacing:2px;text-shadow:3px 3px #000}
+#menu p{margin:4px 0;opacity:.85;font-size:14px;line-height:1.5}
+#menu button{font-size:20px;padding:12px 38px;border:3px solid #222;background:#7d7d7d;color:#fff;cursor:pointer;margin-top:16px;border-radius:0;box-shadow:inset -3px -3px #555,inset 3px 3px #aaa}
+#menu button:hover{background:#8c8cc0}
+#menu button.small{font-size:13px;padding:6px 16px;margin-top:10px;background:#5a3a3a}
+.desk{display:block}.touch .desk{display:none}.mob{display:none}.touch .mob{display:block}
+</style></head>
+<body>
+<div id="hud"><div id="cross"></div><div id="info"></div><div id="name"></div><div id="bar"></div></div>
+<div id="joy" class="ctl"><div id="knob"></div></div>
+<div id="btns" class="ctl"><button id="bJump" class="ctl">JUMP</button><button id="bBreak" class="ctl">BREAK</button><button id="bPlace" class="ctl">PLACE</button></div>
+<button id="fs" class="ctl" title="Fullscreen">⛶</button>
+<button id="snd" class="ctl" title="Toggle Sound">🔊</button>
+<button id="pause" class="ctl" title="Pause">&#9776;</button>
 #menu{position:fixed;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:5;padding:16px;box-sizing:border-box}
 #menu h1{font-size:clamp(32px,9vw,54px);margin:0 0 6px;letter-spacing:2px;text-shadow:3px 3px #000}
 #menu p{margin:4px 0;opacity:.85;font-size:14px;line-height:1.5}
@@ -466,8 +489,26 @@ addEventListener('mousemove',e=>{
  yaw-=e.movementX*.0022;pitch=Math.max(-1.55,Math.min(1.55,pitch-e.movementY*.0022));
 });
 document.addEventListener('pointerlockchange',()=>{if(touch)return;setRunning(document.pointerLockElement===renderer.domElement&&started)});
+function enterFullscreenAuto(){
+ const doc=document,el=doc.documentElement;
+ if(!doc.fullscreenElement&&!doc.webkitFullscreenElement){
+  if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});
+  else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
+ }
+}
+function toggleFullscreen(){
+ const doc=document,el=doc.documentElement;
+ if(!doc.fullscreenElement&&!doc.webkitFullscreenElement){
+  enterFullscreenAuto();
+ }else{
+  if(doc.exitFullscreen)doc.exitFullscreen().catch(()=>{});
+  else if(doc.webkitExitFullscreen)doc.webkitExitFullscreen();
+ }
+}
+$('#fs').addEventListener('pointerdown',e=>{e.stopPropagation();toggleFullscreen()});
+
 playBtn.addEventListener('click',()=>{
- initAudio();started=true;
+ initAudio();started=true;enterFullscreenAuto();
  if(touch)setRunning(true);else renderer.domElement.requestPointerLock();
 });
 $('#reset').addEventListener('click',()=>{if(confirm('Delete your saved world?')){try{localStorage.removeItem('endroid-craft-v1')}catch(e){}dirtySave=false;saveOff=true;location.reload()}});
@@ -567,5 +608,6 @@ function frame(now){
  if(ft>=.5){fps=Math.round(fc/ft);fc=0;ft=0;info.textContent=fps+' fps  |  '+Math.floor(P.x)+', '+Math.floor(P.y)+', '+Math.floor(P.z)}
 }
 requestAnimationFrame(frame);
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{})})}
 </script>
 </body></html>
