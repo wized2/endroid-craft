@@ -1,8 +1,15 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#87ceeb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Endroid Craft">
 <title>Endroid Craft</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
 <style>
 html,body{margin:0;height:100%;overflow:hidden;background:#87ceeb;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 canvas{display:block;touch-action:none}
@@ -19,7 +26,7 @@ canvas{display:block;touch-action:none}
 #air{color:#7cc7ff}
 body.creative #stats{display:none}
 #bar{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:3px;pointer-events:auto}
-.slot{position:relative;width:min(40px,8.6vw);height:min(40px,8.6vw);border:3px solid #4a4a4a;background:rgba(0,0,0,.45);box-sizing:border-box;border-radius:4px;cursor:pointer;transition:transform .08s}
+.slot{touch-action:manipulation;position:relative;width:min(40px,8.6vw);height:min(40px,8.6vw);border:3px solid #4a4a4a;background:rgba(0,0,0,.45);box-sizing:border-box;border-radius:4px;cursor:pointer;transition:transform .08s}
 .slot.sel{border-color:#fff;transform:scale(1.14)}
 .slot i{display:block;width:100%;height:100%;background-size:contain;background-repeat:no-repeat;background-position:center;image-rendering:pixelated}
 .slot.zero i{opacity:.3}
@@ -27,16 +34,16 @@ body.creative #stats{display:none}
 body.creative .slot b{display:none}
 #dmg{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center,rgba(200,0,0,0) 40%,rgba(200,0,0,.65) 100%);opacity:0}
 #wet{position:fixed;inset:0;z-index:1;pointer-events:none;background:rgba(20,80,160,.35);display:none}
-#joy,#btns,#pause,#snd,#craftBtn{display:none;position:fixed;z-index:3}
+#joy,#btns,#pause,#snd,#craftBtn,#fs{display:none;position:fixed;z-index:3;pointer-events:auto;touch-action:manipulation}
 .touch #joy{display:block;left:24px;bottom:100px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.35)}
 #knob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none}
 .touch #btns{display:block;right:14px;bottom:100px;width:170px;height:150px}
 #btns button{position:absolute;width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:14px;font-weight:700;touch-action:none}
 #bJump{right:0;bottom:0}#bBreak{right:76px;bottom:4px}#bPlace{right:34px;bottom:78px}
 #bDown{right:0;bottom:78px;display:none}
-#pause,#snd,#craftBtn{top:10px;width:40px;height:40px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#pause{right:10px}#snd{right:58px}#craftBtn{right:106px;display:none}
-.touch #craftBtn{display:flex}
+#pause,#snd,#craftBtn,#fs{top:10px;user-select:none;-webkit-user-select:none;width:40px;height:40px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#pause{right:10px}#snd{right:58px}#craftBtn{right:106px;display:none}#fs{right:106px}
+.touch #craftBtn{display:flex}.touch #fs{right:154px}
 .mc{font-size:18px;padding:10px 30px;border:3px solid #222;background:#7d7d7d;color:#fff;cursor:pointer;border-radius:0;box-shadow:inset -3px -3px #555,inset 3px 3px #aaa;margin:6px 4px 0}
 .mc:hover{background:#8c8cc0}.mc.sel{background:#4c8c4c}.mc.small{font-size:13px;padding:6px 16px;background:#5a3a3a}
 #menu{position:fixed;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:5;padding:16px;box-sizing:border-box}
@@ -59,6 +66,7 @@ body.creative .slot b{display:none}
 <div id="dmg"></div><div id="wet"></div>
 <div id="joy" class="ctl"><div id="knob"></div></div>
 <div id="btns" class="ctl"><button id="bJump" class="ctl">JUMP</button><button id="bBreak" class="ctl">BREAK</button><button id="bPlace" class="ctl">PLACE</button><button id="bDown" class="ctl">DOWN</button></div>
+<button id="fs" class="ctl" title="Fullscreen">⛶</button>
 <button id="snd" class="ctl" title="Sound">&#128266;</button>
 <button id="craftBtn" class="ctl" title="Craft">&#128296;</button>
 <button id="pause" class="ctl" title="Pause">&#9776;</button>
@@ -99,7 +107,7 @@ try{soundOn=localStorage.getItem('endroid-craft-snd')!=='0'}catch(e){}
 const sndBtn=$('#snd');
 function updateSndBtn(){sndBtn.textContent=soundOn?'\u{1F50A}':'\u{1F507}'}
 updateSndBtn();
-sndBtn.addEventListener('pointerdown',e=>{e.stopPropagation();soundOn=!soundOn;try{localStorage.setItem('endroid-craft-snd',soundOn?'1':'0')}catch(err){}updateSndBtn();if(soundOn)initAudio()});
+makeTouchBtn(sndBtn,()=>{soundOn=!soundOn;try{localStorage.setItem('endroid-craft-snd',soundOn?'1':'0')}catch(err){}updateSndBtn();if(soundOn)initAudio()});
 function initAudio(){if(!actx&&AudioCtx){try{actx=new AudioCtx()}catch(e){}}if(actx&&actx.state==='suspended')actx.resume().catch(()=>{})}
 function playTone(f,type,dur,g=.08,ef=null){
  if(!soundOn||!actx)return;
@@ -492,7 +500,7 @@ const bar=$('#bar');
 HB.forEach((b,i)=>{
  const s=document.createElement('div');s.className='slot';s.innerHTML='<i></i><b></b>';
  s.firstChild.style.backgroundImage='url('+icon(b)+')';
- s.addEventListener('pointerdown',e=>{e.stopPropagation();sel(i);vib(8)});
+ makeTouchBtn(s,()=>{sel(i);vib(8)});
  bar.appendChild(s);
 });
 function renderSlots(){
@@ -803,7 +811,7 @@ function closeCraft(){
  if(touch)setRunning(true);else renderer.domElement.requestPointerLock();
 }
 $('#craftClose').addEventListener('click',closeCraft);
-$('#craftBtn').addEventListener('pointerdown',e=>{e.stopPropagation();craftOpen?closeCraft():openCraft()});
+makeTouchBtn($('#craftBtn'),()=>{craftOpen?closeCraft():openCraft()});
 
 // ---------- input ----------
 let running=false,started=false;
@@ -841,7 +849,7 @@ document.addEventListener('pointerlockchange',()=>{
  else if(started&&running)setRunning(false,true);
 });
 playBtn.addEventListener('click',()=>{
- initAudio();started=true;
+ initAudio();started=true;enterFullscreenAuto();
  if(touch)setRunning(true);else renderer.domElement.requestPointerLock();
 });
 function setMode(m){mode=m;applyMode();sel(si);dirtySave=true;toast(m==='survival'?'Survival mode':'Creative mode',1200)}
@@ -850,7 +858,8 @@ $('#mCre').addEventListener('click',()=>setMode('creative'));
 $('#respawn').addEventListener('click',respawn);
 let saveOff=false;
 $('#reset').addEventListener('click',()=>{if(confirm('Delete your saved world and start a new one?')){try{localStorage.removeItem(SAVEKEY)}catch(e){}saveOff=true;location.reload()}});
-$('#pause').addEventListener('pointerdown',e=>{e.stopPropagation();setRunning(false);playBtn.textContent='Resume'});
+makeTouchBtn($('#pause'),()=>{setRunning(false);playBtn.textContent='Resume'});
+makeTouchBtn($('#fs'),()=>toggleFullscreen());
 // touch controls
 let joyId=null,lookId=null,lx0=0,ly0=0;
 const jEl=$('#joy'),kn=$('#knob');
@@ -865,9 +874,11 @@ addEventListener('touchstart',e=>{
  for(const t of e.changedTouches){
   const el=t.target&&t.target.closest?t.target:null;
   if(el&&el.closest('#joy')){joyId=t.identifier;updJoy(t)}
-  else if(running&&lookId===null&&!(el&&el.closest('.ctl'))&&!(el&&el.closest('#bar'))){lookId=t.identifier;lx0=t.clientX;ly0=t.clientY}
+  else if(el&&(el.closest('.ctl')||el.closest('#bar'))){}
+  else if(running&&lookId===null){lookId=t.identifier;lx0=t.clientX;ly0=t.clientY}
  }
- if(running&&!(e.target.closest&&e.target.closest('#bar')))e.preventDefault();
+ const isCtl=e.target&&e.target.closest&&(e.target.closest('.ctl')||e.target.closest('#bar'));
+ if(running&&!isCtl)e.preventDefault();
 },{passive:false});
 addEventListener('touchmove',e=>{
  for(const t of e.changedTouches){
@@ -878,7 +889,24 @@ addEventListener('touchmove',e=>{
 },{passive:false});
 function tend(e){for(const t of e.changedTouches){if(t.identifier===joyId){joyId=null;joy.fx=joy.fy=0;kn.style.transform=''}if(t.identifier===lookId)lookId=null}}
 addEventListener('touchend',tend);addEventListener('touchcancel',tend);
-function bind(id,down,up){const el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();initAudio();down()});for(const ev of['pointerup','pointerleave','pointercancel'])el.addEventListener(ev,()=>up&&up())}
+function makeTouchBtn(el,onDown,onUp){
+ if(!el)return;
+ el.addEventListener('touchstart',e=>{e.stopPropagation();initAudio();if(onDown)onDown()},{passive:true});
+ if(onUp){el.addEventListener('touchend',e=>{e.stopPropagation();onUp()},{passive:true});el.addEventListener('touchcancel',e=>{e.stopPropagation();onUp()},{passive:true})}
+ el.addEventListener('mousedown',e=>{if(e.button===0){e.stopPropagation();initAudio();if(onDown)onDown()}});
+ if(onUp){el.addEventListener('mouseup',e=>{e.stopPropagation();onUp()});el.addEventListener('mouseleave',()=>onUp())}
+}
+const bind=(id,down,up)=>makeTouchBtn($(id),down,up);
+function enterFullscreenAuto(){
+ const el=document.documentElement;
+ if(!document.fullscreenElement&&!document.webkitFullscreenElement){
+  if(el.requestFullscreen)el.requestFullscreen().catch(()=>{});else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
+ }
+}
+function toggleFullscreen(){
+ if(!document.fullscreenElement&&!document.webkitFullscreenElement)enterFullscreenAuto();
+ else if(document.exitFullscreen)document.exitFullscreen().catch(()=>{});else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+}
 bind('#bJump',()=>{K.Space=true;tapSpace()},()=>{K.Space=false});
 bind('#bDown',()=>{flyDown=true},()=>{flyDown=false});
 bind('#bBreak',()=>{held.brk=true;mineCd=0;atkCd=0},()=>{held.brk=false});
@@ -935,5 +963,6 @@ function frame(now){
  if(ft>=.5){fpsTxt=Math.round(fc/ft)+' fps  |  '+Math.floor(P.x)+', '+Math.floor(P.y)+', '+Math.floor(P.z);fc=0;ft=0;renderInfo()}
 }
 requestAnimationFrame(frame);
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{})})}
 </script>
 </body></html>

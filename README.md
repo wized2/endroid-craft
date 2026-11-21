@@ -26,6 +26,10 @@ A browser voxel survival game built with [Three.js](https://threejs.org/). One H
 | 1-9, 0 or scroll select block | Tap a hotbar slot |
 | E crafting, Esc pause | Hammer button, menu button |
 
+## Install & fullscreen
+- Installable as a PWA (manifest + service worker), opens fullscreen, works offline after the first load.
+- Fullscreen toggle button on the HUD.
+
 ## Run locally
 ```bash
 npx serve .
