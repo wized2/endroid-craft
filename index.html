@@ -537,18 +537,19 @@ function updJoy(t){
  kn.style.transform='translate('+Math.cos(a)*m*mx*.7+'px,'+Math.sin(a)*m*mx*.7+'px)';
 }
 
-// Window-level touchstart: only handle joystick and camera look.
-// Buttons have their own passive touchstart handlers above with stopPropagation.
+// Window-level touchstart: handle joystick and camera look.
+// Buttons have their own passive touchstart handlers (with stopPropagation) above.
 addEventListener('touchstart',e=>{
  initAudio();
  for(const t of e.changedTouches){
   const el=t.target&&t.target.closest?t.target:null;
-  // Skip .ctl elements (buttons, joy, etc) and #bar (hotbar)
-  if(el&&(el.closest('.ctl')||el.closest('#bar')))continue;
+  // Joy must be checked FIRST (it also has class ctl)
   if(el&&el.closest('#joy')){joyId=t.identifier;updJoy(t)}
+  // Skip other .ctl buttons and the hotbar (they handle themselves)
+  else if(el&&(el.closest('.ctl')||el.closest('#bar'))){/* handled by makeTouchBtn / slot handlers */}
   else if(running&&lookId===null){lookId=t.identifier;lx0=t.clientX;ly0=t.clientY}
  }
- // Only preventDefault for non-ctl touches to prevent scroll
+ // preventDefault only for non-ctl, non-bar touches (suppress scroll/zoom on canvas)
  const isCtl=e.target&&e.target.closest&&(e.target.closest('.ctl')||e.target.closest('#bar'));
  if(running&&!isCtl)e.preventDefault();
 },{passive:false});
