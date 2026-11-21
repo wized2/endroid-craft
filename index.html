@@ -24,16 +24,16 @@ canvas{display:block;touch-action:none}
 .slot{width:min(44px,10.5vw);height:min(44px,10.5vw);border:3px solid #555;background:rgba(0,0,0,.4);box-sizing:border-box;border-radius:4px;padding:2px;cursor:pointer}
 .slot.sel{border-color:#fff;transform:scale(1.12)}
 .slot i{display:block;width:100%;height:100%}
-#joy,#btns,#pause,#snd,#fs{display:none;position:fixed;z-index:3}
-.touch #joy{display:block;left:24px;bottom:84px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.35)}
+#joy,#btns{display:none;position:fixed;z-index:10;pointer-events:auto}
+.touch #joy{display:block;left:24px;bottom:84px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.35);touch-action:none}
 #knob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none}
-.touch #btns{display:block;right:14px;bottom:84px;width:170px;height:150px}
-#btns button{position:absolute;width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:14px;font-weight:700;touch-action:none}
+.touch #btns{display:block;right:14px;bottom:84px;width:170px;height:150px;pointer-events:auto}
+#btns button{position:absolute;width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:14px;font-weight:700;touch-action:none;pointer-events:auto;user-select:none;-webkit-user-select:none}
 #bJump{right:0;bottom:0}#bBreak{right:76px;bottom:4px}#bPlace{right:34px;bottom:78px}
-#pause,#snd,#fs{display:block;top:10px;width:40px;height:40px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#pause,#snd,#fs{display:flex;position:fixed;top:10px;width:42px;height:42px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;align-items:center;justify-content:center;cursor:pointer;touch-action:none;pointer-events:auto;user-select:none;-webkit-user-select:none;z-index:10}
 #pause{right:10px}
-#snd{right:58px}
-#fs{right:106px}
+#snd{right:60px}
+#fs{right:110px}
 #menu{position:fixed;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:5;padding:16px;box-sizing:border-box}
 #menu h1{font-size:clamp(32px,9vw,54px);margin:0 0 6px;letter-spacing:2px;text-shadow:3px 3px #000}
 #menu p{margin:4px 0;opacity:.85;font-size:14px;line-height:1.5}
@@ -100,11 +100,26 @@ const FACES=[
 const AudioCtx=window.AudioContext||window.webkitAudioContext;
 let actx=null,soundOn=true;
 try{soundOn=localStorage.getItem('endroid-craft-snd')!=='0'}catch(e){}
+function bindAction(el,fn){
+ if(!el)return;
+ let last=0;
+ function handle(e){
+  if(e){e.preventDefault();e.stopPropagation()}
+  const now=performance.now();
+  if(now-last<120)return;
+  last=now;
+  initAudio();
+  fn();
+ }
+ el.addEventListener('pointerdown',handle);
+ el.addEventListener('touchstart',handle,{passive:false});
+ el.addEventListener('click',handle);
+}
 const sndBtn=$('#snd');
 function updateSndBtn(){sndBtn.textContent=soundOn?'🔊':'🔇'}
 updateSndBtn();
-sndBtn.addEventListener('pointerdown',e=>{
- e.stopPropagation();soundOn=!soundOn;
+bindAction(sndBtn,()=>{
+ soundOn=!soundOn;
  try{localStorage.setItem('endroid-craft-snd',soundOn?'1':'0')}catch(err){}
  updateSndBtn();if(soundOn)initAudio();
 });
@@ -448,7 +463,7 @@ const css=a=>'rgb('+a.map(v=>v*255|0)+')';
 HB.forEach((b,i)=>{
  const s=document.createElement('div');s.className='slot';const c=BC[b];
  s.innerHTML='<i style="background:linear-gradient('+css(c.t)+' 0 30%,'+css(c.s)+' 30%)"></i>';
- s.addEventListener('pointerdown',e=>{e.stopPropagation();sel(i);vib(8)});
+ bindAction(s,()=>{sel(i);vib(8)});
  bar.appendChild(s);
 });
 function sel(i){
@@ -505,14 +520,14 @@ function toggleFullscreen(){
   else if(doc.webkitExitFullscreen)doc.webkitExitFullscreen();
  }
 }
-$('#fs').addEventListener('pointerdown',e=>{e.stopPropagation();toggleFullscreen()});
+bindAction($('#fs'),()=>toggleFullscreen());
 
 playBtn.addEventListener('click',()=>{
  initAudio();started=true;enterFullscreenAuto();
  if(touch)setRunning(true);else renderer.domElement.requestPointerLock();
 });
 $('#reset').addEventListener('click',()=>{if(confirm('Delete your saved world?')){try{localStorage.removeItem('endroid-craft-v1')}catch(e){}dirtySave=false;saveOff=true;location.reload()}});
-$('#pause').addEventListener('pointerdown',e=>{e.stopPropagation();setRunning(false);playBtn.textContent='Resume'});
+bindAction($('#pause'),()=>{setRunning(false);playBtn.textContent='Resume'});
 
 // touch controls
 let joyId=null,lookId=null,lx0=0,ly0=0;
@@ -525,12 +540,13 @@ function updJoy(t){
 }
 addEventListener('touchstart',e=>{
  initAudio();
+ const isCtl=e.target&&e.target.closest&&(e.target.closest('.ctl')||e.target.closest('#bar'));
  for(const t of e.changedTouches){
   const el=t.target&&t.target.closest?t.target:null;
   if(el&&el.closest('#joy')){joyId=t.identifier;updJoy(t)}
-  else if(running&&lookId===null&&!(el&&el.closest('.ctl'))&&!(el&&el.closest('#bar'))){lookId=t.identifier;lx0=t.clientX;ly0=t.clientY}
+  else if(running&&lookId===null&&!isCtl){lookId=t.identifier;lx0=t.clientX;ly0=t.clientY}
  }
- if(running&&!(e.target.closest&&e.target.closest('#bar')))e.preventDefault();
+ if(running&&!isCtl)e.preventDefault();
 },{passive:false});
 addEventListener('touchmove',e=>{
  for(const t of e.changedTouches){
@@ -541,7 +557,28 @@ addEventListener('touchmove',e=>{
 },{passive:false});
 function tend(e){for(const t of e.changedTouches){if(t.identifier===joyId){joyId=null;joy.fx=joy.fy=0;kn.style.transform=''}if(t.identifier===lookId)lookId=null}}
 addEventListener('touchend',tend);addEventListener('touchcancel',tend);
-function bind(id,down,up){const el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();initAudio();down()});for(const ev of['pointerup','pointerleave','pointercancel'])el.addEventListener(ev,()=>up&&up())}
+function bind(id,down,up){
+ const el=$(id);
+ if(!el)return;
+ let lastDown=0;
+ function handleDown(e){
+  if(e){e.preventDefault();e.stopPropagation()}
+  const now=performance.now();
+  if(now-lastDown<80)return;
+  lastDown=now;
+  initAudio();
+  down();
+ }
+ function handleUp(e){
+  if(e){e.preventDefault();e.stopPropagation()}
+  if(up)up();
+ }
+ el.addEventListener('pointerdown',handleDown);
+ el.addEventListener('touchstart',handleDown,{passive:false});
+ for(const ev of ['pointerup','pointercancel','pointerleave','touchend','touchcancel']){
+  el.addEventListener(ev,handleUp,{passive:false});
+ }
+}
 bind('#bJump',()=>{K.Space=true},()=>{K.Space=false});
 bind('#bBreak',()=>{held.brk=true;breakCd=.22;doBreak()},()=>{held.brk=false});
 bind('#bPlace',()=>doPlace());
