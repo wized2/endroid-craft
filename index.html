@@ -20,17 +20,17 @@ canvas{display:block;touch-action:none}
 #cross:after{top:8px;left:0;height:2px;width:18px}
 #info{position:absolute;left:8px;top:6px;color:#fff;font-size:12px;text-shadow:1px 1px 2px #000}
 #name{position:absolute;bottom:68px;width:100%;text-align:center;color:#fff;font-size:16px;font-weight:600;text-shadow:2px 2px 3px #000;opacity:0;transition:opacity .4s}
-#bar{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:4px;pointer-events:auto}
-.slot{width:min(44px,10.5vw);height:min(44px,10.5vw);border:3px solid #555;background:rgba(0,0,0,.4);box-sizing:border-box;border-radius:4px;padding:2px;cursor:pointer}
+#bar{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:4px;pointer-events:auto;touch-action:manipulation}
+.slot{width:min(44px,10.5vw);height:min(44px,10.5vw);border:3px solid #555;background:rgba(0,0,0,.4);box-sizing:border-box;border-radius:4px;padding:2px;cursor:pointer;touch-action:manipulation;pointer-events:auto}
 .slot.sel{border-color:#fff;transform:scale(1.12)}
-.slot i{display:block;width:100%;height:100%}
+.slot i{display:block;width:100%;height:100%;pointer-events:none}
 #joy,#btns{display:none;position:fixed;z-index:10;pointer-events:auto}
 .touch #joy{display:block;left:24px;bottom:84px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.35);touch-action:none}
 #knob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none}
 .touch #btns{display:block;right:14px;bottom:84px;width:170px;height:150px;pointer-events:auto}
-#btns button{position:absolute;width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:14px;font-weight:700;touch-action:none;pointer-events:auto;user-select:none;-webkit-user-select:none}
+#btns button{position:absolute;width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:14px;font-weight:700;touch-action:manipulation;pointer-events:auto;user-select:none;-webkit-user-select:none;cursor:pointer}
 #bJump{right:0;bottom:0}#bBreak{right:76px;bottom:4px}#bPlace{right:34px;bottom:78px}
-#pause,#snd,#fs{display:flex;position:fixed;top:10px;width:42px;height:42px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;align-items:center;justify-content:center;cursor:pointer;touch-action:none;pointer-events:auto;user-select:none;-webkit-user-select:none;z-index:10}
+#pause,#snd,#fs{display:flex;position:fixed;top:10px;width:42px;height:42px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;pointer-events:auto;user-select:none;-webkit-user-select:none;z-index:10}
 #pause{right:10px}
 #snd{right:60px}
 #fs{right:110px}
@@ -47,20 +47,6 @@ canvas{display:block;touch-action:none}
 <div id="joy" class="ctl"><div id="knob"></div></div>
 <div id="btns" class="ctl"><button id="bJump" class="ctl">JUMP</button><button id="bBreak" class="ctl">BREAK</button><button id="bPlace" class="ctl">PLACE</button></div>
 <button id="fs" class="ctl" title="Fullscreen">⛶</button>
-<button id="snd" class="ctl" title="Toggle Sound">🔊</button>
-<button id="pause" class="ctl" title="Pause">&#9776;</button>
-#menu{position:fixed;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:5;padding:16px;box-sizing:border-box}
-#menu h1{font-size:clamp(32px,9vw,54px);margin:0 0 6px;letter-spacing:2px;text-shadow:3px 3px #000}
-#menu p{margin:4px 0;opacity:.85;font-size:14px;line-height:1.5}
-#menu button{font-size:20px;padding:12px 38px;border:3px solid #222;background:#7d7d7d;color:#fff;cursor:pointer;margin-top:16px;border-radius:0;box-shadow:inset -3px -3px #555,inset 3px 3px #aaa}
-#menu button:hover{background:#8c8cc0}
-#menu button.small{font-size:13px;padding:6px 16px;margin-top:10px;background:#5a3a3a}
-.desk{display:block}.touch .desk{display:none}.mob{display:none}.touch .mob{display:block}
-</style></head>
-<body>
-<div id="hud"><div id="cross"></div><div id="info"></div><div id="name"></div><div id="bar"></div></div>
-<div id="joy" class="ctl"><div id="knob"></div></div>
-<div id="btns" class="ctl"><button id="bJump" class="ctl">JUMP</button><button id="bBreak" class="ctl">BREAK</button><button id="bPlace" class="ctl">PLACE</button></div>
 <button id="snd" class="ctl" title="Toggle Sound">🔊</button>
 <button id="pause" class="ctl" title="Pause">&#9776;</button>
 <div id="menu">
@@ -96,33 +82,10 @@ const FACES=[
 {n:[0,0,1],v:[[0,0,1],[1,0,1],[1,1,1],[0,1,1]],sh:.9},
 {n:[0,0,-1],v:[[1,0,0],[0,0,0],[0,1,0],[1,1,0]],sh:.7}];
 
-// ---------- audio (synthesized, zero external assets) ----------
+// ---------- audio ----------
 const AudioCtx=window.AudioContext||window.webkitAudioContext;
 let actx=null,soundOn=true;
 try{soundOn=localStorage.getItem('endroid-craft-snd')!=='0'}catch(e){}
-function bindAction(el,fn){
- if(!el)return;
- let last=0;
- function handle(e){
-  if(e){e.preventDefault();e.stopPropagation()}
-  const now=performance.now();
-  if(now-last<120)return;
-  last=now;
-  initAudio();
-  fn();
- }
- el.addEventListener('pointerdown',handle);
- el.addEventListener('touchstart',handle,{passive:false});
- el.addEventListener('click',handle);
-}
-const sndBtn=$('#snd');
-function updateSndBtn(){sndBtn.textContent=soundOn?'🔊':'🔇'}
-updateSndBtn();
-bindAction(sndBtn,()=>{
- soundOn=!soundOn;
- try{localStorage.setItem('endroid-craft-snd',soundOn?'1':'0')}catch(err){}
- updateSndBtn();if(soundOn)initAudio();
-});
 function initAudio(){
  if(!actx&&AudioCtx){try{actx=new AudioCtx()}catch(e){}}
  if(actx&&actx.state==='suspended'){actx.resume().catch(()=>{})}
@@ -160,6 +123,11 @@ function sfxStep(){playNoise(0.04,0.035,420)}
 function sfxSplash(){playNoise(0.25,0.12,900);playTone(220,'sine',0.15,0.06,120)}
 const vib=ms=>{if(touch&&navigator.vibrate)try{navigator.vibrate(ms)}catch(e){}};
 
+// Sound button — no preventDefault needed, just stopPropagation
+const sndBtn=$('#snd');
+function updateSndBtn(){sndBtn.textContent=soundOn?'🔊':'🔇'}
+updateSndBtn();
+
 // ---------- noise ----------
 function hash(x,z){let h=(Math.imul(x|0,374761393)+Math.imul(z|0,668265263))|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296}
 function vnoise(x,z){const xi=Math.floor(x),zi=Math.floor(z),xf=x-xi,zf=z-zi,u=xf*xf*(3-2*xf),v=zf*zf*(3-2*zf);const a=hash(xi,zi),b=hash(xi+1,zi),c=hash(xi,zi+1),d=hash(xi+1,zi+1);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v}
@@ -182,7 +150,7 @@ const matW=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opaci
 const dayC=new THREE.Color(0x87ceeb),nightC=new THREE.Color(0x070b1c),sky=new THREE.Color(),waterFogC=new THREE.Color(0x0e4368);
 const DAY=240;let clock=DAY*.1;
 
-// Celestial objects (Sun, Moon, Stars, Clouds)
+// Celestial objects
 const sun=new THREE.Mesh(new THREE.PlaneGeometry(16,16),new THREE.MeshBasicMaterial({color:0xfff2a0,side:THREE.DoubleSide}));
 const moon=new THREE.Mesh(new THREE.PlaneGeometry(12,12),new THREE.MeshBasicMaterial({color:0xd8e8ff,side:THREE.DoubleSide}));
 scene.add(sun);scene.add(moon);
@@ -463,7 +431,9 @@ const css=a=>'rgb('+a.map(v=>v*255|0)+')';
 HB.forEach((b,i)=>{
  const s=document.createElement('div');s.className='slot';const c=BC[b];
  s.innerHTML='<i style="background:linear-gradient('+css(c.t)+' 0 30%,'+css(c.s)+' 30%)"></i>';
- bindAction(s,()=>{sel(i);vib(8)});
+ // Hotbar slot touch — passive, no preventDefault
+ s.addEventListener('touchstart',e=>{e.stopPropagation();initAudio();sel(i);vib(8)},{passive:true});
+ s.addEventListener('mousedown',e=>{if(e.button===0){initAudio();sel(i);vib(8)}});
  bar.appendChild(s);
 });
 function sel(i){
@@ -520,16 +490,44 @@ function toggleFullscreen(){
   else if(doc.webkitExitFullscreen)doc.webkitExitFullscreen();
  }
 }
-bindAction($('#fs'),()=>toggleFullscreen());
+
+// ========== Button helpers ==========
+// makeTouchBtn: passive touchstart (no preventDefault) + mousedown
+// This ensures the window touchstart handler never suppresses these buttons.
+function makeTouchBtn(el,onDown,onUp){
+ if(!el)return;
+ el.addEventListener('touchstart',e=>{
+  e.stopPropagation();
+  initAudio();
+  if(onDown)onDown();
+ },{passive:true});
+ if(onUp){
+  el.addEventListener('touchend',e=>{e.stopPropagation();onUp();},{passive:true});
+  el.addEventListener('touchcancel',e=>{e.stopPropagation();onUp();},{passive:true});
+ }
+ el.addEventListener('mousedown',e=>{
+  if(e.button===0){e.stopPropagation();initAudio();if(onDown)onDown();}
+ });
+ if(onUp){
+  el.addEventListener('mouseup',e=>{e.stopPropagation();onUp();});
+ }
+}
+
+makeTouchBtn($('#fs'),()=>toggleFullscreen());
+makeTouchBtn($('#pause'),()=>{setRunning(false);playBtn.textContent='Resume'});
+makeTouchBtn(sndBtn,()=>{
+ soundOn=!soundOn;
+ try{localStorage.setItem('endroid-craft-snd',soundOn?'1':'0')}catch(err){}
+ updateSndBtn();if(soundOn)initAudio();
+});
 
 playBtn.addEventListener('click',()=>{
  initAudio();started=true;enterFullscreenAuto();
  if(touch)setRunning(true);else renderer.domElement.requestPointerLock();
 });
 $('#reset').addEventListener('click',()=>{if(confirm('Delete your saved world?')){try{localStorage.removeItem('endroid-craft-v1')}catch(e){}dirtySave=false;saveOff=true;location.reload()}});
-bindAction($('#pause'),()=>{setRunning(false);playBtn.textContent='Resume'});
 
-// touch controls
+// ---------- touch controls ----------
 let joyId=null,lookId=null,lx0=0,ly0=0;
 const jEl=$('#joy'),kn=$('#knob');
 function updJoy(t){
@@ -538,16 +536,23 @@ function updJoy(t){
  joy.fx=Math.cos(a)*mm;joy.fy=-Math.sin(a)*mm;
  kn.style.transform='translate('+Math.cos(a)*m*mx*.7+'px,'+Math.sin(a)*m*mx*.7+'px)';
 }
+
+// Window-level touchstart: only handle joystick and camera look.
+// Buttons have their own passive touchstart handlers above with stopPropagation.
 addEventListener('touchstart',e=>{
  initAudio();
- const isCtl=e.target&&e.target.closest&&(e.target.closest('.ctl')||e.target.closest('#bar'));
  for(const t of e.changedTouches){
   const el=t.target&&t.target.closest?t.target:null;
+  // Skip .ctl elements (buttons, joy, etc) and #bar (hotbar)
+  if(el&&(el.closest('.ctl')||el.closest('#bar')))continue;
   if(el&&el.closest('#joy')){joyId=t.identifier;updJoy(t)}
-  else if(running&&lookId===null&&!isCtl){lookId=t.identifier;lx0=t.clientX;ly0=t.clientY}
+  else if(running&&lookId===null){lookId=t.identifier;lx0=t.clientX;ly0=t.clientY}
  }
+ // Only preventDefault for non-ctl touches to prevent scroll
+ const isCtl=e.target&&e.target.closest&&(e.target.closest('.ctl')||e.target.closest('#bar'));
  if(running&&!isCtl)e.preventDefault();
 },{passive:false});
+
 addEventListener('touchmove',e=>{
  for(const t of e.changedTouches){
   if(t.identifier===joyId)updJoy(t);
@@ -555,33 +560,21 @@ addEventListener('touchmove',e=>{
  }
  if(running)e.preventDefault();
 },{passive:false});
+
 function tend(e){for(const t of e.changedTouches){if(t.identifier===joyId){joyId=null;joy.fx=joy.fy=0;kn.style.transform=''}if(t.identifier===lookId)lookId=null}}
 addEventListener('touchend',tend);addEventListener('touchcancel',tend);
-function bind(id,down,up){
- const el=$(id);
- if(!el)return;
- let lastDown=0;
- function handleDown(e){
-  if(e){e.preventDefault();e.stopPropagation()}
-  const now=performance.now();
-  if(now-lastDown<80)return;
-  lastDown=now;
-  initAudio();
-  down();
- }
- function handleUp(e){
-  if(e){e.preventDefault();e.stopPropagation()}
-  if(up)up();
- }
- el.addEventListener('pointerdown',handleDown);
- el.addEventListener('touchstart',handleDown,{passive:false});
- for(const ev of ['pointerup','pointercancel','pointerleave','touchend','touchcancel']){
-  el.addEventListener(ev,handleUp,{passive:false});
- }
-}
-bind('#bJump',()=>{K.Space=true},()=>{K.Space=false});
-bind('#bBreak',()=>{held.brk=true;breakCd=.22;doBreak()},()=>{held.brk=false});
-bind('#bPlace',()=>doPlace());
+
+// Action buttons: passive touchstart for DOWN, touchend for UP
+makeTouchBtn($('#bJump'),
+ ()=>{K.Space=true;vib(10)},
+ ()=>{K.Space=false}
+);
+makeTouchBtn($('#bBreak'),
+ ()=>{held.brk=true;breakCd=0.22;doBreak()},
+ ()=>{held.brk=false}
+);
+makeTouchBtn($('#bPlace'),()=>doPlace());
+
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()});
 
 // ---------- save ----------

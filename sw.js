@@ -1,4 +1,4 @@
-const CACHE_NAME = 'endroid-craft-v1';
+const CACHE_NAME = 'endroid-craft-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -22,6 +22,20 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Network-first for HTML pages so updates are instant
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+  // Cache-first for Three.js and assets
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
