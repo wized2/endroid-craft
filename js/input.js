@@ -7,6 +7,7 @@ function setRunning(v,showMenu=true){
  if(!v){held.brk=false;flyDown=false;for(const k in K)K[k]=false;joy.fx=joy.fy=0}else initAudio();
 }
 addEventListener('keydown',e=>{
+ if(e.target&&/^(TEXTAREA|INPUT)$/.test(e.target.tagName))return; // typing in the script console
  initAudio();
  if(e.code==='Escape'&&craftOpen){closeCraft();return}
  if(e.code==='KeyE'&&!e.repeat&&started){if(craftOpen)closeCraft();else if(running)openCraft();return}
@@ -15,7 +16,7 @@ addEventListener('keydown',e=>{
  if(e.code==='Space'&&!e.repeat&&running)tapSpace();
  if(e.code==='Space'||e.code.startsWith('Arrow'))e.preventDefault();
 });
-addEventListener('keyup',e=>{K[e.code]=false});
+addEventListener('keyup',e=>{if(e.target&&/^(TEXTAREA|INPUT)$/.test(e.target.tagName))return;K[e.code]=false});
 addEventListener('wheel',e=>{if(running)sel(si+(e.deltaY>0?1:-1))},{passive:true});
 addEventListener('contextmenu',e=>e.preventDefault());
 renderer.domElement.addEventListener('mousedown',e=>{
@@ -43,7 +44,12 @@ $('#mSurv').addEventListener('click',()=>setMode('survival'));
 $('#mCre').addEventListener('click',()=>setMode('creative'));
 $('#respawn').addEventListener('click',respawn);
 let saveOff=false;
-$('#reset').addEventListener('click',()=>{if(confirm('Delete your saved world and start a new one?')){try{localStorage.removeItem(SAVEKEY)}catch(e){}saveOff=true;location.reload()}});
+$('#reset').addEventListener('click',()=>{
+ const s=prompt('New world - this deletes your saved world.\nEnter a seed (number or word), or leave blank for random:','');
+ if(s===null)return;
+ try{localStorage.removeItem(SAVEKEY);localStorage.setItem('endroid-craft-nextseed',s)}catch(e){}
+ saveOff=true;location.reload();
+});
 makeTouchBtn($('#pause'),()=>{setRunning(false);playBtn.textContent='Resume'});
 makeTouchBtn($('#fs'),()=>toggleFullscreen());
 // touch controls

@@ -26,6 +26,11 @@ A browser voxel survival game built with [Three.js](https://threejs.org/). One H
 | 1-9, 0 or scroll select block | Tap a hotbar slot |
 | E crafting, Esc pause | Hammer button, menu button |
 
+## Script Console & seeds
+- Open with the `</>` button or the `` ` `` key. Run JS build scripts (`player()`, `setBlock`, `getB`, `fill`, `tp`, `await delay`, `log`).
+- 16 templates (house, castle, maze, dome...), plus your own saved presets. Ctrl+Enter runs.
+- "New world" asks for a seed (number or word). The seed shows in the info text.
+
 ## Install & fullscreen
 - Installable as a PWA (manifest + service worker), opens fullscreen, works offline after the first load.
 - Fullscreen toggle button on the HUD.
@@ -38,7 +43,7 @@ js/boot.js        entry: loads Three.js, then the files below IN ORDER (edit FIL
 js/icons.js       Lucide icons as inline SVG: ico('name', size) or <i data-icon="name">
 js/config.js      constants, saved state, inventory
 js/touch.js       touch/mouse button helper, fullscreen
-js/audio.js  noise.js  textures.js  scene.js  world.js
+js/templates.js  scripting.js  audio.js  noise.js  textures.js  scene.js  world.js
 js/hud.js  physics.js  player.js  mobs.js  interact.js  crafting.js
 js/input.js  save.js  main.js (game loop)
 ```

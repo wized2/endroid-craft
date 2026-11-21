@@ -1,9 +1,9 @@
-const CACHE_NAME = 'endroid-craft-v5';
+const CACHE_NAME = 'endroid-craft-v6';
 const ASSETS = [
   './',
   './index.html',
-  './css/base.css','./css/hud.css','./css/controls.css','./css/menus.css','./css/icons.css',
-  './js/boot.js','./js/icons.js','./js/config.js','./js/touch.js','./js/audio.js','./js/noise.js','./js/textures.js','./js/scene.js','./js/world.js','./js/hud.js','./js/physics.js','./js/player.js','./js/mobs.js','./js/interact.js','./js/crafting.js','./js/input.js','./js/save.js','./js/main.js',
+  './css/base.css','./css/hud.css','./css/controls.css','./css/menus.css','./css/icons.css','./css/script.css',
+  './js/boot.js','./js/icons.js','./js/config.js','./js/touch.js','./js/audio.js','./js/noise.js','./js/textures.js','./js/scene.js','./js/world.js','./js/hud.js','./js/physics.js','./js/player.js','./js/mobs.js','./js/interact.js','./js/crafting.js','./js/templates.js','./js/scripting.js','./js/input.js','./js/save.js','./js/main.js',
   './manifest.json',
   './icon.svg',
   'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'

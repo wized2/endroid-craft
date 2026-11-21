@@ -125,11 +125,15 @@ function drop(m){if(m){scene.remove(m);m.geometry.dispose()}}
 function rebuild(c){drop(c.mO);drop(c.mW);drop(c.mG);const B=build(c);c.mO=mk(B[0],matO,c,0);c.mW=mk(B[1],matW,c,1);c.mG=mk(B[2],matG,c,2);c.dirty=false}
 function nbRebuild(cx,cz){const c=chunks.get(ck(cx,cz));if(c)rebuild(c)}
 let dirtySave=false;
-function setBlock(x,y,z,id){
+const lazyDirty=new Set();
+function flushChunks(){for(const c of lazyDirty)rebuild(c);lazyDirty.clear()}
+function setBlock(x,y,z,id,lazy){
  const cx=x>>4,cz=z>>4,c=chunks.get(ck(cx,cz));if(!c||y<0||y>=H)return;
  const lx=x&15,lz=z&15,i=lx+CS*(lz+CS*y);c.d[i]=id;
  if(y+1>c.top)c.top=Math.min(H-1,y+1);
  let m=edits.get(ck(cx,cz));if(!m){m=new Map();edits.set(ck(cx,cz),m)}m.set(i,id);dirtySave=true;
+ if(lazy){lazyDirty.add(c);const nb=(a,b)=>{const n=chunks.get(ck(a,b));if(n)lazyDirty.add(n)};
+  if(lx===0)nb(cx-1,cz);if(lx===15)nb(cx+1,cz);if(lz===0)nb(cx,cz-1);if(lz===15)nb(cx,cz+1);return}
  rebuild(c);
  if(lx===0)nbRebuild(cx-1,cz);if(lx===15)nbRebuild(cx+1,cz);if(lz===0)nbRebuild(cx,cz-1);if(lz===15)nbRebuild(cx,cz+1);
 }

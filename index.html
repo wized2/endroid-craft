@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="css/controls.css">
 <link rel="stylesheet" href="css/menus.css">
 <link rel="stylesheet" href="css/icons.css">
+<link rel="stylesheet" href="css/script.css">
 </head>
 <body>
 <body>
@@ -27,6 +28,17 @@
 <button id="snd" class="ctl" title="Sound"></button>
 <button id="craftBtn" class="ctl" title="Craft"><i data-icon="hammer"></i></button>
 <button id="pause" class="ctl" title="Pause"><i data-icon="menu"></i></button>
+<button id="scr-btn" class="ctl" title="Script console (`)"><i data-icon="terminal"></i></button>
+<div id="scr-panel"><div class="box">
+<h2><span><i data-icon="terminal" data-size="18"></i> Script Console</span><button id="scr-close"><i data-icon="x" data-size="14"></i> Close</button></h2>
+<div id="scr-examples"><button data-tpl="house">House</button><button data-tpl="pyramid">Pyramid</button><button data-tpl="sphere">Sphere</button><button data-tpl="tower">Tower</button><button data-tpl="castle">Castle</button><button data-tpl="fill">Box</button><button data-tpl="flatten">Flatten</button><button data-tpl="checkers">Checkers</button><button data-tpl="bridge">Bridge</button><button data-tpl="spiral">Spiral</button><button data-tpl="dome">Dome</button><button data-tpl="maze">Maze</button><button data-tpl="wall">Wall</button><button data-tpl="trees">Forest</button><button data-tpl="pool">Pool</button><button data-tpl="clear">Clear</button></div>
+<div id="scr-presets"></div>
+<textarea id="scr-textarea" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="// pick a template above or write your own&#10;const p = player();&#10;setBlock(p.x, p.y+3, p.z, 8);"></textarea>
+<div id="scr-bar"><button id="scr-run"><i data-icon="play" data-size="14"></i> Run</button><button id="scr-stop"><i data-icon="square" data-size="14"></i> Stop</button><button id="scr-save"><i data-icon="save" data-size="14"></i> Save preset</button></div>
+<div id="scr-progress"><div id="scr-progress-bar"></div></div>
+<pre id="scr-status">Ready.</pre>
+<div id="scr-help">player() setBlock(x,y,z,id) getB(x,y,z) fill(x1,y1,z1,x2,y2,z2,id) tp(x,y,z) await delay(ms) log(msg) - ids: 1 grass 2 dirt 3 stone 4 log 5 leaves 6 sand 7 planks 8 brick 9 water 10 glass 11 snow 12 coal 13 gold 0 air. Ctrl+Enter runs, ` toggles.</div>
+</div></div>
 <div id="craft"><div class="box"><h2><i data-icon="hammer" data-size="20"></i> Crafting</h2><div id="recs"></div><div style="text-align:center"><button class="mc small" id="craftClose" style="background:#555"><i data-icon="x" data-size="14"></i> Close (E)</button></div></div></div>
 <div id="death"><h1><i data-icon="skull" data-size="44"></i> YOU DIED</h1><p>Your items are safe.</p><button class="mc" id="respawn">Respawn</button></div>
 <div id="menu">
@@ -36,6 +48,7 @@
 <p class="desk">WASD move &bull; Space jump / swim &bull; Shift sprint<br>Hold left click mine / attack &bull; Right click place<br>1-9, 0 or scroll pick block &bull; E craft &bull; Esc pause<br>Creative: double-tap Space to fly (Shift = down)</p>
 <p class="mob">Left stick move (push far to sprint) &bull; Drag right side to look<br>Hold BREAK to mine / attack &bull; PLACE to build &bull; hammer = crafting<br>Creative: double-tap JUMP to fly</p>
 <button class="mc" id="play">Loading...</button>
+<button class="mc small" id="scr-menu"><i data-icon="terminal" data-size="14"></i> Script console</button>
 <button class="mc small" id="reset"><i data-icon="rotate-ccw" data-size="14"></i> New world</button>
 </div>
 <script src="js/icons.js"></script>

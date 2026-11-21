@@ -2,6 +2,11 @@
 // Add one: paste the inner SVG elements (no <svg> wrapper) into ICONS below.
 // Use: ico('name',size) -> SVG string, or <i data-icon="name"></i> in HTML (see hydrateIcons).
 const ICONS={
+ 'terminal':"<polyline points='4 17 10 11 4 5'/> <line x1='12' x2='20' y1='19' y2='19'/>",
+ 'play':"<polygon points='6 3 20 12 6 21 6 3'/>",
+ 'save':"<path d='M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z'/> <path d='M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7'/> <path d='M7 3v4a1 1 0 0 0 1 1h7'/>",
+ 'trash-2':"<path d='M3 6h18'/> <path d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6'/> <path d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2'/> <line x1='10' x2='10' y1='11' y2='17'/> <line x1='14' x2='14' y1='11' y2='17'/>",
+ 'dices':"<rect width='12' height='12' x='2' y='10' rx='2' ry='2'/> <path d='m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6'/> <path d='M6 18h.01'/> <path d='M10 14h.01'/> <path d='M15 6h.01'/> <path d='M18 9h.01'/>",
  'volume-2':"<path d='M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z'/> <path d='M16 9a5 5 0 0 1 0 6'/> <path d='M19.364 18.364a9 9 0 0 0 0-12.728'/>",
  'volume-x':"<path d='M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z'/> <line x1='22' x2='16' y1='9' y2='15'/> <line x1='16' x2='22' y1='9' y2='15'/>",
  'maximize':"<path d='M8 3H5a2 2 0 0 0-2 2v3'/> <path d='M21 8V5a2 2 0 0 0-2-2h-3'/> <path d='M3 16v3a2 2 0 0 0 2 2h3'/> <path d='M16 21h3a2 2 0 0 0 2-2v-3'/>",
