@@ -1,0 +1,11 @@
+/* touch controls + top-right buttons */
+#joy,#btns,#pause,#snd,#craftBtn,#fs{display:none;position:fixed;z-index:3;pointer-events:auto;touch-action:manipulation}
+.touch #joy{display:block;left:24px;bottom:100px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.35)}
+#knob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:rgba(255,255,255,.45);pointer-events:none}
+.touch #btns{display:block;right:14px;bottom:100px;width:170px;height:150px}
+#btns button{position:absolute;width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:14px;font-weight:700;touch-action:none}
+#bJump{right:0;bottom:0}#bBreak{right:76px;bottom:4px}#bPlace{right:34px;bottom:78px}
+#bDown{right:0;bottom:78px;display:none}
+#pause,#snd,#craftBtn,#fs{top:10px;user-select:none;-webkit-user-select:none;width:40px;height:40px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#pause{right:10px}#snd{right:58px}#craftBtn{right:106px;display:none}#fs{right:106px}
+.touch #craftBtn{display:flex}.touch #fs{right:154px}

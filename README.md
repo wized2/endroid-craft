@@ -30,6 +30,22 @@ A browser voxel survival game built with [Three.js](https://threejs.org/). One H
 - Installable as a PWA (manifest + service worker), opens fullscreen, works offline after the first load.
 - Fullscreen toggle button on the HUD.
 
+## Project structure
+```
+index.html        markup only
+css/              base, hud, controls, menus, icons
+js/boot.js        entry: loads Three.js, then the files below IN ORDER (edit FILES to add one)
+js/icons.js       Lucide icons as inline SVG: ico('name', size) or <i data-icon="name">
+js/config.js      constants, saved state, inventory
+js/touch.js       touch/mouse button helper, fullscreen
+js/audio.js  noise.js  textures.js  scene.js  world.js
+js/hud.js  physics.js  player.js  mobs.js  interact.js  crafting.js
+js/input.js  save.js  main.js (game loop)
+```
+Files are classic scripts sharing one scope, so a file can use anything defined above it in `FILES`.
+To add a feature: create `js/yourfeature.js`, add it to `FILES` in `js/boot.js` and to `ASSETS` in `sw.js`.
+To add an icon: copy its inner SVG elements from [lucide.dev](https://lucide.dev) into `ICONS` in `js/icons.js`.
+
 ## Run locally
 ```bash
 npx serve .

@@ -1,7 +1,9 @@
-const CACHE_NAME = 'endroid-craft-v4';
+const CACHE_NAME = 'endroid-craft-v5';
 const ASSETS = [
   './',
   './index.html',
+  './css/base.css','./css/hud.css','./css/controls.css','./css/menus.css','./css/icons.css',
+  './js/boot.js','./js/icons.js','./js/config.js','./js/touch.js','./js/audio.js','./js/noise.js','./js/textures.js','./js/scene.js','./js/world.js','./js/hud.js','./js/physics.js','./js/player.js','./js/mobs.js','./js/interact.js','./js/crafting.js','./js/input.js','./js/save.js','./js/main.js',
   './manifest.json',
   './icon.svg',
   'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'
@@ -35,9 +37,11 @@ self.addEventListener('fetch', event => {
     );
     return;
   }
-  // Cache-first for Three.js and assets
+  // Own files (js/css): network-first so edits show up, cache as offline fallback.
+  // Three.js (cross-origin, versioned): cache-first.
+  const own = new URL(event.request.url).origin === location.origin;
   event.respondWith(
-    caches.match(event.request).then(cached => {
+    (own ? Promise.resolve(null) : caches.match(event.request)).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(response => {
         if (response && response.status === 200 && event.request.method === 'GET') {
@@ -45,7 +49,7 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return response;
-      }).catch(() => caches.match('./index.html'));
+      }).catch(() => caches.match(event.request).then(c => c || caches.match('./index.html')));
     })
   );
 });
