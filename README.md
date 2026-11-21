@@ -1,32 +1,35 @@
 # Endroid Craft
 
-A lightweight, browser-based 3D voxel sandbox game built with [Three.js](https://threejs.org/).
+A browser voxel survival game built with [Three.js](https://threejs.org/). One HTML file, no build step, plays on desktop and phone.
 
-## Features
-- **3D Voxel World**: Procedural chunks and blocks (Grass, Dirt, Stone, Wood, Leaves, Sand, Planks, Brick, Water).
-- **Smooth Step Climbing (Auto-Step)**: Effortlessly walk up single-block height elevations without constant jumping.
-- **Dynamic Celestial Sky**:
-  - Orbiting Sun and Moon synchronized with the day/night cycle.
-  - Nighttime starfield that fades in smoothly at dusk.
-  - Drifting low-poly cloud layer.
-- **Underwater Immersion**: Deep blue underwater fog and lighting when the camera is submerged.
-- **Interactive First-Person Hand**:
-  - Displays the active held block in 3D.
-  - Walking bobbing motion and satisfying swinging/punching animations when breaking or placing blocks.
-- **Block Break Particles**: Colorful voxel debris explodes outward and falls with physics when blocks are mined.
-- **Procedural Sound Effects (Web Audio API)**:
-  - Synthesized footsteps, jumping, block breaking, block placing, and water splashes (zero external sound files needed).
-  - Sound toggle button (`🔊` / `🔇`) in the HUD.
-- **Cross-Platform Controls & Haptics**:
-  - **Desktop**: WASD to move, Space to jump/swim, Shift to sprint, Mouse look, Left click to break, Right click to place, Number keys (1-8) or mouse scroll for hotbar selection.
-  - **Mobile / Touch**: Virtual joystick, dedicated Jump, Break, Place buttons, touch-to-look camera controls, and subtle tactile haptic vibration feedback.
-- **Persistent Save System**: Automatically persists world modifications and player coordinates to browser `localStorage`.
+## Gameplay
+- **Survival**: punch trees, craft planks, a stone pickaxe and a stone sword, mine ore, build a shelter before night. Hearts, fall damage, drowning, regeneration, death and respawn.
+- **Creative**: unlimited blocks, instant breaking, double-tap Space (or JUMP) to fly. No damage, no zombies.
+- **Mobs**: zombies spawn at night and burn at dawn. Pigs wander in the day and heal you when killed.
+- **Crafting** (`E` or the hammer button): planks, pickaxe, sword, bricks, glass (sand + coal), golden apple (3 gold, full heal).
+- **Mining with progress**: crack overlay, block hardness, tools speed things up. Blocks drop into your inventory.
 
-## Running Locally
-Just open `index.html` in any modern web browser or serve it with any local static HTTP server:
+## World
+- Infinite procedural terrain from a random seed: oceans, beaches, forests, mountains with snow caps.
+- Caves and tunnels, coal and gold ore, flowers and tall grass.
+- Pixel-art textures generated in code, ambient occlusion, darker caves, day/night cycle with sun, moon, stars and blocky clouds.
+- Procedural sound effects (Web Audio) and mobile haptics.
+- World, inventory and progress save automatically to `localStorage`.
+
+## Controls
+| Desktop | Mobile |
+|---|---|
+| WASD move, Space jump/swim, Shift sprint | Left stick move (push far to sprint) |
+| Mouse look | Drag the right side to look |
+| Hold left click mine / attack | Hold BREAK |
+| Right click place | PLACE |
+| 1-9, 0 or scroll select block | Tap a hotbar slot |
+| E crafting, Esc pause | Hammer button, menu button |
+
+## Run locally
 ```bash
 npx serve .
 ```
 
 ## Deployment
-Deployable directly to [Vercel](https://vercel.com/) as a static web application.
+Static site, deploys as-is on [Vercel](https://vercel.com/).
