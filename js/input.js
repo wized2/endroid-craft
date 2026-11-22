@@ -24,7 +24,11 @@ addEventListener('wheel',e=>{if(running)sel(si+(e.deltaY>0?1:-1))},{passive:true
 addEventListener('contextmenu',e=>e.preventDefault());
 renderer.domElement.addEventListener('mousedown',e=>{
  initAudio();if(!running)return;
- if(e.button===0){held.brk=true;mineCd=0;atkCd=0}else if(e.button===2)doPlace();
+ if(e.button===0){
+  held.brk=true;mineCd=0;atkCd=0;
+  if(!surv())creativeBreakOnce(); // creative: break on click, not only while held across frames
+ }else if(e.button===2)doPlace();
+ else if(e.button===1){e.preventDefault();pickBlock()} // middle-click pick block
 });
 addEventListener('mouseup',e=>{if(e.button===0)held.brk=false});
 addEventListener('mousemove',e=>{
@@ -42,7 +46,11 @@ playBtn.addEventListener('click',()=>{
  initAudio();started=true;enterFullscreenAuto();
  if(touch)setRunning(true);else renderer.domElement.requestPointerLock();
 });
-function setMode(m){mode=m;applyMode();sel(si);dirtySave=true;toast(m==='survival'?'Survival mode':'Creative mode',1200)}
+function setMode(m){
+ mode=m;applyMode();
+ if(!surv()){for(const id of HB)inv[id]=Math.max(inv[id],64);for(let i=1;i<=17;i++)if(i!==9)inv[i]=Math.max(inv[i]|0,64)}
+ sel(si);dirtySave=true;toast(m==='survival'?'Survival mode':'Creative mode — middle-click / long-press PLACE to pick blocks',2200)
+}
 $('#mSurv').addEventListener('click',()=>setMode('survival'));
 $('#mCre').addEventListener('click',()=>setMode('creative'));
 $('#respawn').addEventListener('click',respawn);
@@ -87,7 +95,16 @@ function tend(e){for(const t of e.changedTouches){if(t.identifier===joyId){joyId
 addEventListener('touchend',tend);addEventListener('touchcancel',tend);
 bind('#bJump',()=>{K.Space=true;tapSpace()},()=>{K.Space=false});
 bind('#bDown',()=>{flyDown=true},()=>{flyDown=false});
-bind('#bBreak',()=>{held.brk=true;mineCd=0;atkCd=0},()=>{held.brk=false});
-bind('#bPlace',()=>doPlace());
+bind('#bBreak',()=>{held.brk=true;mineCd=0;atkCd=0;if(!surv())creativeBreakOnce()},()=>{held.brk=false});
+(function(){
+ let placeTimer=0;
+ bind('#bPlace',()=>{
+  if(surv()){doPlace();return}
+  clearTimeout(placeTimer);
+  placeTimer=setTimeout(()=>{placeTimer=0;pickBlock()},450);
+ },()=>{
+  if(!surv()&&placeTimer){clearTimeout(placeTimer);placeTimer=0;doPlace()}
+ });
+})();
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()});
 

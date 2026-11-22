@@ -7,7 +7,7 @@ const isPlant=b=>b>=14&&b<=16;
 const SAVEKEY='endroid-craft-v2';
 let saved=null;try{saved=JSON.parse(localStorage.getItem(SAVEKEY))}catch(e){}
 const NAMES=['','Grass','Dirt','Stone','Log','Leaves','Sand','Planks','Brick','Water','Glass','Snow','Coal','Gold','Rose','Dandelion','Tall grass','Bed','Raw Porkchop','Cooked Porkchop','Raw Beef','Steak','Raw Mutton','Cooked Mutton','Apple','Rotten Flesh','Wool','Leather','Golden Apple'];
-const HARD=[0,.6,.5,1.5,2,.2,.5,2,2,0,.3,.2,3,3,.05,.05,.05,.2]; // Minecraft block hardness
+const HARD=[0,.6,.5,1.5,2,.2,.5,2,2,0,.3,.2,3,3,.05,.05,.05,.2,0,0,0,0,0,0,0,0,0,0,0,0]; // hardness by block id
 const HB=[1,2,3,4,5,6,7,8,10,11,17];
 let mode=(saved&&saved.mode==='creative')?'creative':'survival';
 const surv=()=>mode==='survival';

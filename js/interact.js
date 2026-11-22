@@ -18,21 +18,30 @@ function raycast(o,d,max){
 let target=null,hoverMob=null,mine=null,crackStage=-1,atkCd=0,mineCd=0,swingT=0,swing=0;
 const dir=new THREE.Vector3();
 function triggerSwing(){swing=1}
+// Aim from player look (yaw/pitch), not third-person camera offset
+function refreshAim(){
+ eye.set(P.x,P.y+EYE+bob,P.z);
+ const cp=Math.cos(pitch),sp=Math.sin(pitch),sy=Math.sin(yaw),cy=Math.cos(yaw);
+ dir.set(-sy*cp,sp,-cy*cp);
+}
 // what a block drops (Minecraft-like): glass/leaves/plants drop nothing, grass gives dirt, leaves 0.5% apple
 function dropOf(b){if(b===1)return 2;if(b===5)return Math.random()<.005?24:0;if(isPlant(b)||b===9||b===10)return 0;return b}
-// needs a pickaxe tier to drop anything: stone/brick/coal need wood (1), gold ore needs stone (2, no iron here)
+// needs a pickaxe tier to drop anything: stone/brick/coal need wood (1), gold ore needs stone (2)
 const NEEDPICK={3:1,8:1,12:1,13:2},AXEB={4:1,7:1,17:1};
 const TIERSPD=[1,2,4];
-// Minecraft break time: hardness*1.5/speed with the right tool, hardness*5/speed without
 function canHarvest(b){return !NEEDPICK[b]||tools.pick>=NEEDPICK[b]}
 function hardness(b){
- const h=HARD[b];let spd=1;
- if(NEEDPICK[b])spd=TIERSPD[tools.pick];else if(AXEB[b])spd=TIERSPD[tools.axe];
+ const h=(HARD[b]!=null)?HARD[b]:1;
+ let spd=1;
+ if(NEEDPICK[b])spd=TIERSPD[tools.pick]||1;else if(AXEB[b])spd=TIERSPD[tools.axe]||1;
  return Math.max(.05,h*(canHarvest(b)?1.5:5)/spd);
 }
 function breakBlock(h){
+ if(!h||h.b<=0)return false;
+ // creative: no bedrock-style lock except y<=0 world floor
+ if(h.y<=0)return false;
  triggerSwing();
- spawnParticles(h.x+.5,h.y+.5,h.z+.5,tileAvg[tileFor(h.b,4)],12);
+ spawnParticles(h.x+.5,h.y+.5,h.z+.5,tileAvg[tileFor(h.b,4)]||[.5,.5,.5],12);
  sfxBreak(h.b);vib(18);
  setBlock(h.x,h.y,h.z,0);
  if(surv()){
@@ -42,6 +51,7 @@ function breakBlock(h){
   if(dr){inv[dr]++;if(h.b===13)toast('Gold!',1200);renderSlots();renderInfo()}
  }
  const ab=getBlock(h.x,h.y+1,h.z);if(isPlant(ab))setBlock(h.x,h.y+1,h.z,0);
+ return true;
 }
 function drop(id,n){if(n<=0||!surv())return;inv[id]+=n}
 const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
@@ -71,6 +81,21 @@ function attack(m){
  if(m.type!=='z')m.flee=3;
  if(m.hp<=0)killMob(m);
 }
+// Instant creative break (Minecraft: one click destroys). Also used for held continuous break.
+function creativeBreakOnce(){
+ if(surv()||dead||!running)return false;
+ refreshAim();
+ // Prefer block under crosshair; only attack mobs if closer than the block
+ let bestMob=null,bestMt=REACH_M;
+ for(const m of mobs){const t=rayBox(eye,dir,m.x,m.y,m.z,m.w,m.h);if(t!==null&&t<bestMt){bestMt=t;bestMob=m}}
+ const t=raycast(eye,dir,REACH_B+.6);
+ if(bestMob&&(!t||bestMt<t.t)){if(atkCd<=0){attack(bestMob);atkCd=.25}return true}
+ if(!t||t.t>REACH_B||t.y<=0)return false;
+ const ok=breakBlock(t);
+ if(ok)mineCd=.12;
+ return ok;
+}
+// Survival/creative continuous mining while held.brk
 function interact(dt){
  atkCd-=dt;mineCd-=dt;swingT-=dt;
  hoverMob=null;let best=REACH_M;
@@ -78,9 +103,16 @@ function interact(dt){
  for(const m of mobs){const t=rayBox(eye,dir,m.x,m.y,m.z,m.w,m.h);if(t!==null&&t<best){best=t;hoverMob=m}}
  showMobHp(hoverMob);
  if(!held.brk){mine=null;crack.visible=false;return}
+ // Creative: instant break with small cooldown between blocks (hold to clear rows)
+ if(!surv()){
+  mine=null;crack.visible=false;
+  if(hoverMob&&(!target||hoverMob&&best<=(target?target.t:9))){if(atkCd<=0){attack(hoverMob);atkCd=.25}return}
+  if(!target||target.t>REACH_B||target.y<=0)return;
+  if(mineCd<=0){breakBlock(target);mineCd=.12}
+  return;
+ }
  if(hoverMob){mine=null;crack.visible=false;if(atkCd<=0){attack(hoverMob);atkCd=.45}return}
  if(!target||target.t>REACH_B||target.y<=0){mine=null;crack.visible=false;return}
- if(!surv()){if(mineCd<=0){breakBlock(target);mineCd=.2}return}
  if(!mine||mine.x!==target.x||mine.y!==target.y||mine.z!==target.z)mine={x:target.x,y:target.y,z:target.z,t:0,need:hardness(target.b)};
  mine.t+=dt;
  if(swingT<=0){triggerSwing();swingT=.3;sfxTick(target.b)}
@@ -101,4 +133,20 @@ function doPlace(){
  setBlock(x,y,z,id);
  if(surv()){inv[id]--;renderSlots();nameEl.textContent=NAMES[id]+' ×'+inv[id];nameEl.style.opacity=1;clearTimeout(nameT);nameT=setTimeout(()=>nameEl.style.opacity=0,1000)}
 }
-
+// Minecraft creative middle-click: pick the block you're looking at into the hotbar
+function pickBlock(){
+ if(dead||!running)return;
+ refreshAim();
+ const t=raycast(eye,dir,REACH_B+.6);
+ if(!t||t.b<=0||t.b===9)return;
+ const id=t.b===1?1:t.b; // keep grass as grass in creative
+ let idx=HB.indexOf(id);
+ if(idx<0){
+  // swap into selected hotbar slot
+  HB[si]=id;idx=si;
+  const slots=bar.children;if(slots[si])slots[si].querySelector('i').style.backgroundImage='url('+icon(id)+')';
+ }
+ if(!surv())inv[id]=Math.max(inv[id],64);
+ sel(idx);
+ toast(NAMES[id]||('Block '+id),800);
+}
