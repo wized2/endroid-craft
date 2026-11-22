@@ -55,7 +55,7 @@ function interact(dt){
  atkCd-=dt;mineCd-=dt;swingT-=dt;
  hoverMob=null;let best=3.6;
  if(target&&target.t<best)best=target.t;
- for(const m of mobs){const t=rayBox(camera.position,dir,m.x,m.y,m.z,m.w,m.h);if(t!==null&&t<best){best=t;hoverMob=m}}
+ for(const m of mobs){const t=rayBox(eye,dir,m.x,m.y,m.z,m.w,m.h);if(t!==null&&t<best){best=t;hoverMob=m}}
  if(!held.brk){mine=null;crack.visible=false;return}
  if(hoverMob){mine=null;crack.visible=false;if(atkCd<=0){attack(hoverMob);atkCd=.45}return}
  if(!target||target.t>5||target.y<=0){mine=null;crack.visible=false;return}

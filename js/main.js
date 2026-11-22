@@ -20,9 +20,8 @@ function frame(now){
  if(running){update(dt);clock+=dt;const dn=Math.floor(clock/DAY);if(dn!==lastDay){lastDay=dn;if(surv())toast('Day '+(dn+1)+' — you survived the night!',2600)}}
  updateChunks(touch?1:2);
 updateWeather(dt);
- camera.position.set(P.x,P.y+EYE+bob,P.z);camera.rotation.set(pitch,yaw,0);camera.updateMatrixWorld();
- camera.getWorldDirection(dir);
- target=raycast(camera.position,dir,5.5);
+ placeCamera(dt);
+ target=raycast(eye,dir,5.5);
  if(running){
   interact(dt);updateMobs(dt);spawnMobs(dt);
   if(P.onGround&&Math.hypot(P.vx,P.vz)>.3){}

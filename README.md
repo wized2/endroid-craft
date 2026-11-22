@@ -27,6 +27,7 @@ A browser voxel survival game built with [Three.js](https://threejs.org/). One H
 | E crafting, Esc pause | Hammer button, menu button |
 
 ## More
+- Player character with walk/swing animation. Switch camera view (first person / behind / front) with `V`, `F5` or the person button.
 - Rain showers with darker skies and soft rain sound.
 - Settings (menu): render distance, look sensitivity, FOV, volume, info text. Saved automatically.
 - Screenshot: F2 or the menu button.
@@ -50,7 +51,7 @@ js/icons.js       Lucide icons as inline SVG: ico('name', size) or <i data-icon=
 js/config.js      constants, saved state, inventory
 js/touch.js       touch/mouse button helper, fullscreen
 js/templates.js  scripting.js  weather.js  settings.js  audio.js  noise.js  textures.js  scene.js  world.js
-js/hud.js  physics.js  player.js  mobs.js  interact.js  crafting.js
+js/hud.js  physics.js  player.js  mobs.js  playermodel.js  interact.js  crafting.js
 js/input.js  save.js  main.js (game loop)
 ```
 Files are classic scripts sharing one scope, so a file can use anything defined above it in `FILES`.

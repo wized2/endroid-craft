@@ -9,3 +9,5 @@
 #pause,#snd,#craftBtn,#fs{top:10px;user-select:none;-webkit-user-select:none;width:40px;height:40px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}
 #pause{right:10px}#snd{right:58px}#craftBtn{right:106px;display:none}#fs{right:106px}
 .touch #craftBtn{display:flex}.touch #fs{right:154px}
+#viewBtn{display:flex;position:fixed;z-index:3;top:10px;right:202px;width:40px;height:40px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;align-items:center;justify-content:center;cursor:pointer;padding:0;pointer-events:auto;touch-action:manipulation}
+.touch #viewBtn{right:250px}
