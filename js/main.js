@@ -2,6 +2,14 @@
 // ---------- main loop ----------
 applyMode();renderAir();sel(0);
 updateChunks(40);
+// make sure the player starts somewhere sensible (not inside a tree / underwater / in rock)
+{
+ const inBlock=()=>solidB(getBlock(Math.floor(P.x),Math.floor(P.y+.5),Math.floor(P.z)))||solidB(getBlock(Math.floor(P.x),Math.floor(P.y+1.5),Math.floor(P.z)));
+ if(!(saved&&saved.spawn)||inBlock()){
+  const s=findSafeSpawn(P.x,P.z);
+  if(s){if(!(saved&&saved.spawn))spawn=s;P.x=s[0];P.y=s[1];P.z=s[2];P.vx=P.vy=P.vz=0;fallY=P.y}
+ }
+}
 playBtn.textContent='Play';
 setSky();renderInfo();
 let last=performance.now(),fc=0,ft=0,lastDay=Math.floor(clock/DAY);

@@ -162,6 +162,27 @@ function updateChunks(budget){
  for(const[x,z]of needed){const c=chunks.get(ck(x,z));if(c&&c.dirty){rebuild(c);if(++m>=budget)break}}
 }
 
+// ---------- safe spawn: open ground, not in/under trees, not in water ----------
+function surfaceY(x,z){for(let y=H-1;y>0;y--){const b=getBlock(x,y,z);if(b===-1)return -1;if(b!==0&&b<14&&b!==9&&b!==5)return y;if(b===9)return -2}return -1}
+function safeSpot(x,z){
+ const y=surfaceY(x,z);if(y<SEA+1)return null;
+ const t=getBlock(x,y,z);if(t!==1&&t!==2&&t!==6&&t!==11)return null;
+ for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++){
+  const yy=surfaceY(x+dx,z+dz);if(yy<0||Math.abs(yy-y)>1)return null;
+  for(let dy=1;dy<=7;dy++){const b=getBlock(x+dx,y+dy,z+dz);if(b===4||b===5||b===-1)return null}
+ }
+ return y;
+}
+function findSafeSpawn(cx,cz){
+ for(let r=0;r<=48;r+=1){
+  for(let dx=-r;dx<=r;dx++)for(let dz=-r;dz<=r;dz++){
+   if(Math.max(Math.abs(dx),Math.abs(dz))!==r)continue;
+   const x=Math.floor(cx)+dx,z=Math.floor(cz)+dz,y=safeSpot(x,z);
+   if(y!==null)return [x+.5,y+1.01,z+.5];
+  }
+ }
+ return null;
+}
 const FACES=[
 {n:[1,0,0],v:[[1,0,1],[1,0,0],[1,1,0],[1,1,1]]},
 {n:[-1,0,0],v:[[0,0,0],[0,0,1],[0,1,1],[0,1,0]]},
