@@ -56,6 +56,8 @@ function genChunk(cx,cz){
  }
  const e=edits.get(ck(cx,cz));if(e)for(const[i,v]of e)d[i]=v;
  chunks.set(ck(cx,cz),{cx,cz,d,hs,top:Math.min(H-1,topH+9),mO:null,mW:null,mG:null,dirty:true});
+ try{if(typeof tryGenVillage==='function')tryGenVillage(cx,cz)}catch(e){}
+
 }
 const AX=[[1,2],[1,2],[0,2],[0,2],[0,1],[0,1]];
 const SHD=[.82,.82,1,.55,.92,.72],AOV=[.5,.68,.84,1],E1=[0,0,0],E2=[0,0,0];

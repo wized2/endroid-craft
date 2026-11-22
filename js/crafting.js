@@ -3,6 +3,8 @@
 const tier=(k,l)=>({k,l});
 const RECIPES=[
  {ic:'layers',n:'Planks ×4',cost:{4:1},give(){inv[7]+=4}},
+ {ic:'drumstick',n:'Bread ×1',cost:{33:3},give(){inv[34]=(inv[34]|0)+1},note:'3 seeds of wheat → bread'},
+ {ic:'drumstick',n:'Bread ×4',cost:{33:10},give(){inv[34]=(inv[34]|0)+4},note:'Bake a loaf stack'},
  {ic:'pickaxe',n:'Wooden Pickaxe',cost:{7:5},tier:tier('pick',1),note:'Mines stone, coal'},
  {ic:'sword',n:'Wooden Sword',cost:{7:3},tier:tier('sword',1),note:'Damage 4'},
  {ic:'hammer',n:'Wooden Axe',cost:{7:5},tier:tier('axe',1),note:'Chops 2x faster'},

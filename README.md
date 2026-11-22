@@ -2,6 +2,12 @@
 
 A browser voxel survival game built with [Three.js](https://threejs.org/). One HTML file, no build step, plays on desktop and phone.
 
+### Villages & farming
+- Explore plains to find **villages** (houses, farms, paths)
+- **Villagers** — press PLACE to trade emeralds for goods
+- **Farming** — plant **seeds** on dirt/farmland, wait for wheat to grow, craft **bread**
+- Feed animals seeds/bread/carrots to **breed** them
+
 ## Gameplay
 - **Survival**: punch trees, craft planks, a stone pickaxe and a stone sword, mine ore, build a shelter before night. Hearts, fall damage, drowning, regeneration, death and respawn.
 - **Creative**: unlimited blocks, instant breaking, double-tap Space (or JUMP) to fly. No damage, no zombies.

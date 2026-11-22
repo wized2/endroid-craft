@@ -23,6 +23,16 @@ function makeMob(type,x,y,z){
   box(.7,.65,1,Wl,0,.9,0,g);box(.4,.4,.4,0xc9a98a,0,1.05,-.68,g);box(.44,.14,.44,Wl,0,1.3,-.66,g);
   box(.06,.06,.02,0x111111,-.1,1.08,-.89,g);box(.06,.06,.02,0x111111,.1,1.08,-.89,g);
   for(const[px,pz]of[[-.2,-.32],[.2,-.32],[-.2,.32],[.2,.32]])m.legs.push(limb(.18,.55,.18,0xcdb8a0,px,.55,pz,g));
+ }else if(type==='v'){
+  m.hp=20;m.w=.3;m.h=1.85;m.spd=1.15;m.prof='farmer';m.love=0;
+  box(.5,.75,.3,0x6b5344,0,1.1,0,g); // robe
+  box(.48,.48,.48,0xc49a6c,0,1.72,0,g); // head
+  box(.12,.2,.2,0xc49a6c,0,1.6,-.28,g); // nose
+  box(.08,.06,.02,0x2e8b57,-.12,1.78,-.24,g);box(.08,.06,.02,0x2e8b57,.12,1.78,-.24,g);
+  box(.52,.12,.52,0xc9a227,0,2.0,0,g); // straw hat brim
+  box(.36,.14,.36,0xd4b84a,0,2.08,0,g);
+  m.arms.push(limb(.18,.65,.18,0xc49a6c,-.34,1.42,0,g),limb(.18,.65,.18,0xc49a6c,.34,1.42,0,g));
+  m.legs.push(limb(.22,.7,.22,0x3d3d5c,-.12,.7,0,g),limb(.22,.7,.22,0x3d3d5c,.12,.7,0,g));
  }else{
   m.hp=10;m.w=.45;m.h=.9;m.spd=1.1;
   box(.55,.5,.9,0xf0a0a8,0,.6,0,g);box(.42,.4,.4,0xf0a0a8,0,.72,-.62,g);box(.22,.16,.1,0xdc8a94,0,.66,-.85,g);
@@ -32,6 +42,7 @@ function makeMob(type,x,y,z){
  m.maxhp=m.hp;
  g.position.set(x,y,z);scene.add(g);return m;
 }
+function spawnMob(type,x,y,z){const m=makeMob(type,x,y,z);mobs.push(m);return m}
 function removeMob(i){
  if(i<0)return;const m=mobs[i];scene.remove(m.g);
  m.g.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose()}});mobs.splice(i,1);
@@ -62,9 +73,10 @@ function spawnMobs(dt){
 function updateMobs(dt){
  for(let i=mobs.length-1;i>=0;i--){
   const m=mobs[i],dx=P.x-m.x,dz=P.z-m.z,dist=Math.hypot(dx,dz)||.001;
-  if(dist>64||(!surv()&&m.type==='z')){removeMob(i);continue}
+  if(dist>80||(!surv()&&m.type==='z')){removeMob(i);continue}
   if(getBlock(Math.floor(m.x),Math.floor(m.y),Math.floor(m.z))===-1)continue;
   m.hurt=Math.max(0,m.hurt-dt);m.cd-=dt;
+  if(m.baby&&m.grow!=null){m.grow-=dt;if(m.grow<=0){m.baby=false;m.g.scale.setScalar(1);m.hp=m.maxhp}}
   const ux=dx/dist,uz=dz/dist;let spd=0;
   if(m.type==='z'){
    if(dist<26&&dist>.9){m.dirx=ux;m.dirz=uz;spd=m.spd}else{m.dirx=m.dirz=0}
@@ -76,11 +88,19 @@ function updateMobs(dt){
    m.burn=dayK>.5;
    if(m.burn){m.hp-=2.5*dt;if(m.hp<=0){spawnParticles(m.x,m.y+1,m.z,[.3,.3,.3],8);removeMob(i);continue}}
    m.gT-=dt;if(m.gT<=0){m.gT=4+Math.random()*5;if(dist<20)sfxGroan(.07*(1-dist/20))}
+  }else if(m.type==='v'){
+   m.wt-=dt;m.love=Math.max(0,(m.love||0)-dt);
+   if(m.wt<=0){m.wt=2+Math.random()*3;if(Math.random()<.35){m.dirx=m.dirz=0}else{const a=Math.random()*6.28;m.dirx=Math.cos(a);m.dirz=Math.sin(a)}}
+   if(m.dirx||m.dirz)spd=m.spd;
+   // stay near home if set
+   if(m.home&&Math.hypot(m.x-m.home[0],m.z-m.home[2])>14){m.dirx=Math.sign(m.home[0]-m.x);m.dirz=Math.sign(m.home[2]-m.z);spd=m.spd}
   }else{
    m.wt-=dt;
    if(m.wt<=0){m.wt=2+Math.random()*4;if(Math.random()<.4){m.dirx=m.dirz=0}else{const a=Math.random()*6.28;m.dirx=Math.cos(a);m.dirz=Math.sin(a)}}
    if(m.flee>0){m.flee-=dt;m.dirx=-ux;m.dirz=-uz;spd=2.6}else if(m.dirx||m.dirz)spd=m.spd;
    m.gT-=dt;if(m.gT<=0){m.gT=6+Math.random()*8;if(dist<16)sfxOink()}
+   // breeding hearts
+   if(m.love>0){m.love-=dt;if(Math.random()<.05)spawnParticles(m.x,m.y+m.h,m.z,[1,.4,.6],2)}
   }
   const k=Math.min(1,dt*(m.onGround?8:2));
   if(m.hurt<.22){m.vx+=(m.dirx*spd-m.vx)*k;m.vz+=(m.dirz*spd-m.vz)*k}
@@ -96,6 +116,7 @@ function updateMobs(dt){
   m.ph+=hs*dt*4;
   const sw=Math.sin(m.ph)*Math.min(1,hs);
   if(m.type==='z'){m.legs[0].rotation.x=sw*.7;m.legs[1].rotation.x=-sw*.7;const ar=m.wind>0?2.4:1.45;m.arms[0].rotation.x=ar+Math.sin(m.ph*.5)*.08;m.arms[1].rotation.x=ar-Math.sin(m.ph*.5)*.08}
+  else if(m.type==='v'){m.legs[0].rotation.x=sw*.6;m.legs[1].rotation.x=-sw*.6;if(m.arms[0]){m.arms[0].rotation.x=sw*.3;m.arms[1].rotation.x=-sw*.3}}
   else{m.legs[0].rotation.x=m.legs[3].rotation.x=sw*.7;m.legs[1].rotation.x=m.legs[2].rotation.x=-sw*.7}
   m.g.position.set(m.x,m.y,m.z);m.g.rotation.y=m.yaw;
   const lm=Math.max(.35,L);
@@ -116,3 +137,30 @@ function rayBox(o,d,cx,cy,cz,hw,h){
  return tmin;
 }
 
+
+// Feed passive mobs (wheat 34? seeds 33 for chickens-we use pigs/cows/sheep with wheat bread or seeds)
+// Wheat item is harvested as bread ingredient; use seeds 33 or bread 34 or wheat-like: seeds work for all for simplicity
+function feedMob(m){
+ if(!m||m.type==='z'||m.type==='v')return false;
+ const id=HB[si];
+ if(id!==33&&id!==34&&id!==35)return false;
+ if(surv()&&inv[id]<=0)return false;
+ if(surv()){inv[id]--;renderSlots()}
+ m.love=8;
+ spawnParticles(m.x,m.y+m.h,m.z,[1,.45,.7],6);
+ // find nearby loved mate
+ for(const o of mobs){
+  if(o===m||o.type!==m.type||(o.love||0)<=0)continue;
+  if(Math.hypot(o.x-m.x,o.z-m.z)<3.5){
+   m.love=0;o.love=0;
+   const baby=makeMob(m.type,(m.x+o.x)/2,m.y,(m.z+o.z)/2);
+   baby.hp=Math.max(4,m.hp/2);baby.maxhp=baby.hp;baby.g.scale.setScalar(.55);
+   baby.baby=true;baby.grow=120; // seconds to adult
+   mobs.push(baby);
+   toast('A baby was born!',1400);vib(20);
+   return true;
+  }
+ }
+ toast('In love!',800);
+ return true;
+}

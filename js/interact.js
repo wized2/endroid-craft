@@ -38,8 +38,9 @@ function hardness(b){
 }
 function breakBlock(h){
  if(!h||h.b<=0)return false;
- // creative: no bedrock-style lock except y<=0 world floor
  if(h.y<=0)return false;
+ if(isCrop(h.b)){harvestCrop(h.x,h.y,h.z);triggerSwing();return true}
+
  triggerSwing();
  spawnParticles(h.x+.5,h.y+.5,h.z+.5,tileAvg[tileFor(h.b,4)]||[.5,.5,.5],12);
  sfxBreak(h.b);vib(18);
@@ -56,7 +57,8 @@ function breakBlock(h){
 function drop(id,n){if(n<=0||!surv())return;inv[id]+=n}
 const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 function killMob(m){
- if(m.type==='z'){
+ if(m.type==='v'){drop(37,1);toast('Villager dropped an emerald',1200)}
+ else if(m.type==='z'){
   kills++;if(m.big)bruteKills++;
   drop(25,m.big?rint(1,3):rint(0,2)); // rotten flesh
   if(Math.random()<(m.big?.1:.025)){inv[13]++;toast('Zombie dropped gold!')} // rare, like Minecraft's iron
@@ -67,6 +69,7 @@ function killMob(m){
  removeMob(mobs.indexOf(m));renderSlots();renderInfo();showMobHp(null);
 }
 function attack(m){
+ if(m.type==='v'){toast('Use PLACE to trade',1000);return}
  triggerSwing();
  // falling hit = critical (x1.5); sprint hit = extra knockback
  const crit=surv()&&!P.onGround&&P.vy<-1&&!inWater&&!fly;
@@ -122,7 +125,12 @@ function interact(dt){
  if(mine.t>=mine.need){const h={x:mine.x,y:mine.y,z:mine.z,b:getBlock(mine.x,mine.y,mine.z)};mine=null;crack.visible=false;if(h.b>0)breakBlock(h)}
 }
 function doPlace(){
- const h=target;if(!h||h.t>REACH_B+.2||dead)return;
+ const h=target;
+ // Trade with villager under crosshair
+ if(hoverMob&&hoverMob.type==='v'){openTrade(hoverMob);return}
+ if(hoverMob&&(hoverMob.type==='p'||hoverMob.type==='c'||hoverMob.type==='s')){if(feedMob(hoverMob))return}
+ if(!h||h.t>REACH_B+.2||dead)return;
+ if(typeof tryFarmUse==='function'&&tryFarmUse(h))return;
  if(getBlock(h.x,h.y,h.z)===17){useBed(h.x,h.y,h.z);return} // right-click a bed
  const id=HB[si];
  if(surv()&&inv[id]<=0){toast('No '+NAMES[id]+' left',900);return}

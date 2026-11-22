@@ -2,7 +2,7 @@
 // food 0-20 (10 drumsticks), saturation, exhaustion: at 4 exhaustion -> -1 saturation (or -1 food if none left).
 // food>=18: heal 1 HP / 4 s; food=20 with saturation: 1 HP / 0.5 s (each HP costs 6 exhaustion).
 // food=0: starvation 1 HP / 4 s down to half a heart. Sprint needs food > 6. Eating takes 1.6 s.
-const FOODS={18:[3,1.8],19:[8,12.8],20:[3,1.8],21:[8,12.8],22:[2,1.2],23:[6,9.6],24:[4,2.4],25:[4,.8],28:[4,9.6]}; // id:[hunger,saturation]
+const FOODS={18:[3,1.8],19:[8,12.8],20:[3,1.8],21:[8,12.8],22:[2,1.2],23:[6,9.6],24:[4,2.4],25:[4,.8],28:[4,9.6],34:[5,6],35:[3,3.6],36:[1,0.6]}; // bread, carrot, potato
 let starveT=0,eatT=0,eatId=0;
 const foodEl=$('#food'),eatBar=$('#eatbar'),eatFill=eatBar.querySelector('i');
 let lastFood=-1;
