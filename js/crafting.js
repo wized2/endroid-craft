@@ -3,26 +3,26 @@
 const tier=(k,l)=>({k,l});
 const RECIPES=[
  {ic:'layers',n:'Planks ×4',cost:{4:1},give(){inv[7]+=4}},
- {ic:'layers',n:'Sticks ×4',cost:{7:2},give(){inv[42]=(inv[42]|0)+4},note:'For torches & tools'},
- {ic:'flame',n:'Torch ×4',cost:{42:1,12:1},give(){inv[41]=(inv[41]|0)+4},note:'Stick + coal'},
- {ic:'box',n:'Chest',cost:{7:8},give(){inv[40]=(inv[40]|0)+1},note:'Store items'},
- {ic:'settings',n:'Furnace',cost:{3:8},give(){inv[39]=(inv[39]|0)+1},note:'Smelt food & ore'},
- {ic:'sword',n:'Shears',cost:{3:2},give(){inv[43]=(inv[43]|0)+1},note:'Shear sheep'},
- {ic:'drumstick',n:'Bread ×1',cost:{33:3},give(){inv[34]=(inv[34]|0)+1},note:'3 seeds of wheat → bread'},
- {ic:'drumstick',n:'Bread ×4',cost:{33:10},give(){inv[34]=(inv[34]|0)+4},note:'Bake a loaf stack'},
+ {ic:'stick',n:'Sticks ×4',cost:{7:2},give(){inv[42]=(inv[42]|0)+4},note:'For torches & tools'},
+ {ic:'torch',n:'Torch ×4',cost:{42:1,12:1},give(){inv[41]=(inv[41]|0)+4},note:'Stick + coal'},
+ {ic:'chest',n:'Chest',cost:{7:8},give(){inv[40]=(inv[40]|0)+1},note:'Store items'},
+ {ic:'furnace',n:'Furnace',cost:{3:8},give(){inv[39]=(inv[39]|0)+1},note:'Smelt food & ore'},
+ {ic:'shears',n:'Shears',cost:{3:2},give(){inv[43]=(inv[43]|0)+1},note:'Shear sheep'},
+ {ic:'bread',n:'Bread ×1',cost:{33:3},give(){inv[34]=(inv[34]|0)+1},note:'3 seeds of wheat → bread'},
+ {ic:'bread',n:'Bread ×4',cost:{33:10},give(){inv[34]=(inv[34]|0)+4},note:'Bake a loaf stack'},
  {ic:'pickaxe',n:'Wooden Pickaxe',cost:{7:5},tier:tier('pick',1),note:'Mines stone, coal'},
  {ic:'sword',n:'Wooden Sword',cost:{7:3},tier:tier('sword',1),note:'Damage 4'},
- {ic:'hammer',n:'Wooden Axe',cost:{7:5},tier:tier('axe',1),note:'Chops 2x faster'},
+ {ic:'axe',n:'Wooden Axe',cost:{7:5},tier:tier('axe',1),note:'Chops 2x faster'},
  {ic:'pickaxe',n:'Stone Pickaxe',cost:{7:2,3:3},tier:tier('pick',2),note:'Mines gold ore, 2x faster'},
  {ic:'sword',n:'Stone Sword',cost:{7:1,3:2},tier:tier('sword',2),note:'Damage 5'},
- {ic:'hammer',n:'Stone Axe',cost:{7:2,3:3},tier:tier('axe',2),note:'Chops 4x faster'},
- {ic:'drumstick',n:'Cook 2 Porkchops',cost:{18:2,12:1},give(){inv[19]+=2},note:'Coal as fuel. Heals 8 food'},
- {ic:'drumstick',n:'Cook 2 Steaks',cost:{20:2,12:1},give(){inv[21]+=2},note:'Coal as fuel. Heals 8 food'},
- {ic:'drumstick',n:'Cook 2 Mutton',cost:{22:2,12:1},give(){inv[23]+=2},note:'Coal as fuel. Heals 6 food'},
+ {ic:'axe',n:'Stone Axe',cost:{7:2,3:3},tier:tier('axe',2),note:'Chops 4x faster'},
+ {ic:'porkchop',n:'Cook 2 Porkchops',cost:{18:2,12:1},give(){inv[19]+=2},note:'Coal as fuel. Heals 8 food'},
+ {ic:'steak',n:'Cook 2 Steaks',cost:{20:2,12:1},give(){inv[21]+=2},note:'Coal as fuel. Heals 8 food'},
+ {ic:'mutton',n:'Cook 2 Mutton',cost:{22:2,12:1},give(){inv[23]+=2},note:'Coal as fuel. Heals 6 food'},
  {ic:'bed',n:'Bed',cost:{7:3,26:3},give(){inv[17]++},note:'Sleep at night, set spawn'},
- {ic:'shield',n:'Leather Armor',cost:{27:8},once:'a1',give(){tools.a1=true},note:'-28% melee damage'},
+ {ic:'leather',n:'Leather Armor',cost:{27:8},once:'a1',give(){tools.a1=true},note:'-28% melee damage'},
  {ic:'shield',n:'Gold Armor',cost:{13:8},once:'a2',give(){tools.a2=true},note:'-44% melee damage'},
- {ic:'apple',n:'Golden Apple',cost:{13:8,24:1},give(){inv[28]++},note:'Heals 4 HP + food (eat with F)'},
+ {ic:'golden-apple',n:'Golden Apple',cost:{13:8,24:1},give(){inv[28]++},note:'Heals 4 HP + food (eat with F)'},
  {ic:'box',n:'Bricks ×4',cost:{3:4},give(){inv[8]+=4}},
  {ic:'square',n:'Glass ×2',cost:{6:2,12:1},give(){inv[10]+=2}}
 ];
@@ -30,8 +30,17 @@ const craftEl=$('#craft'),recsEl=$('#recs');
 let craftOpen=false;
 const owns=r=>(r.once&&tools[r.once])||(r.tier&&tools[r.tier.k]>=r.tier.l);
 const canCraft=r=>Object.entries(r.cost).every(([id,n])=>inv[id]>=n)&&!owns(r);
+const BAG=[[12,'Coal','box'],[13,'Gold','gem'],[37,'Emerald','emerald'],[26,'Wool','wool'],[27,'Leather','leather'],[33,'Seeds','seeds'],[34,'Bread','bread'],[18,'Raw Pork','porkchop'],[19,'Cooked Pork','porkchop'],[20,'Raw Beef','steak'],[21,'Steak','steak'],[22,'Raw Mutton','mutton'],[23,'Mutton','mutton'],[24,'Apple','apple'],[28,'Golden Apple','golden-apple'],[25,'Rotten Flesh','drumstick'],[42,'Sticks','stick'],[41,'Torch','torch'],[39,'Furnace','furnace'],[40,'Chest','chest'],[43,'Shears','shears']];
+function backpackHTML(){
+ const T=['','Wooden','Stone'],gear=[];
+ if(tools.pick)gear.push(ico('pickaxe',14)+T[tools.pick]);if(tools.axe)gear.push(ico('axe',14)+T[tools.axe]);if(tools.sword)gear.push(ico('sword',14)+T[tools.sword]);if(armorLvl())gear.push(ico('shield',14)+(tools.a2?'Gold':'Leather'));
+ const items=BAG.filter(b=>inv[b[0]]>0).map(b=>'<span class="bagi" title="'+b[1]+'">'+ico(b[2],14)+b[1]+' <b>'+inv[b[0]]+'</b></span>');
+ const all=gear.map(g=>'<span class="bagi">'+g+'</span>').concat(items);
+ return '<div class="rec bag"><div><div class="rn">'+ico('layers',18)+'Backpack</div><div class="bagl">'+(all.join('')||'<small>Empty</small>')+'</div></div></div>';
+}
 function renderCraft(){
  recsEl.innerHTML='';
+ if(surv())recsEl.insertAdjacentHTML('beforeend',backpackHTML());
  if(!surv()){recsEl.innerHTML='<div class="rec">Creative mode has unlimited blocks. Switch to Survival in the menu to craft.</div>';return}
  for(const r of RECIPES){
   const d=document.createElement('div'),ok=canCraft(r);d.className='rec'+(ok?'':' no');

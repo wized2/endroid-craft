@@ -63,7 +63,7 @@ $('#reset').addEventListener('click',()=>{
  try{localStorage.removeItem(SAVEKEY);localStorage.setItem('endroid-craft-nextseed',$('#seedIn').value)}catch(e){}
  saveOff=true;location.reload();
 });
-makeTouchBtn($('#pause'),()=>{setRunning(false);playBtn.textContent='Resume'});
+makeTouchBtn($('#pause'),()=>{if(running){setRunning(false);playBtn.textContent='Resume'}});
 makeTouchBtn($('#fs'),()=>toggleFullscreen());
 // touch controls
 let joyId=null,lookId=null,lx0=0,ly0=0;
@@ -97,7 +97,7 @@ addEventListener('touchend',tend);addEventListener('touchcancel',tend);
 bind('#bJump',()=>{K.Space=true;tapSpace()},()=>{K.Space=false});
 bind('#bDown',()=>{flyDown=true},()=>{flyDown=false});
 bind('#bBreak',()=>{held.brk=true;mineCd=0;atkCd=0;if(!surv())creativeBreakOnce()},()=>{held.brk=false});
-makeTouchBtn($('#pauseBtn'),()=>{if(running){setRunning(false);toast('Paused',900)}else if(started)setRunning(true)});
+makeTouchBtn($('#palBtn'),()=>{if(started)setRunning(true);openPalette()});
 makeTouchBtn($('#palClose'),()=>closePalette());
 
 (function(){

@@ -1,7 +1,7 @@
 /* menu, crafting, death screen */
 .mc{font-size:18px;padding:10px 30px;border:3px solid #222;background:#7d7d7d;color:#fff;cursor:pointer;border-radius:0;box-shadow:inset -3px -3px #555,inset 3px 3px #aaa;margin:6px 4px 0}
 .mc:hover{background:#8c8cc0}.mc.sel{background:#4c8c4c}.mc.small{font-size:13px;padding:6px 16px;background:#5a3a3a}
-#menu{position:fixed;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:5;padding:16px;box-sizing:border-box}
+#menu{position:fixed;inset:0;background:rgba(0,0,0,.8);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:5;padding:16px;box-sizing:border-box}
 #menu h1{font-size:clamp(32px,9vw,54px);margin:0 0 6px;letter-spacing:2px;text-shadow:3px 3px #000}
 #menu p{margin:4px 0;opacity:.85;font-size:14px;line-height:1.5}
 .desk{display:block}.touch .desk{display:none}.mob{display:none}.touch .mob{display:block}
@@ -19,3 +19,5 @@
 #menu>:first-child{margin-top:auto}#menu>:last-child{margin-bottom:auto}
 #menu .mc.small{margin-top:4px}
 #seedrow{display:flex;gap:6px;align-items:center;justify-content:center;margin-top:6px;flex-wrap:wrap}#seedIn{font:inherit;font-size:13px;padding:7px 9px;width:min(230px,60vw);background:#111;color:#fff;border:2px solid #444;user-select:text;-webkit-user-select:text}#seedCopy span{font-variant-numeric:tabular-nums}
+
+.rec.bag{display:block}.bagl{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:4px;font-size:12px}.bagi{display:inline-flex;align-items:center;gap:3px;background:#2a2a2a;border:1px solid #222;padding:2px 6px}.bagi .ic{flex:none}

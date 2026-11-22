@@ -2,7 +2,7 @@
 .ic{display:block;flex:none;pointer-events:none}
 .icw{display:inline-flex;align-items:center;justify-content:center;vertical-align:-.2em;pointer-events:none}
 #btns button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;padding:0}
-#pause,#snd,#craftBtn,#fs{padding:0;align-items:center;justify-content:center}
+#pause,#craftBtn{padding:0;align-items:center;justify-content:center}
 #hearts,#air{display:flex;gap:1px;align-items:center}
 .hr{position:relative;width:18px;height:18px;color:#4a2227}
 .hr .f{position:absolute;inset:0;color:#e5252a}

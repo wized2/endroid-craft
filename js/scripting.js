@@ -18,7 +18,6 @@ function closeScr(){
  scrPanel.classList.remove('open');
  if(started&&!craftOpen){if(touch)setRunning(true);else{setRunning(false);playBtn.textContent='Resume'}}
 }
-makeTouchBtn($('#scr-btn'),()=>scrPanel.classList.contains('open')?closeScr():openScr());
 makeTouchBtn($('#scr-menu'),openScr);
 makeTouchBtn(scrClose,closeScr);
 addEventListener('keydown',e=>{

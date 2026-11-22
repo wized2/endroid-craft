@@ -4,7 +4,7 @@ const AudioCtx=window.AudioContext||window.webkitAudioContext;
 let actx=null,soundOn=true;
 try{soundOn=localStorage.getItem('endroid-craft-snd')!=='0'}catch(e){}
 const sndBtn=$('#snd');
-function updateSndBtn(){sndBtn.innerHTML=ico(soundOn?'volume-2':'volume-x',20)}
+function updateSndBtn(){sndBtn.innerHTML=ico(soundOn?'volume-2':'volume-x',14)+' Sound: '+(soundOn?'on':'off')}
 updateSndBtn();
 makeTouchBtn(sndBtn,()=>{soundOn=!soundOn;try{localStorage.setItem('endroid-craft-snd',soundOn?'1':'0')}catch(err){}updateSndBtn();if(soundOn)initAudio()});
 function initAudio(){if(!actx&&AudioCtx){try{actx=new AudioCtx()}catch(e){}}if(actx&&actx.state==='suspended')actx.resume().catch(()=>{})}

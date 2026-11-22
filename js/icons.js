@@ -42,6 +42,25 @@ const ICONS={
  'apple':"<path d='M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z'/> <path d='M10 2c1 .5 2 2 2 5'/>",
  'sparkles':"<path d='M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z'/> <path d='M20 3v4'/> <path d='M22 5h-4'/> <path d='M4 17v2'/> <path d='M5 18H3'/>",
 };
+// ---- custom icons (drawn for Endroid Craft; Lucide has nothing for these) ----
+Object.assign(ICONS,{
+ 'furnace':"<rect x='3' y='3' width='18' height='18' rx='2'/><path d='M3 9h18'/><path d='M7 6h.01M11 6h.01'/><path d='M8 18v-2.5a4 4 0 0 1 8 0V18Z'/>",
+ 'chest':"<path d='M3 11V8a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v3'/><rect x='3' y='11' width='18' height='9' rx='1.5'/><path d='M3 15h18'/><rect x='10.5' y='13' width='3' height='4' rx='.8'/>",
+ 'torch':"<path d='M12 2c2.2 2.2 3.2 4 3.2 5.5a3.2 3.2 0 0 1-6.4 0C8.8 6 9.8 4.2 12 2Z'/><path d='M12 11.5V22'/><path d='M10 22h4'/>",
+ 'wheat':"<path d='M12 22V9'/><path d='M12 9C9.8 8.6 8.6 7 8.6 4.6 10.8 5 12 6.6 12 9Zm0 0c2.2-.4 3.4-2 3.4-4.4C13.2 5 12 6.6 12 9Z'/><path d='M12 15c-2.2-.4-3.4-2-3.4-4.4 2.2.4 3.4 2 3.4 4.4Zm0 0c2.2-.4 3.4-2 3.4-4.4-2.2.4-3.4 2-3.4 4.4Z'/><path d='M12 20.5c-2-.4-3-1.8-3-3.8 2 .4 3 1.8 3 3.8Zm0 0c2-.4 3-1.8 3-3.8-2 .4-3 1.8-3 3.8Z'/>",
+ 'emerald':"<path d='M7 3h10l4 6-9 12L3 9l4-6Z'/><path d='M3 9h18'/><path d='M9.5 3 8 9l4 12 4-12-1.5-6'/>",
+ 'porkchop':"<path d='M4.5 13c0-5 3.5-9 8.5-9 4.2 0 7 2.7 7 6.5 0 5.2-4.6 9.5-10 9.5-3.4 0-5.5-2.8-5.5-7Z'/><circle cx='14' cy='11' r='2.6'/><path d='M7 17.5 4 20.5'/>",
+ 'steak':"<path d='M3.5 12.5C3.5 7.5 8 4 13 4c4.4 0 7.5 2.8 7.5 6.6 0 5-5 9.4-10.4 9.4-4 0-6.6-3-6.6-7.5Z'/><path d='M9 10c1.2-1.2 3.2-1.8 5-1.4M8.5 14.5c2 .6 4.2.2 5.8-1'/>",
+ 'mutton':"<ellipse cx='13' cy='10.5' rx='7' ry='5.5'/><path d='M9 8.5c2-1 4.6-.8 6.4.6M8.5 12c2.4 1 5 .8 7-.6'/><path d='M7.5 14.5 3.5 19.5M3 18.2l-1 1.6M5 20.5l-1.6.8'/>",
+ 'leather':"<path d='M8 3 3 6l2.5 4.5L8 9.5V21h8V9.5l2.5 1L21 6l-5-3c-.6 1.6-2 2.4-4 2.4S8.6 4.6 8 3Z'/><path d='M10 14h4'/>",
+ 'wool':"<path d='M7 19a4 4 0 0 1-.8-7.9A5 5 0 0 1 12 5a5 5 0 0 1 5.8 6.1A4 4 0 0 1 17 19Z'/><path d='M9 14c1 .8 2 .8 3 0s2-.8 3 0'/>",
+ 'bread':"<path d='M4.5 11a4 4 0 0 1 3.5-4h8a4 4 0 0 1 3.5 4c0 1-.4 1.8-1.2 2.2V19H5.7v-5.8C4.9 12.8 4.5 12 4.5 11Z'/><path d='M9 10.5v2.5M12 10.5v2.5M15 10.5v2.5'/>",
+ 'shears':"<circle cx='6' cy='6' r='3'/><circle cx='6' cy='18' r='3'/><path d='M8.2 8.2 20 20M8.2 15.8 20 4'/>",
+ 'axe':"<path d='m14 12-8.5 8.5a2.1 2.1 0 1 1-3-3L11 9'/><path d='M15 13 9 7l4-4 6 6h3a8 8 0 0 1-7 7Z'/>",
+ 'stick':"<path d='M20 4 4 20'/><path d='M17.5 3.5 20.5 6.5'/><path d='m3.5 17.5 3 3'/>",
+ 'seeds':"<path d='M12 21c-4 0-6-3-6-6 0-4 3-8 6-12 3 4 6 8 6 12 0 3-2 6-6 6Z'/><path d='M12 9v10'/>",
+});
+ICONS['golden-apple']=ICONS['apple']+"<path d='M19 2v4M17 4h4'/>";
 function ico(name,size=20,cls='',fill='none'){
  return '<svg class="ic '+cls+'" xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="'+fill+'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[name]||'')+'</svg>';
 }

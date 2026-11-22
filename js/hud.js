@@ -8,10 +8,7 @@ function renderAir(){const n=Math.ceil(air);airEl.innerHTML=air<9.95?ico('drople
 function renderInfo(){
  const day=Math.floor(clock/DAY)+1,ph=dayK>.55?'Day':(dayK<.3?'Night':'Dusk');
  let l3='';
- if(surv()){const T=['','Wood','Stone'],tl=[];if(tools.pick)tl.push(T[tools.pick]+' Pick');if(tools.axe)tl.push(T[tools.axe]+' Axe');if(tools.sword)tl.push(T[tools.sword]+' Sword');
-  const fd=[[18,'Pork'],[19,'Cooked Pork'],[20,'Beef'],[21,'Steak'],[22,'Mutton'],[23,'Cooked Mutton'],[24,'Apple'],[25,'Flesh'],[28,'G.Apple']].filter(x=>inv[x[0]]>0).map(x=>x[1]+' '+inv[x[0]]);
-  l3='\nGold '+inv[13]+' · Coal '+inv[12]+' · Wool '+inv[26]+' · Leather '+inv[27]+' · Kills '+kills+(tl.length?'\n'+tl.join(' · '):'')+(armorLvl()?' · Armor':'')+(fd.length?'\nFood: '+fd.join(' · '):'');}
- else if(fly)l3='\nFlying';
+ if(!surv()&&fly)l3='\nFlying';
  info.style.display=SET.info?'block':'none';
  info.textContent=fpsTxt+(weather.rain>.3?' | Rain':'')+'\n'+(surv()?'Survival':'Creative')+' · '+ph+' '+day+' · seed '+SEEDL+l3;
 }
