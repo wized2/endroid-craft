@@ -36,6 +36,8 @@ A browser voxel survival game built with [Three.js](https://threejs.org/). One H
 ## Script Console & seeds
 - Open with the `</>` button or the `` ` `` key. Run JS build scripts (`player()`, `setBlock`, `getB`, `fill`, `tp`, `await delay`, `log`).
 - 16 templates (house, castle, maze, dome...), plus your own saved presets. Ctrl+Enter runs.
+- `site(r)` finds a flat, dry, tree-free spot ahead of you, clears trees/plants and levels the ground, so builds never end up in or on trees.
+- Undo the last script, and a Normal/Fast/Instant speed switch.
 - "New world" asks for a seed (number or word). The seed shows in the info text.
 
 ## Install & fullscreen

@@ -1,4 +1,5 @@
 // scripting.js - in-game Script Console: run JS build scripts, templates, saved presets.
+// Extra helpers: site(r) finds a flat, dry, tree-free spot ahead and levels it; facing() -> {x,z} unit direction.
 // Open with the </> button or the ` key. Script API (all inside an async function):
 //   player() -> {x,y,z}      setBlock(x,y,z,id)     getB(x,y,z)
 //   fill(x1,y1,z1,x2,y2,z2,id)   tp(x,y,z)          await delay(ms)     log(text)
@@ -59,6 +60,39 @@ $('#scr-save').addEventListener('click',()=>{
 });
 renderPresets();
 
+// ----- build-site finder: flat, dry, tree-free spot ahead of the player -----
+const clearable=b=>b===4||b===5||b===14||b===15||b===16;
+function groundYAt(x,z){for(let y=H-1;y>0;y--){const b=getBlock(x,y,z);if(b===-1)return -1;if(b===9)return -2;if(b!==0&&!clearable(b))return y}return -1}
+function facingDir(){const fx=-Math.sin(yaw),fz=-Math.cos(yaw);return Math.abs(fx)>Math.abs(fz)?{x:Math.sign(fx),z:0}:{x:0,z:Math.sign(fz)}}
+function siteFree(cx,cz,r){
+ let lo=1e9,hi=-1e9;
+ for(let dx=-r-1;dx<=r+1;dx+=2)for(let dz=-r-1;dz<=r+1;dz+=2){
+  const g=groundYAt(cx+dx,cz+dz);if(g<SEA+1)return null;
+  if(g<lo)lo=g;if(g>hi)hi=g;if(hi-lo>2)return null;
+ }
+ return hi;
+}
+function findSite(r,sb){
+ const f=facingDir(),px=Math.floor(P.x),pz=Math.floor(P.z),c=[];
+ for(let d=r+3;d<=r+45;d+=2)for(let l=-30;l<=30;l+=3)c.push([d,l,d+Math.abs(l)*.9]);
+ c.sort((a,b)=>a[2]-b[2]);
+ let best=null,top=0;
+ for(const[d,l]of c){
+  const cx=px+f.x*d+f.z*l,cz=pz+f.z*d-f.x*l,h=siteFree(cx,cz,r);
+  if(h!==null){best=[cx,cz];top=h;break}
+ }
+ let ok=true;
+ if(!best){ok=false;const d=r+3;best=[px+f.x*d,pz+f.z*d];top=Math.max(groundYAt(best[0],best[1]),SEA+1)}
+ const[cx,cz]=best;
+ // clear trees/plants (footprint + 1 margin) and level the footprint up to the highest ground
+ for(let dx=-r-1;dx<=r+1;dx++)for(let dz=-r-1;dz<=r+1;dz++){
+  const x=cx+dx,z=cz+dz,g=groundYAt(x,z);if(g<0)continue;
+  for(let y=g+1;y<=g+18;y++)if(clearable(getBlock(x,y,z)))sb(x,y,z,0);
+  if(Math.abs(dx)<=r&&Math.abs(dz)<=r&&g<top){for(let y=g+1;y<top;y++)sb(x,y,z,2);sb(x,top,z,1)}
+ }
+ return{x:cx,y:top+1,z:cz,ok};
+}
+
 // ----- runner -----
 function scrLog(m){scrStatus.textContent+='\n'+String(m);scrStatus.scrollTop=scrStatus.scrollHeight}
 const scrDelay=ms=>new Promise(r=>setTimeout(r,Math.max(0,ms||0)));
@@ -69,18 +103,25 @@ async function runScript(code){
  scrRun.style.display='none';scrStop.style.display='inline-flex';
  scrStatus.textContent='Running...';scrProg.style.display='block';scrProgBar.style.width='0%';
  let pct=0;const timer=setInterval(()=>{pct=Math.min(pct+2,90);scrProgBar.style.width=pct+'%';flushChunks()},120);
- let ops=0;
- const sb=(x,y,z,id)=>{scrAbortCheck();setBlock(Math.round(x),Math.round(y),Math.round(z),id|0,true);if(++ops%400===0)flushChunks()};
+ let ops=0;const hist=[];
+ const speed=+($('#scr-speed')||{value:1}).value;let dl=0;
+ const sb=(x,y,z,id)=>{scrAbortCheck();x=Math.round(x);y=Math.round(y);z=Math.round(z);id|=0;
+  const old=getBlock(x,y,z);if(old===-1)return;
+  if(old!==id&&hist.length<300000)hist.push(x,y,z,old);
+  setBlock(x,y,z,id,true);if(++ops%400===0)flushChunks()};
+ lastRun=hist;
  try{
-  const fn=new Function('setBlock','player','getB','delay','log','fill','tp','"use strict";return (async()=>{\n'+code+'\n})();');
+  const fn=new Function('setBlock','player','getB','delay','log','fill','tp','site','facing','"use strict";return (async()=>{\n'+code+'\n})();');
   await fn(
    sb,
    ()=>({x:Math.floor(P.x),y:Math.floor(P.y),z:Math.floor(P.z)}),
    (x,y,z)=>getBlock(Math.round(x),Math.round(y),Math.round(z)),
-   async ms=>{scrAbortCheck();flushChunks();await scrDelay(ms);scrAbortCheck()},
+   async ms=>{scrAbortCheck();flushChunks();if(speed===0){if(++dl%25===0)await scrDelay(0)}else await scrDelay(ms*speed);scrAbortCheck()},
    scrLog,
    (x1,y1,z1,x2,y2,z2,id)=>{for(let x=Math.min(x1,x2);x<=Math.max(x1,x2);x++)for(let y=Math.min(y1,y2);y<=Math.max(y1,y2);y++)for(let z=Math.min(z1,z2);z<=Math.max(z1,z2);z++)sb(x,y,z,id)},
-   (x,y,z)=>{P.x=x+.5;P.y=y;P.z=z+.5;P.vx=P.vy=P.vz=0;fallY=P.y}
+   (x,y,z)=>{P.x=x+.5;P.y=y;P.z=z+.5;P.vx=P.vy=P.vz=0;fallY=P.y},
+   (r=5)=>{const s=findSite(Math.max(1,Math.min(14,r|0)),sb);if(!s.ok)scrLog('No flat dry spot nearby - building right ahead of you.');return{x:s.x,y:s.y,z:s.z}},
+   facingDir
   );
   scrProgBar.style.width='100%';scrStatus.textContent+='\nScript finished.';
  }catch(err){
@@ -93,6 +134,14 @@ async function runScript(code){
  }
 }
 makeTouchBtn(scrRun,()=>{if(!scrRunning)runScript(scrText.value.trim())});
+let lastRun=[];
+$('#scr-undo').addEventListener('click',()=>{
+ if(scrRunning){scrStatus.textContent+='\nStop the script first.';return}
+ if(!lastRun.length){scrStatus.textContent='Nothing to undo.';return}
+ const h=lastRun;lastRun=[];
+ for(let i=h.length-4;i>=0;i-=4)setBlock(h[i],h[i+1],h[i+2],h[i+3],true);
+ flushChunks();dirtySave=true;scrStatus.textContent='Undid last script ('+(h.length/4)+' blocks).';
+});
 makeTouchBtn(scrStop,()=>{if(scrRunning)scrAbort=true});
 scrText.addEventListener('keydown',e=>{
  if(e.key==='Tab'){e.preventDefault();const s=scrText.selectionStart,v=scrText.value;scrText.value=v.slice(0,s)+'  '+v.slice(scrText.selectionEnd);scrText.selectionStart=scrText.selectionEnd=s+2}

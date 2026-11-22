@@ -19,3 +19,4 @@
 #scr-progress-bar{height:100%;width:0;background:#5c9c5c;transition:width .15s}
 #scr-status{margin:0;background:#111;border:2px solid #333;padding:6px 8px;height:84px;overflow:auto;font:11.5px/1.4 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;user-select:text;-webkit-user-select:text;touch-action:auto;color:#bbb}
 #scr-help{font-size:11px;opacity:.65;line-height:1.4}
+#scr-spd{font-size:12px;display:inline-flex;align-items:center;gap:5px}#scr-speed{font:inherit;font-size:12px;background:#3b3b3b;color:#fff;border:2px solid #111;padding:4px}
