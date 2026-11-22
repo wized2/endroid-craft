@@ -12,6 +12,17 @@ function makeMob(type,x,y,z){
   m.arms.push(limb(.2,.7,.2,0x5b9449,-.35,1.47,0,g),limb(.2,.7,.2,0x5b9449,.35,1.47,0,g));
   m.arms.forEach(a=>a.rotation.x=1.45);
   m.legs.push(limb(.24,.75,.24,0x3a3a8c,-.13,.75,0,g),limb(.24,.75,.24,0x3a3a8c,.13,.75,0,g));
+ }else if(type==='c'){
+  m.hp=10;m.w=.5;m.h=1.35;m.spd=1.1;const B=0x4e3b2c,W=0xe9e4dc;
+  box(.7,.7,1.2,B,0,.95,0,g);box(.3,.3,.4,W,.18,1.02,.1,g);box(.5,.5,.45,0x3f2f23,0,1.1,-.78,g);box(.3,.2,.1,0xd9b99b,0,1.02,-1.02,g);
+  box(.08,.2,.08,W,-.22,1.42,-.7,g);box(.08,.2,.08,W,.22,1.42,-.7,g);
+  box(.06,.06,.02,0x111111,-.14,1.16,-1.01,g);box(.06,.06,.02,0x111111,.14,1.16,-1.01,g);
+  for(const[px,pz]of[[-.22,-.45],[.22,-.45],[-.22,.45],[.22,.45]])m.legs.push(limb(.2,.6,.2,B,px,.6,pz,g));
+ }else if(type==='s'){
+  m.hp=8;m.w=.45;m.h=1.1;m.spd=1.1;const Wl=0xe8e6e0;
+  box(.7,.65,1,Wl,0,.9,0,g);box(.4,.4,.4,0xc9a98a,0,1.05,-.68,g);box(.44,.14,.44,Wl,0,1.3,-.66,g);
+  box(.06,.06,.02,0x111111,-.1,1.08,-.89,g);box(.06,.06,.02,0x111111,.1,1.08,-.89,g);
+  for(const[px,pz]of[[-.2,-.32],[.2,-.32],[-.2,.32],[.2,.32]])m.legs.push(limb(.18,.55,.18,0xcdb8a0,px,.55,pz,g));
  }else{
   m.hp=10;m.w=.45;m.h=.9;m.spd=1.1;
   box(.55,.5,.9,0xf0a0a8,0,.6,0,g);box(.42,.4,.4,0xf0a0a8,0,.72,-.62,g);box(.22,.16,.1,0xdc8a94,0,.66,-.85,g);
@@ -46,7 +57,7 @@ function spawnMobs(dt){
  const cap=(touch?3:5)+Math.min(4,Math.floor(clock/DAY));
  if(surv()&&dayK<.45&&!warned){warned=true;toast('Night is falling - build a shelter or grab a sword!',3200)}else if(dayK>.6)warned=false;
  if(surv()&&night&&nz<cap)trySpawn('z');
- else if(!night&&np<4&&Math.random()<.6)trySpawn('p');
+ else if(!night&&np<8&&Math.random()<.6){const r=Math.random();trySpawn(r<.35?'p':r<.7?'c':'s')}
 }
 function updateMobs(dt){
  for(let i=mobs.length-1;i>=0;i--){

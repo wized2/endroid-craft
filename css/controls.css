@@ -11,3 +11,4 @@
 .touch #craftBtn{display:flex}.touch #fs{right:154px}
 #viewBtn{display:flex;position:fixed;z-index:3;top:10px;right:202px;width:40px;height:40px;border-radius:8px;border:2px solid rgba(255,255,255,.5);background:rgba(0,0,0,.35);color:#fff;align-items:center;justify-content:center;cursor:pointer;padding:0;pointer-events:auto;touch-action:manipulation}
 .touch #viewBtn{right:250px}
+#bEat{right:108px;bottom:80px;width:56px!important;height:56px!important;font-size:11px!important}

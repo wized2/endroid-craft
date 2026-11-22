@@ -8,7 +8,9 @@ function renderAir(){const n=Math.ceil(air);airEl.innerHTML=air<9.95?ico('drople
 function renderInfo(){
  const day=Math.floor(clock/DAY)+1,ph=dayK>.55?'Day':(dayK<.3?'Night':'Dusk');
  let l3='';
- if(surv())l3='\nGold '+inv[13]+' · Coal '+inv[12]+' · Kills '+kills+(tools.pick?' · Pickaxe':'')+(tools.gsword?' · Gold Sword':tools.sword?' · Sword':'')+(armorLvl()?' · Armor':'');
+ if(surv()){const T=['','Wood','Stone'],tl=[];if(tools.pick)tl.push(T[tools.pick]+' Pick');if(tools.axe)tl.push(T[tools.axe]+' Axe');if(tools.sword)tl.push(T[tools.sword]+' Sword');
+  const fd=[[18,'Pork'],[19,'Cooked Pork'],[20,'Beef'],[21,'Steak'],[22,'Mutton'],[23,'Cooked Mutton'],[24,'Apple'],[25,'Flesh'],[28,'G.Apple']].filter(x=>inv[x[0]]>0).map(x=>x[1]+' '+inv[x[0]]);
+  l3='\nGold '+inv[13]+' · Coal '+inv[12]+' · Wool '+inv[26]+' · Leather '+inv[27]+' · Kills '+kills+(tl.length?'\n'+tl.join(' · '):'')+(armorLvl()?' · Armor':'')+(fd.length?'\nFood: '+fd.join(' · '):'');}
  else if(fly)l3='\nFlying';
  info.style.display=SET.info?'block':'none';
  info.textContent=fpsTxt+(weather.rain>.3?' | Rain':'')+'\n'+(surv()?'Survival':'Creative')+' · '+ph+' '+day+' · seed '+SEEDL+l3;
@@ -35,7 +37,7 @@ function applyMode(){
  if(surv())fly=false;
  $('#mSurv').classList.toggle('sel',surv());$('#mCre').classList.toggle('sel',!surv());
  $('#bDown').style.display=(fly&&!surv()&&touch)?'block':'none';
- renderHearts();renderArmor();renderSlots();renderInfo();
+ renderHearts();renderArmor();renderFood();renderSlots();renderInfo();
  if(typeof renderQuest==='function')renderQuest();
 }
 
@@ -44,6 +46,6 @@ function renderArmor(){const e=$('#armor'),l=armorLvl();e.innerHTML=(l&&surv())?
 const mobhpEl=$('#mobhp'),mobhpBar=mobhpEl.querySelector('i'),mobhpTxt=mobhpEl.querySelector('span');
 function showMobHp(m){
  if(!m){mobhpEl.style.opacity=0;return}
- mobhpEl.style.opacity=1;mobhpTxt.textContent=(m.type==='p'?'Pig':m.big?'Brute Zombie':'Zombie')+'  '+Math.max(0,Math.ceil(m.hp));
+ mobhpEl.style.opacity=1;mobhpTxt.textContent=(m.type==='p'?'Pig':m.type==='c'?'Cow':m.type==='s'?'Sheep':m.big?'Brute Zombie':'Zombie')+'  '+Math.max(0,Math.ceil(m.hp));
  mobhpBar.style.width=Math.max(0,Math.min(100,m.hp/(m.maxhp||m.hp)*100))+'%';
 }

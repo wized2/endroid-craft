@@ -81,3 +81,10 @@ npx serve .
 
 ## Deployment
 Static site, deploys as-is on [Vercel](https://vercel.com/).
+
+## Survival v3 (Minecraft values)
+- Hunger: 20 food, saturation, exhaustion (sprint/jump/mining), regen at food ≥18, starvation; sprint needs food > 6. Eat with F / EAT button.
+- Food: raw/cooked porkchop, beef, mutton (cook with coal), apple, golden apple, rotten flesh.
+- Tools: wood/stone tiers for pickaxe, axe, sword; break time = hardness × (1.5 if harvestable else 5) / tool speed. Stone/coal need a pickaxe to drop, gold needs stone.
+- Mobs: pigs, cows, sheep drop meat, leather, wool. Bed = 3 wool + 3 planks. Day = 20 min.
+- Not Minecraft-identical: terrain generator, no iron/furnace/diamond yet.

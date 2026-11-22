@@ -10,6 +10,7 @@ addEventListener('keydown',e=>{
  if(e.target&&/^(TEXTAREA|INPUT)$/.test(e.target.tagName))return; // typing in the script console
  initAudio();
  if(e.code==='Escape'&&craftOpen){closeCraft();return}
+ if(e.code==='KeyF'&&!e.repeat&&started){startEat();return}
  if((e.code==='F5'||e.code==='KeyV')&&!e.repeat&&started){e.preventDefault();cycleView();return}
  if(e.code==='KeyE'&&!e.repeat&&started){if(craftOpen)closeCraft();else if(running)openCraft();return}
  K[e.code]=true;

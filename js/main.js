@@ -21,9 +21,10 @@ function frame(now){
  updateChunks(touch?1:2);
 updateWeather(dt);
 updateSleep(dt);
+updateHunger(dt);
 if(running)updateObjectives(dt);
  placeCamera(dt);
- target=raycast(eye,dir,5.5);
+ target=raycast(eye,dir,REACH_B+.6);
  if(running){
   interact(dt);updateMobs(dt);spawnMobs(dt);
   if(P.onGround&&Math.hypot(P.vx,P.vz)>.3){}

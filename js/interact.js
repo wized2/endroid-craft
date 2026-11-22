@@ -18,11 +18,17 @@ function raycast(o,d,max){
 let target=null,hoverMob=null,mine=null,crackStage=-1,atkCd=0,mineCd=0,swingT=0,swing=0;
 const dir=new THREE.Vector3();
 function triggerSwing(){swing=1}
-function dropOf(b){if(b===1)return 2;if(b===5)return Math.random()<.3?5:0;if(isPlant(b)||b===9)return 0;return b}
+// what a block drops (Minecraft-like): glass/leaves/plants drop nothing, grass gives dirt, leaves 0.5% apple
+function dropOf(b){if(b===1)return 2;if(b===5)return Math.random()<.005?24:0;if(isPlant(b)||b===9||b===10)return 0;return b}
+// needs a pickaxe tier to drop anything: stone/brick/coal need wood (1), gold ore needs stone (2, no iron here)
+const NEEDPICK={3:1,8:1,12:1,13:2},AXEB={4:1,7:1,17:1};
+const TIERSPD=[1,2,4];
+// Minecraft break time: hardness*1.5/speed with the right tool, hardness*5/speed without
+function canHarvest(b){return !NEEDPICK[b]||tools.pick>=NEEDPICK[b]}
 function hardness(b){
- let h=HARD[b];
- if(tools.pick)h/=hardB(b)?4:1.6;
- return Math.max(.05,h);
+ const h=HARD[b];let spd=1;
+ if(NEEDPICK[b])spd=TIERSPD[tools.pick];else if(AXEB[b])spd=TIERSPD[tools.axe];
+ return Math.max(.05,h*(canHarvest(b)?1.5:5)/spd);
 }
 function breakBlock(h){
  triggerSwing();
@@ -30,17 +36,24 @@ function breakBlock(h){
  sfxBreak(h.b);vib(18);
  setBlock(h.x,h.y,h.z,0);
  if(surv()){
-  const dr=dropOf(h.b);
+  addExh(.005);
+  if(!canHarvest(h.b))toast(h.b===13?'Needs a stone pickaxe':'Needs a pickaxe',1300);
+  const dr=canHarvest(h.b)?dropOf(h.b):0;
   if(dr){inv[dr]++;if(h.b===13)toast('Gold!',1200);renderSlots();renderInfo()}
  }
  const ab=getBlock(h.x,h.y+1,h.z);if(isPlant(ab))setBlock(h.x,h.y+1,h.z,0);
 }
+function drop(id,n){if(n<=0||!surv())return;inv[id]+=n}
+const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 function killMob(m){
  if(m.type==='z'){
   kills++;if(m.big)bruteKills++;
-  if(Math.random()<(m.big?.85:.3)){const n=m.big?1+(Math.random()<.5):1;inv[13]+=n;toast('Zombie dropped gold!')}else if(Math.random()<.4){inv[12]++}
- }else if(surv()&&hp<20){hp=Math.min(20,hp+4);renderHearts();toast('+2 \u2665',1200)}
- spawnParticles(m.x,m.y+m.h*.5,m.z,m.type==='z'?[.35,.58,.29]:[.94,.63,.66],m.big?24:14);
+  drop(25,m.big?rint(1,3):rint(0,2)); // rotten flesh
+  if(Math.random()<(m.big?.1:.025)){inv[13]++;toast('Zombie dropped gold!')} // rare, like Minecraft's iron
+ }else if(m.type==='p'){drop(18,rint(1,3));toast('Raw Porkchop',900)}
+ else if(m.type==='c'){drop(20,rint(1,3));drop(27,rint(0,2));toast('Raw Beef + leather',1000)}
+ else{drop(26,1);drop(22,rint(1,2));toast('Wool + Raw Mutton',1000)}
+ spawnParticles(m.x,m.y+m.h*.5,m.z,m.type==='z'?[.35,.58,.29]:m.type==='c'?[.4,.3,.22]:m.type==='s'?[.9,.9,.9]:[.94,.63,.66],m.big?24:14);
  removeMob(mobs.indexOf(m));renderSlots();renderInfo();showMobHp(null);
 }
 function attack(m){
@@ -48,25 +61,25 @@ function attack(m){
  // falling hit = critical (x1.5); sprint hit = extra knockback
  const crit=surv()&&!P.onGround&&P.vy<-1&&!inWater&&!fly;
  let dmg=!surv()?30:weaponDmg();if(crit)dmg=Math.round(dmg*1.5);
- m.hp-=dmg;m.hurt=.35;
+ m.hp-=dmg;m.hurt=.35;addExh(.1);
  // swords interrupt a zombie's wind-up (brutes only with the gold sword); fists only nudge it
- const wd=weaponDmg();if(wd>=5&&(!m.big||wd>=6)){m.wind=0;m.stun=.4}else m.stun=.12;
+ const wd=weaponDmg();if(wd>=4&&(!m.big||wd>=5)){m.wind=0;m.stun=.4}else m.stun=.12;
  sfxHit();vib(15);
  const dx=m.x-P.x,dz=m.z-P.z,dd=Math.hypot(dx,dz)||1,kb=(Math.hypot(P.vx,P.vz)>5.5?10:7)*(m.big?.6:1);
  m.vx=dx/dd*kb;m.vz=dz/dd*kb;m.vy=5;m.onGround=false;
  if(crit){spawnParticles(m.x,m.y+m.h*.7,m.z,[1,.9,.3],10);toast('Critical hit!',500);sfxHit()}
- if(m.type==='p')m.flee=3;
+ if(m.type!=='z')m.flee=3;
  if(m.hp<=0)killMob(m);
 }
 function interact(dt){
  atkCd-=dt;mineCd-=dt;swingT-=dt;
- hoverMob=null;let best=3.6;
+ hoverMob=null;let best=REACH_M;
  if(target&&target.t<best)best=target.t;
  for(const m of mobs){const t=rayBox(eye,dir,m.x,m.y,m.z,m.w,m.h);if(t!==null&&t<best){best=t;hoverMob=m}}
  showMobHp(hoverMob);
  if(!held.brk){mine=null;crack.visible=false;return}
  if(hoverMob){mine=null;crack.visible=false;if(atkCd<=0){attack(hoverMob);atkCd=.45}return}
- if(!target||target.t>5||target.y<=0){mine=null;crack.visible=false;return}
+ if(!target||target.t>REACH_B||target.y<=0){mine=null;crack.visible=false;return}
  if(!surv()){if(mineCd<=0){breakBlock(target);mineCd=.2}return}
  if(!mine||mine.x!==target.x||mine.y!==target.y||mine.z!==target.z)mine={x:target.x,y:target.y,z:target.z,t:0,need:hardness(target.b)};
  mine.t+=dt;
@@ -77,7 +90,7 @@ function interact(dt){
  if(mine.t>=mine.need){const h={x:mine.x,y:mine.y,z:mine.z,b:getBlock(mine.x,mine.y,mine.z)};mine=null;crack.visible=false;if(h.b>0)breakBlock(h)}
 }
 function doPlace(){
- const h=target;if(!h||h.t>5.2||dead)return;
+ const h=target;if(!h||h.t>REACH_B+.2||dead)return;
  if(getBlock(h.x,h.y,h.z)===17){useBed(h.x,h.y,h.z);return} // right-click a bed
  const id=HB[si];
  if(surv()&&inv[id]<=0){toast('No '+NAMES[id]+' left',900);return}
