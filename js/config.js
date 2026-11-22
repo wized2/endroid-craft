@@ -2,7 +2,7 @@
 const $=s=>document.querySelector(s);
 const touch=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
 if(touch)document.body.classList.add('touch');
-const CS=16,H=64,SEA=17,R=touch?4:6,HT=1.8,EYE=1.62,PW=0.3,DAY=240;
+const CS=16,H=64,SEA=17,HT=1.8,EYE=1.62,PW=0.3,DAY=240;
 const SAVEKEY='endroid-craft-v2';
 let saved=null;try{saved=JSON.parse(localStorage.getItem(SAVEKEY))}catch(e){}
 const NAMES=['','Grass','Dirt','Stone','Log','Leaves','Sand','Planks','Brick','Water','Glass','Snow','Coal','Gold','Rose','Dandelion','Tall grass'];
@@ -16,3 +16,10 @@ const inv={};for(let i=0;i<=16;i++)inv[i]=0;
 if(saved&&saved.inv)for(const k in saved.inv)inv[k]=saved.inv[k]|0;
 const tools={pick:!!(saved&&saved.tools&&saved.tools.pick),sword:!!(saved&&saved.tools&&saved.tools.sword)};
 
+
+// ---------- user settings (saved in localStorage) ----------
+const SETKEY='endroid-craft-settings';
+const SET={rd:touch?4:6,sens:1,fov:75,vol:1,info:true};
+try{Object.assign(SET,JSON.parse(localStorage.getItem(SETKEY)))}catch(e){}
+let R=Math.max(2,Math.min(10,SET.rd|0));
+function saveSettings(){try{localStorage.setItem(SETKEY,JSON.stringify(SET))}catch(e){}}

@@ -26,7 +26,7 @@ renderer.domElement.addEventListener('mousedown',e=>{
 addEventListener('mouseup',e=>{if(e.button===0)held.brk=false});
 addEventListener('mousemove',e=>{
  if(!running||touch||document.pointerLockElement!==renderer.domElement)return;
- yaw-=e.movementX*.0022;pitch=Math.max(-1.55,Math.min(1.55,pitch-e.movementY*.0022));
+ yaw-=e.movementX*.0022*SET.sens;pitch=Math.max(-1.55,Math.min(1.55,pitch-e.movementY*.0022*SET.sens));
 });
 document.addEventListener('pointerlockchange',()=>{
  if(touch)return;
@@ -75,7 +75,7 @@ addEventListener('touchstart',e=>{
 addEventListener('touchmove',e=>{
  for(const t of e.changedTouches){
   if(t.identifier===joyId)updJoy(t);
-  else if(t.identifier===lookId){yaw-=(t.clientX-lx0)*.0055;pitch=Math.max(-1.55,Math.min(1.55,pitch-(t.clientY-ly0)*.0055));lx0=t.clientX;ly0=t.clientY}
+  else if(t.identifier===lookId){yaw-=(t.clientX-lx0)*.0055*SET.sens;pitch=Math.max(-1.55,Math.min(1.55,pitch-(t.clientY-ly0)*.0055*SET.sens));lx0=t.clientX;ly0=t.clientY}
  }
  if(running)e.preventDefault();
 },{passive:false});

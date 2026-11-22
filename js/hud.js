@@ -10,7 +10,8 @@ function renderInfo(){
  let l3='';
  if(surv())l3='\nGold '+inv[13]+' · Coal '+inv[12]+' · Kills '+kills+(tools.pick?' · Pickaxe':'')+(tools.sword?' · Sword':'');
  else if(fly)l3='\nFlying';
- info.textContent=fpsTxt+'\n'+(surv()?'Survival':'Creative')+' · '+ph+' '+day+' · seed '+SEED+l3;
+ info.style.display=SET.info?'block':'none';
+ info.textContent=fpsTxt+(weather.rain>.3?' | Rain':'')+'\n'+(surv()?'Survival':'Creative')+' · '+ph+' '+day+' · seed '+SEED+l3;
 }
 let si=0;
 const bar=$('#bar');

@@ -12,7 +12,7 @@ function playTone(f,type,dur,g=.08,ef=null){
  if(!soundOn||!actx)return;
  try{const o=actx.createOscillator(),ga=actx.createGain(),t=actx.currentTime;
   o.type=type;o.frequency.setValueAtTime(f,t);if(ef)o.frequency.exponentialRampToValueAtTime(ef,t+dur);
-  ga.gain.setValueAtTime(g,t);ga.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  ga.gain.setValueAtTime(g*SET.vol+1e-5,t);ga.gain.exponentialRampToValueAtTime(.0001,t+dur);
   o.connect(ga);ga.connect(actx.destination);o.start();o.stop(t+dur)}catch(e){}
 }
 function playNoise(dur,g=.06,lp=600){
@@ -21,7 +21,7 @@ function playNoise(dur,g=.06,lp=600){
   for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
   const s=actx.createBufferSource();s.buffer=buf;
   const fl=actx.createBiquadFilter();fl.type='lowpass';fl.frequency.setValueAtTime(lp,actx.currentTime);
-  const ga=actx.createGain();ga.gain.setValueAtTime(g,actx.currentTime);ga.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur);
+  const ga=actx.createGain();ga.gain.setValueAtTime(g*SET.vol+1e-5,actx.currentTime);ga.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur);
   s.connect(fl);fl.connect(ga);ga.connect(actx.destination);s.start()}catch(e){}
 }
 const hardB=b=>b===3||b===8||b===12||b===13;

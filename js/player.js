@@ -57,7 +57,7 @@ function update(dt){
  const hsp=Math.hypot(P.vx,P.vz);
  if(P.onGround&&hsp>.3)walkClock+=dt*(sprint?12:9);
  bob+=((P.onGround&&hsp>.5?Math.abs(Math.sin(walkClock))*.045:0)-bob)*Math.min(1,dt*14);
- const tf=75+(sprint&&hsp>3?9:0)+(fl?4:0);fovCur+=(tf-fovCur)*Math.min(1,dt*8);
+ const tf=SET.fov+(sprint&&hsp>3?9:0)+(fl?4:0);fovCur+=(tf-fovCur)*Math.min(1,dt*8);
  if(Math.abs(camera.fov-fovCur)>.05){camera.fov=fovCur;camera.updateProjectionMatrix()}
 }
 

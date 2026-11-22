@@ -3,7 +3,7 @@
 // what earlier files define. ORDER MATTERS: add new files to FILES in the right spot.
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 window.THREE=THREE;
-const FILES=["config", "touch", "audio", "noise", "textures", "scene", "world", "hud", "physics", "player", "mobs", "interact", "crafting", "templates", "scripting", "input", "save", "main"];
+const FILES=["config", "touch", "audio", "noise", "textures", "scene", "world", "hud", "physics", "player", "mobs", "interact", "crafting", "templates", "scripting", "weather", "settings", "input", "save", "main"];
 for(const f of FILES){
  const s=document.createElement('script');
  s.src='js/'+f+'.js';

@@ -41,7 +41,7 @@ function setSky(){
  stars.position.set(P.x,P.y,P.z);starMat.opacity=Math.max(0,(.35-k)*2.5);
  clouds.position.set(P.x,62,P.z);cloudTex.offset.set(P.x/CSZ+clock*.0016,-P.z/CSZ);
  if(camInWater){scene.background=waterFogC;scene.fog.color.copy(waterFogC);scene.fog.near=1;scene.fog.far=18;L=.55}
- else{sky.lerpColors(nightC,dayC,k);scene.background=sky;scene.fog.color.copy(sky);scene.fog.near=R*CS*.5;scene.fog.far=R*CS*.92;L=.28+.72*k}
+ else{sky.lerpColors(nightC,dayC,k);if(weather.rain>.01)sky.multiplyScalar(1-.35*weather.rain);scene.background=sky;scene.fog.color.copy(sky);scene.fog.near=R*CS*.5;scene.fog.far=R*CS*.92;L=(.28+.72*k)*(1-.2*weather.rain)}
  matO.color.setScalar(L);matW.color.setScalar(L);matG.color.setScalar(L);cloudMat.color.setScalar(.35+.65*k);
  for(const m of handMats)m.color.setScalar(Math.max(.5,L));
 }

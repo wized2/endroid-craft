@@ -1,5 +1,6 @@
 // main.js - game loop (runs last)
 // ---------- main loop ----------
+let shotReq=false;
 applyMode();renderAir();sel(0);
 updateChunks(40);
 // make sure the player starts somewhere sensible (not inside a tree / underwater / in rock)
@@ -18,6 +19,7 @@ function frame(now){
  const dt=Math.min((now-last)/1000,.05);last=now;
  if(running){update(dt);clock+=dt;const dn=Math.floor(clock/DAY);if(dn!==lastDay){lastDay=dn;if(surv())toast('Day '+(dn+1)+' — you survived the night!',2600)}}
  updateChunks(touch?1:2);
+updateWeather(dt);
  camera.position.set(P.x,P.y+EYE+bob,P.z);camera.rotation.set(pitch,yaw,0);camera.updateMatrixWorld();
  camera.getWorldDirection(dir);
  target=raycast(camera.position,dir,5.5);
@@ -39,6 +41,7 @@ function frame(now){
  if(target&&running&&!hoverMob&&target.t<=5.2){hl.visible=true;hl.position.set(target.x+.5,target.y+.5,target.z+.5)}else hl.visible=false;
  setSky();
  renderer.render(scene,camera);
+ if(shotReq){shotReq=false;try{const a=document.createElement('a');a.href=renderer.domElement.toDataURL('image/png');a.download='endroid-craft-'+Date.now()+'.png';a.click();toast('Screenshot saved',1400)}catch(e){toast('Screenshot failed',1400)}}
  fc++;ft+=dt;
  if(ft>=.5){fpsTxt=Math.round(fc/ft)+' fps  |  '+Math.floor(P.x)+', '+Math.floor(P.y)+', '+Math.floor(P.z);fc=0;ft=0;renderInfo()}
 }
