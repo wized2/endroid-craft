@@ -18,3 +18,4 @@
 #menu{overflow-y:auto;justify-content:flex-start}
 #menu>:first-child{margin-top:auto}#menu>:last-child{margin-bottom:auto}
 #menu .mc.small{margin-top:4px}
+#seedrow{display:flex;gap:6px;align-items:center;justify-content:center;margin-top:6px;flex-wrap:wrap}#seedIn{font:inherit;font-size:13px;padding:7px 9px;width:min(230px,60vw);background:#111;color:#fff;border:2px solid #444;user-select:text;-webkit-user-select:text}#seedCopy span{font-variant-numeric:tabular-nums}

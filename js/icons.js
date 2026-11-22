@@ -2,6 +2,7 @@
 // Add one: paste the inner SVG elements (no <svg> wrapper) into ICONS below.
 // Use: ico('name',size) -> SVG string, or <i data-icon="name"></i> in HTML (see hydrateIcons).
 const ICONS={
+ 'bed':"<path d='M2 4v16'/> <path d='M2 8h18a2 2 0 0 1 2 2v10'/> <path d='M2 17h20'/> <path d='M6 8v9'/>",
  'check':"<path d='M20 6 9 17l-5-5'/>",
  'target':"<circle cx='12' cy='12' r='10'/> <circle cx='12' cy='12' r='6'/> <circle cx='12' cy='12' r='2'/>",
  'shield':"<path d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/>",

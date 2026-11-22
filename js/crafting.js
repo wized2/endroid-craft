@@ -3,8 +3,9 @@
 const RECIPES=[
  {ic:'layers',n:'Planks ×4',cost:{4:1},give(){inv[7]+=4}},
  {ic:'pickaxe',n:'Stone Pickaxe',cost:{7:3,3:3},once:'pick',give(){tools.pick=true},note:'Mines much faster'},
- {ic:'sword',n:'Stone Sword',cost:{7:2,3:2},once:'sword',give(){tools.sword=true},note:'Damage 6'},
- {ic:'sword',n:'Gold Sword',cost:{13:3,7:1},once:'gsword',give(){tools.gsword=true},note:'Damage 9'},
+ {ic:'sword',n:'Stone Sword',cost:{7:2,3:2},once:'sword',give(){tools.sword=true},note:'Damage 5'},
+ {ic:'bed',n:'Bed',cost:{7:3,5:3},give(){inv[17]++},note:'Sleep at night, set spawn (leaves = wool)'},
+ {ic:'sword',n:'Gold Sword',cost:{13:3,7:1},once:'gsword',give(){tools.gsword=true},note:'Damage 6, best'},
  {ic:'shield',n:'Stone Armor',cost:{3:8,7:2},once:'a1',give(){tools.a1=true},note:'-25% melee damage'},
  {ic:'shield',n:'Gold Armor',cost:{13:6},once:'a2',give(){tools.a2=true},note:'-45% melee damage'},
  {ic:'box',n:'Bricks ×4',cost:{3:4},give(){inv[8]+=4}},

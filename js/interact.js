@@ -18,7 +18,7 @@ function raycast(o,d,max){
 let target=null,hoverMob=null,mine=null,crackStage=-1,atkCd=0,mineCd=0,swingT=0,swing=0;
 const dir=new THREE.Vector3();
 function triggerSwing(){swing=1}
-function dropOf(b){if(b===1)return 2;if(b===5)return Math.random()<.3?5:0;if(b>=14||b===9)return 0;return b}
+function dropOf(b){if(b===1)return 2;if(b===5)return Math.random()<.3?5:0;if(isPlant(b)||b===9)return 0;return b}
 function hardness(b){
  let h=HARD[b];
  if(tools.pick)h/=hardB(b)?4:1.6;
@@ -33,7 +33,7 @@ function breakBlock(h){
   const dr=dropOf(h.b);
   if(dr){inv[dr]++;if(h.b===13)toast('Gold!',1200);renderSlots();renderInfo()}
  }
- const ab=getBlock(h.x,h.y+1,h.z);if(ab>=14)setBlock(h.x,h.y+1,h.z,0);
+ const ab=getBlock(h.x,h.y+1,h.z);if(isPlant(ab))setBlock(h.x,h.y+1,h.z,0);
 }
 function killMob(m){
  if(m.type==='z'){
@@ -50,7 +50,7 @@ function attack(m){
  let dmg=!surv()?30:weaponDmg();if(crit)dmg=Math.round(dmg*1.5);
  m.hp-=dmg;m.hurt=.35;
  // swords interrupt a zombie's wind-up (brutes only with the gold sword); fists only nudge it
- const wd=weaponDmg();if(wd>=6&&(!m.big||wd>=9)){m.wind=0;m.stun=.4}else m.stun=.12;
+ const wd=weaponDmg();if(wd>=5&&(!m.big||wd>=6)){m.wind=0;m.stun=.4}else m.stun=.12;
  sfxHit();vib(15);
  const dx=m.x-P.x,dz=m.z-P.z,dd=Math.hypot(dx,dz)||1,kb=(Math.hypot(P.vx,P.vz)>5.5?10:7)*(m.big?.6:1);
  m.vx=dx/dd*kb;m.vz=dz/dd*kb;m.vy=5;m.onGround=false;
@@ -78,10 +78,11 @@ function interact(dt){
 }
 function doPlace(){
  const h=target;if(!h||h.t>5.2||dead)return;
+ if(getBlock(h.x,h.y,h.z)===17){useBed(h.x,h.y,h.z);return} // right-click a bed
  const id=HB[si];
  if(surv()&&inv[id]<=0){toast('No '+NAMES[id]+' left',900);return}
  const x=h.x+h.f[0],y=h.y+h.f[1],z=h.z+h.f[2];if(y<0||y>=H)return;
- const b=getBlock(x,y,z);if(b!==0&&b!==9&&b<14)return;
+ const b=getBlock(x,y,z);if(b!==0&&b!==9&&!isPlant(b))return;
  if(x+1>P.x-PW&&x<P.x+PW&&y+1>P.y&&y<P.y+HT&&z+1>P.z-PW&&z<P.z+PW)return;
  triggerSwing();sfxPlace();vib(14);
  setBlock(x,y,z,id);

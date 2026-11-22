@@ -5,7 +5,7 @@ const ck=(x,z)=>((x&0xffff)<<16)|(z&0xffff);
 const edits=new Map();
 if(saved&&saved.e)for(const k in saved.e)edits.set(+k,new Map(Object.entries(saved.e[k]).map(([i,v])=>[+i,v])));
 function getBlock(x,y,z){if(y<0)return 3;if(y>=H)return 0;const c=chunks.get(ck(x>>4,z>>4));if(!c)return -1;return c.d[(x&15)+CS*((z&15)+CS*y)]}
-const solidB=b=>b===-1||(b>0&&b!==9&&b<14);
+const solidB=b=>b===-1||(b>0&&b!==9&&!isPlant(b));
 function treeAt(wx,wz,h){
  if(h<=SEA+1||h>=40)return 0;
  const fd=fbm(wx*.02+SX+777,wz*.02+SZ-555),prob=fd>.58?.035:.004;
@@ -60,7 +60,7 @@ function genChunk(cx,cz){
 const AX=[[1,2],[1,2],[0,2],[0,2],[0,1],[0,1]];
 const SHD=[.82,.82,1,.55,.92,.72],AOV=[.5,.68,.84,1],E1=[0,0,0],E2=[0,0,0];
 const PQ=[[[0,0,0],[1,0,1],[1,1,1],[0,1,0]],[[1,0,0],[0,0,1],[0,1,1],[1,1,0]]];
-const isOp=b=>b>0&&b!==9&&b!==10&&b<14;
+const isOp=b=>b>0&&b!==9&&b!==10&&!isPlant(b);
 function build(c){
  const{cx,cz,d}=c,mkb=()=>({p:[],c:[],u:[],i:[]}),B=[mkb(),mkb(),mkb()];
  const get=(x,y,z)=>{
@@ -75,7 +75,7 @@ function build(c){
  const ao=[0,0,0,0];
  for(let y=0;y<=c.top;y++)for(let z=0;z<CS;z++)for(let x=0;x<CS;x++){
   const b=d[x+CS*(z+CS*y)];if(!b)continue;
-  if(b>=14){
+  if(isPlant(b)){
    const[u0,v0,u1,v1]=tileUV(tileFor(b,0)),buf=B[0],jx=(hash(x+cx*CS,z+cz*CS)-.5)*.3,jz=(hash(z+cz*CS+7,x+cx*CS-3)-.5)*.3;
    for(const quad of PQ){
     const base=buf.p.length/3;
@@ -87,7 +87,7 @@ function build(c){
   const buf=B[b===9?1:(b===10?2:0)],plain=b===9||b===10;
   for(let f=0;f<6;f++){
    const F=FACES[f],nx=x+F.n[0],ny=y+F.n[1],nz=z+F.n[2],nb=get(nx,ny,nz);
-   if(b===9){if(nb!==0&&nb<14)continue}
+   if(b===9){if(nb!==0&&!isPlant(nb))continue}
    else if(b===10){if(nb===10||isOp(nb))continue}
    else if(isOp(nb))continue;
    let dk=1;
@@ -163,7 +163,7 @@ function updateChunks(budget){
 }
 
 // ---------- safe spawn: open ground, not in/under trees, not in water ----------
-function surfaceY(x,z){for(let y=H-1;y>0;y--){const b=getBlock(x,y,z);if(b===-1)return -1;if(b!==0&&b<14&&b!==9&&b!==5)return y;if(b===9)return -2}return -1}
+function surfaceY(x,z){for(let y=H-1;y>0;y--){const b=getBlock(x,y,z);if(b===-1)return -1;if(b!==0&&!isPlant(b)&&b!==9&&b!==5)return y;if(b===9)return -2}return -1}
 function safeSpot(x,z){
  const y=surfaceY(x,z);if(y<SEA+1)return null;
  const t=getBlock(x,y,z);if(t!==1&&t!==2&&t!==6&&t!==11)return null;

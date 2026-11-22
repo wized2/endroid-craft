@@ -14,6 +14,7 @@ addEventListener('keydown',e=>{
  if(e.code==='KeyE'&&!e.repeat&&started){if(craftOpen)closeCraft();else if(running)openCraft();return}
  K[e.code]=true;
  if(/^Digit[0-9]$/.test(e.code)){const n=+e.code.slice(5);sel(n===0?9:n-1)}
+ if(e.code==='Minus')sel(10);
  if(e.code==='Space'&&!e.repeat&&running)tapSpace();
  if(e.code==='Space'||e.code.startsWith('Arrow'))e.preventDefault();
 });
@@ -45,10 +46,11 @@ $('#mSurv').addEventListener('click',()=>setMode('survival'));
 $('#mCre').addEventListener('click',()=>setMode('creative'));
 $('#respawn').addEventListener('click',respawn);
 let saveOff=false;
+$('#seedCur').textContent=String(SEEDL);
+$('#seedCopy').addEventListener('click',()=>{try{navigator.clipboard.writeText(String(SEEDL));toast('Seed copied',1200)}catch(e){toast('Seed: '+SEEDL,3000)}});
 $('#reset').addEventListener('click',()=>{
- const s=prompt('New world - this deletes your saved world.\nEnter a seed (number or word), or leave blank for random:','');
- if(s===null)return;
- try{localStorage.removeItem(SAVEKEY);localStorage.setItem('endroid-craft-nextseed',s)}catch(e){}
+ if(!confirm('Delete your saved world and start a new one?'))return;
+ try{localStorage.removeItem(SAVEKEY);localStorage.setItem('endroid-craft-nextseed',$('#seedIn').value)}catch(e){}
  saveOff=true;location.reload();
 });
 makeTouchBtn($('#pause'),()=>{setRunning(false);playBtn.textContent='Resume'});

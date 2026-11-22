@@ -1,9 +1,5 @@
 // noise.js - seeded noise + terrain height
 // ---------- seeded noise ----------
-// seed text -> number (numbers stay numbers, words are hashed)
-function strToSeed(s){s=String(s).trim();if(!s)return null;const n=parseInt(s,10);if(!isNaN(n)&&String(n)===s)return n>>>0;let h=5381;for(let i=0;i<s.length;i++)h=(Math.imul(h,33)^s.charCodeAt(i))|0;return h>>>0}
-let pendingSeed=null;try{pendingSeed=localStorage.getItem('endroid-craft-nextseed');localStorage.removeItem('endroid-craft-nextseed')}catch(e){}
-let SEED=(saved&&typeof saved.s==='number')?saved.s:(pendingSeed!==null&&pendingSeed!==''?strToSeed(pendingSeed):((Math.random()*1e9)|0));
 const SX=(SEED%9973)*13.7,SZ=((SEED>>>3)%9967)*11.3;
 function hash(x,z){let h=(Math.imul(x|0,374761393)+Math.imul(z|0,668265263))|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296}
 const hsh=(x,z,s)=>hash(x+s*131+(SEED&0xffff),z-s*71+((SEED>>>8)&0xffff));

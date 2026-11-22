@@ -11,7 +11,7 @@ function renderInfo(){
  if(surv())l3='\nGold '+inv[13]+' · Coal '+inv[12]+' · Kills '+kills+(tools.pick?' · Pickaxe':'')+(tools.gsword?' · Gold Sword':tools.sword?' · Sword':'')+(armorLvl()?' · Armor':'');
  else if(fly)l3='\nFlying';
  info.style.display=SET.info?'block':'none';
- info.textContent=fpsTxt+(weather.rain>.3?' | Rain':'')+'\n'+(surv()?'Survival':'Creative')+' · '+ph+' '+day+' · seed '+SEED+l3;
+ info.textContent=fpsTxt+(weather.rain>.3?' | Rain':'')+'\n'+(surv()?'Survival':'Creative')+' · '+ph+' '+day+' · seed '+SEEDL+l3;
 }
 let si=0;
 const bar=$('#bar');

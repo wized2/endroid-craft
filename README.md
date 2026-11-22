@@ -29,8 +29,12 @@ A browser voxel survival game built with [Three.js](https://threejs.org/). One H
 ## Goals
 - A guided objective list (10 goals: logs, planks, stone, pickaxe, sword, first night, zombies, gold, armor, Brute) shows under the info text in Survival. Progress is saved.
 
+## Days, beds, numbers
+- A day+night lasts 10 minutes. Craft a Bed (3 planks + 3 leaves) and place it. PLACE/right-click it to set your spawn; at night (no zombie within 8 blocks) it sleeps through to morning.
+- Minecraft-style values: walk 4.3 / sprint 5.6 blocks/s, fall damage after 3 blocks, 15 s of air, regen about 1 HP per 4 s after 10 s without damage, zombie 20 HP / 3 damage, stone sword 5, gold sword 6.
+
 ## Combat
-- Weapons: fists 2, Stone Sword 6, Gold Sword 9. Falling hits are critical (x1.5); sprint hits knock back further.
+- Weapons: fists 2, Stone Sword 5, Gold Sword 6. Falling hits are critical (x1.5); sprint hits knock back further.
 - Armor: Stone (-25% melee damage) and Gold (-45%), shown next to your hearts.
 - Zombies wind up before swiping (arms rise): dodge, back off, or hit them to interrupt. Walls 2 high stop them.
 - Brute zombies from day 3: bigger, 45 HP, hit for 5, better drops. More zombies as days pass.
@@ -48,7 +52,7 @@ A browser voxel survival game built with [Three.js](https://threejs.org/). One H
 - 16 templates (house, castle, maze, dome...), plus your own saved presets. Ctrl+Enter runs.
 - `site(r)` finds a flat, dry, tree-free spot ahead of you, clears trees/plants and levels the ground, so builds never end up in or on trees.
 - Undo the last script, and a Normal/Fast/Instant speed switch.
-- "New world" asks for a seed (number or word). The seed shows in the info text.
+- Seeds follow Minecraft Java rules: blank = random 64-bit, a number up to 64-bit is used as is, anything else becomes Java's `String.hashCode()`, then feeds `java.util.Random`. Type one in the menu before New world; tap the seed button to copy it. The terrain is Endroid Craft's own generator, so a seed does not give the same land as Minecraft.
 
 ## Install & fullscreen
 - Installable as a PWA (manifest + service worker), opens fullscreen, works offline after the first load.
@@ -62,7 +66,7 @@ js/boot.js        entry: loads Three.js, then the files below IN ORDER (edit FIL
 js/icons.js       Lucide icons as inline SVG: ico('name', size) or <i data-icon="name">
 js/config.js      constants, saved state, inventory
 js/touch.js       touch/mouse button helper, fullscreen
-js/objectives.js  templates.js  scripting.js  weather.js  settings.js  audio.js  noise.js  textures.js  scene.js  world.js
+js/sleep.js  seed.js  objectives.js  templates.js  scripting.js  weather.js  settings.js  audio.js  noise.js  textures.js  scene.js  world.js
 js/hud.js  physics.js  player.js  mobs.js  playermodel.js  interact.js  crafting.js
 js/input.js  save.js  main.js (game loop)
 ```

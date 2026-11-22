@@ -6,6 +6,7 @@ const OBJECTIVES=[
  {t:'Craft a Stone Pickaxe',ok:()=>tools.pick},
  {t:'Craft a Stone Sword',ok:()=>tools.sword||tools.gsword},
  {t:'Survive your first night (build a shelter!)',ok:()=>Math.floor(clock/DAY)>=1},
+ {t:'Craft a Bed (planks + leaves) and sleep through a night',ok:()=>sleeps>=1},
  {t:'Defeat 3 zombies',ok:()=>kills>=3},
  {t:'Find 3 gold (mine ore or zombie drops)',ok:()=>inv[13]>=3||tools.a2||tools.gsword},
  {t:'Craft armor',ok:()=>tools.a1||tools.a2},

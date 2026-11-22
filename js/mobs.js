@@ -6,7 +6,7 @@ function limb(w,h,d,col,x,y,z,par){const g=new THREE.Group();g.position.set(x,y,
 function makeMob(type,x,y,z){
  const g=new THREE.Group(),m={type,g,x,y,z,vx:0,vy:0,vz:0,onGround:false,wall:false,wallPrev:false,hurt:0,cd:1,yaw:Math.random()*6.28,ph:0,wt:0,dirx:0,dirz:0,flee:0,gT:3+Math.random()*4,legs:[],arms:[],burn:false};
  if(type==='z'){
-  m.hp=20;m.w=.3;m.h=1.8;m.spd=2.8;m.dmg=4;m.wind=0;m.stun=0;
+  m.hp=20;m.w=.3;m.h=1.8;m.spd=3.5;m.dmg=3;m.wind=0;m.stun=0;
   box(.5,.75,.25,0x2f6f9f,0,1.125,0,g);box(.5,.5,.5,0x5b9449,0,1.75,0,g);
   box(.1,.08,.03,0x111111,-.12,1.78,-.26,g);box(.1,.08,.03,0x111111,.12,1.78,-.26,g);
   m.arms.push(limb(.2,.7,.2,0x5b9449,-.35,1.47,0,g),limb(.2,.7,.2,0x5b9449,.35,1.47,0,g));
@@ -26,12 +26,12 @@ function removeMob(i){
  m.g.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose()}});mobs.splice(i,1);
 }
 // Brute zombies appear from day 3: bigger, tougher, hit harder, better drops
-function bigify(m){m.big=true;m.hp=m.maxhp=45;m.dmg=6;m.w=.4;m.h=2.3;m.spd=2.4;m.g.scale.setScalar(1.3);m.g.traverse(o=>{if(o.isMesh)o.userData.base.multiplyScalar(.72)})}
+function bigify(m){m.big=true;m.hp=m.maxhp=45;m.dmg=5;m.w=.4;m.h=2.3;m.spd=3;m.g.scale.setScalar(1.3);m.g.traverse(o=>{if(o.isMesh)o.userData.base.multiplyScalar(.72)})}
 function trySpawn(type){
  for(let t=0;t<6;t++){
   const a=Math.random()*Math.PI*2,r=type==='z'?18+Math.random()*12:14+Math.random()*14,x=Math.floor(P.x+Math.cos(a)*r),z=Math.floor(P.z+Math.sin(a)*r);
   let y=-1;
-  for(let yy=H-1;yy>0;yy--){const b=getBlock(x,yy,z);if(b===0||b>=14)continue;if(b===-1)break;if(b===1||b===2||b===6||b===11||b===3)y=yy+1;break}
+  for(let yy=H-1;yy>0;yy--){const b=getBlock(x,yy,z);if(b===0||isPlant(b))continue;if(b===-1)break;if(b===1||b===2||b===6||b===11||b===3)y=yy+1;break}
   if(y<0)continue;
   const nm=makeMob(type,x+.5,y,z+.5);
   if(type==='z'&&Math.floor(clock/DAY)>=2&&Math.random()<.22)bigify(nm);

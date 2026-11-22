@@ -5,9 +5,9 @@ let flyDown=false,lastSpace=0,fallY=P.y,airT=0,stepDist=0,wasInWater=false,inWat
 function toggleFly(){if(surv())return;fly=!fly;P.vy=0;fallY=P.y;toast(fly?'Flying on':'Flying off',900);$('#bDown').style.display=(fly&&touch)?'block':'none';renderInfo()}
 function tapSpace(){const n=performance.now();if(!surv()&&n-lastSpace<300)toggleFly();lastSpace=n}
 function damagePlayer(n,fx,fz){
- if(!surv()||dead)return;
+ if(!surv()||dead||sleepT>0)return;
  if(fx!==undefined)n=Math.max(1,Math.round(n*(1-DMGRED[armorLvl()]))); // armor only helps against melee
- hp=Math.max(0,hp-n);regenCd=7;flash=1;sfxHurt();vib(40);
+ hp=Math.max(0,hp-n);regenCd=10;flash=1;sfxHurt();vib(40);
  if(fx!==undefined){const dx=P.x-fx,dz=P.z-fz,dd=Math.hypot(dx,dz)||1;P.vx=dx/dd*6;P.vz=dz/dd*6;P.vy=Math.max(P.vy,4.5);kbT=.28}
  renderHearts();
  if(hp<=0)die();
@@ -26,9 +26,10 @@ function respawn(){
 function update(dt){
  const fl=fly&&!surv();
  let fwd=(K.KeyW||K.ArrowUp?1:0)-(K.KeyS||K.ArrowDown?1:0)+joy.fy,str=(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0)+joy.fx;
+ if(sleepT>0){fwd=0;str=0}
  const mag=Math.hypot(fwd,str);if(mag>1){fwd/=mag;str/=mag}
  const shift=K.ShiftLeft||K.ShiftRight,sprint=!fl&&(shift||Math.hypot(joy.fx,joy.fy)>.92)&&fwd>.1;
- let sp=fl?8:(touch?4.8:4.3);if(sprint)sp*=1.45;if(inWater&&!fl)sp*=.55;
+ let sp=fl?8:(touch?4.8:4.3);if(sprint)sp*=1.3;if(inWater&&!fl)sp*=.55;
  const sy=Math.sin(yaw),cy=Math.cos(yaw),tx=(-sy*fwd+cy*str)*sp,tz=(-cy*fwd-sy*str)*sp,k=Math.min(1,dt*(P.onGround||fl?12:4));
  kbT=Math.max(0,kbT-dt);
  if(kbT<=0){P.vx+=(tx-P.vx)*k;P.vz+=(tz-P.vz)*k}
@@ -50,9 +51,9 @@ function update(dt){
   const hs=Math.hypot(P.vx,P.vz);
   if(hs>.8){stepDist+=hs*dt;if(stepDist>(sprint?2.2:1.7)){sfxStep(getBlock(Math.floor(P.x),Math.floor(P.y-.1),Math.floor(P.z)));stepDist=0}}
  }else fallY=(inWater||fl)?P.y:Math.max(fallY,P.y);
- if(camInWater&&surv()){air-=dt;if(air<=0){air=0;airT-=dt;if(airT<=0){airT=1;damagePlayer(2)}}}else air=Math.min(10,air+dt*5);
+ if(camInWater&&surv()){air-=dt*.667;if(air<=0){air=0;airT-=dt;if(airT<=0){airT=1;damagePlayer(2)}}}else air=Math.min(10,air+dt*5);
  const an=air>=9.95?-1:Math.ceil(air);if(an!==lastAirN){lastAirN=an;renderAir()}
- if(surv()&&hp<20&&hp>0){regenCd-=dt;if(regenCd<=0){regenT+=dt;if(regenT>=2.5){regenT=0;hp++;renderHearts()}}}
+ if(surv()&&hp<20&&hp>0){regenCd-=dt;if(regenCd<=0){regenT+=dt;if(regenT>=4){regenT=0;hp++;renderHearts()}}}
  flash=Math.max(0,flash-dt*2.2);dmgEl.style.opacity=flash;
  if(P.y<-40){P.x=spawn[0];P.y=spawn[1];P.z=spawn[2];P.vy=0;fallY=P.y}
  const hsp=Math.hypot(P.vx,P.vz);

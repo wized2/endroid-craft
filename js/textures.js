@@ -4,7 +4,7 @@ const TS=16,AC=8,ac=document.createElement('canvas');ac.width=ac.height=TS*AC;
 const tc=ac.getContext('2d');
 let rs=987654321;const rnd=()=>{rs=(Math.imul(rs,1664525)+1013904223)>>>0;return rs/4294967296};
 const tileAvg=[];
-const TI={grassTop:0,grassSide:1,dirt:2,stone:3,logSide:4,logTop:5,leaves:6,sand:7,planks:8,brick:9,water:10,glass:11,snow:12,coal:13,gold:14,flowerR:15,flowerY:16,tall:17};
+const TI={grassTop:0,grassSide:1,dirt:2,stone:3,logSide:4,logTop:5,leaves:6,sand:7,planks:8,brick:9,water:10,glass:11,snow:12,coal:13,gold:14,flowerR:15,flowerY:16,tall:17,bedTop:18,bedSide:19};
 function paint(i,fn){
  const im=tc.createImageData(TS,TS);let r=0,g=0,b=0,n=0;
  for(let y=0;y<TS;y++)for(let x=0;x<TS;x++){
@@ -44,6 +44,8 @@ paint(TI.flowerR,flower([220,40,50],[250,210,60]));
 paint(TI.flowerY,flower([250,215,40],[240,140,30]));
 const bh=[];for(let x=0;x<TS;x++)bh[x]=(x%3===2)?0:5+((rnd()*9)|0);
 paint(TI.tall,(x,y)=>y>=16-bh[x]?vr(y<18-bh[x]?[120,190,70]:[70,150,45],24):null);
+paint(TI.bedTop,(x,y)=>{if(y<5)return vr([240,238,230],10);if(y===5)return vr([200,196,186],10);return vr([196,40,44],18)});
+paint(TI.bedSide,(x,y)=>{if(y>=11)return vr([150,112,64],14);if(y===10)return vr([100,70,40],10);return vr([196,40,44],18)});
 const EP=.0008;
 function tileUV(i){const c=i%AC,r=(i/AC)|0;return[c/AC+EP,1-(r+1)/AC+EP,(c+1)/AC-EP,1-r/AC-EP]}
 function tileFor(b,f){
@@ -53,6 +55,7 @@ function tileFor(b,f){
   case 4:return(f===2||f===3)?TI.logTop:TI.logSide;
   case 5:return TI.leaves;case 6:return TI.sand;case 7:return TI.planks;case 8:return TI.brick;
   case 9:return TI.water;case 10:return TI.glass;case 11:return TI.snow;case 12:return TI.coal;case 13:return TI.gold;
+  case 17:return(f===2)?TI.bedTop:(f===3?TI.planks:TI.bedSide);
   case 14:return TI.flowerR;case 15:return TI.flowerY;case 16:return TI.tall;
  }
  return 0;
