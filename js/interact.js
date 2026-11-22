@@ -39,19 +39,22 @@ function hardness(b){
 function breakBlock(h){
  if(!h||h.b<=0)return false;
  if(h.y<=0)return false;
- if(isCrop(h.b)){harvestCrop(h.x,h.y,h.z);triggerSwing();return true}
-
+ if(typeof isCrop==='function'&&isCrop(h.b)){harvestCrop(h.x,h.y,h.z);triggerSwing();mine=null;crack.visible=false;if(target&&target.x===h.x&&target.y===h.y&&target.z===h.z)target=null;if(typeof hl!=='undefined')hl.visible=false;return true}
+ const bx=h.x,by=h.y,bz=h.z,bb=h.b;
  triggerSwing();
- spawnParticles(h.x+.5,h.y+.5,h.z+.5,tileAvg[tileFor(h.b,4)]||[.5,.5,.5],12);
- sfxBreak(h.b);vib(18);
- setBlock(h.x,h.y,h.z,0);
+ spawnParticles(bx+.5,by+.5,bz+.5,(typeof tileAvg!=='undefined'&&tileAvg[tileFor(bb,4)])||[.5,.5,.5],12);
+ sfxBreak(bb);vib(18);
+ setBlock(bx,by,bz,0);
+ const ab=getBlock(bx,by+1,bz);if(isPlant(ab))setBlock(bx,by+1,bz,0);
  if(surv()){
   addExh(.005);
-  if(!canHarvest(h.b))toast(h.b===13?'Needs a stone pickaxe':'Needs a pickaxe',1300);
-  const dr=canHarvest(h.b)?dropOf(h.b):0;
-  if(dr){inv[dr]++;if(h.b===13)toast('Gold!',1200);renderSlots();renderInfo()}
+  if(!canHarvest(bb))toast(bb===13?'Needs a stone pickaxe':'Needs a pickaxe',1300);
+  const dr=canHarvest(bb)?dropOf(bb):0;
+  if(dr){inv[dr]++;if(bb===13)toast('Gold!',1200);renderSlots();renderInfo()}
  }
- const ab=getBlock(h.x,h.y+1,h.z);if(isPlant(ab))setBlock(h.x,h.y+1,h.z,0);
+ mine=null;crack.visible=false;
+ if(target&&target.x===bx&&target.y===by&&target.z===bz)target=null;
+ if(typeof hl!=='undefined')hl.visible=false;
  return true;
 }
 function drop(id,n){if(n<=0||!surv())return;inv[id]+=n}
