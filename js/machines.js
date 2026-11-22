@@ -5,9 +5,9 @@ const SMELT={12:/*coal stays*/null,18:19,20:21,22:23,13:37}; // raw meats -> coo
 const furnaces=new Map(); // key "x,y,z" -> {fuel,prog,inId,outId}
 const chests=new Map();
 
-function mk(x,y,z){return x+','+y+','+z}
+function posKey(x,y,z){return x+','+y+','+z}
 function openFurnace(x,y,z){
- const k=mk(x,y,z);if(!furnaces.has(k))furnaces.set(k,{fuel:0,prog:0,inId:0,outId:0,outN:0});
+ const k=posKey(x,y,z);if(!furnaces.has(k))furnaces.set(k,{fuel:0,prog:0,inId:0,outId:0,outN:0});
  const f=furnaces.get(k);
  const el=$('#furnace');if(!el)return;
  $('#furnStatus').textContent=f.fuel>0?('Fuel '+f.fuel.toFixed(1)+'s · smelt '+(f.prog*100|0)+'%'):'Add coal (hotbar) then raw food / ore';
@@ -31,7 +31,7 @@ function tickFurnaces(dt){
 }
 function furnFeed(){
  if(!window._furnPos)return;
- const[x,y,z]=window._furnPos;const f=furnaces.get(mk(x,y,z));if(!f)return;
+ const[x,y,z]=window._furnPos;const f=furnaces.get(posKey(x,y,z));if(!f)return;
  const id=HB[si];
  if(id===12){ // coal as fuel
   if(surv()&&inv[12]<=0){toast('No coal',900);return}
@@ -45,13 +45,13 @@ function furnFeed(){
 }
 function furnTake(){
  if(!window._furnPos)return;
- const f=furnaces.get(mk(...window._furnPos));if(!f||!f.outN){toast('Nothing ready',900);return}
+ const f=furnaces.get(posKey(...window._furnPos));if(!f||!f.outN){toast('Nothing ready',900);return}
  if(surv())inv[f.outId]=(inv[f.outId]|0)+f.outN;
  toast('Took '+f.outN+'× '+(NAMES[f.outId]||'?'),1000);
  f.outN=0;f.outId=0;renderSlots();
 }
 function openChest(x,y,z){
- const k=mk(x,y,z);if(!chests.has(k))chests.set(k,{});
+ const k=posKey(x,y,z);if(!chests.has(k))chests.set(k,{});
  const c=chests.get(k);
  const el=$('#chest');if(!el)return;
  const list=$('#chestList');list.innerHTML='';
@@ -72,7 +72,7 @@ function openChest(x,y,z){
 function closeChest(){const el=$('#chest');if(el)el.style.display='none';window._chestPos=null}
 function chestDeposit(){
  if(!window._chestPos)return;
- const k=mk(...window._chestPos);const c=chests.get(k)||{};chests.set(k,c);
+ const k=posKey(...window._chestPos);const c=chests.get(k)||{};chests.set(k,c);
  const id=HB[si];if(!id)return;
  if(surv()){
   if(inv[id]<=0){toast('Nothing to deposit',900);return}

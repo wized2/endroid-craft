@@ -30,7 +30,6 @@ body.creative #quest{display:none!important}
 #quest .ic{display:inline-block;vertical-align:-2px;margin-right:4px}
 #sleepfx{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:6}
 
-#stats{position:relative}
 #food{display:flex;gap:1px;align-items:center}
 .hr.fd{width:17px;height:17px;color:#3a2a1a}.hr.fd .f{color:#d58a3c}
 #air{position:absolute;right:0;bottom:21px}

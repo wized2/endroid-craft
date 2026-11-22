@@ -4,7 +4,7 @@ const villagesDone=new Set();
 function villageChance(cx,cz){
  return hsh(cx*17+3,cz*13+9,7)<.05;
 }
-function surfaceY(x,z){
+function vSurfaceY(x,z){
  for(let y=H-2;y>0;y--){const b=getBlock(x,y,z);if(b>0&&b!==9&&!isPlant(b)&&b!==-1)return y}
  return SEA;
 }
@@ -16,7 +16,7 @@ function putV(x,y,z,b){
 function buildHouseInChunk(cx,cz,lx,lz){
  // lx,lz local 0-11 so house fits in chunk
  const x0=cx*CS+lx,z0=cz*CS+lz;
- const y0=Math.min(H-6,Math.max(SEA+1,surfaceY(x0+1,z0+1)));
+ const y0=Math.min(H-6,Math.max(SEA+1,vSurfaceY(x0+1,z0+1)));
  for(let dx=0;dx<=3;dx++)for(let dz=0;dz<=3;dz++){
   const x=x0+dx,z=z0+dz;
   for(let yy=y0-2;yy<=y0;yy++)if(yy>0)putV(x,yy,z,yy===y0?7:2);
@@ -36,7 +36,7 @@ function buildHouseInChunk(cx,cz,lx,lz){
 }
 function buildFarmInChunk(cx,cz,lx,lz){
  const x0=cx*CS+lx,z0=cz*CS+lz;
- const y0=Math.min(H-4,Math.max(SEA+1,surfaceY(x0+2,z0+1)));
+ const y0=Math.min(H-4,Math.max(SEA+1,vSurfaceY(x0+2,z0+1)));
  for(let dx=0;dx<=4;dx++)for(let dz=0;dz<=3;dz++){
   if(lx+dx>15||lz+dz>15)continue;
   const x=x0+dx,z=z0+dz;
@@ -56,7 +56,7 @@ function tryGenVillage(cx,cz){
  if(CS>=16)spots.push(buildHouseInChunk(cx,cz,9,9));
  buildFarmInChunk(cx,cz,3,2);
  // path strip
- for(let i=2;i<=12;i++){const x=cx*CS+i,z=cz*CS+7;const y=surfaceY(x,z);putV(x,y,z,38)}
+ for(let i=2;i<=12;i++){const x=cx*CS+i,z=cz*CS+7;const y=vSurfaceY(x,z);putV(x,y,z,38)}
  flushChunks();
  setTimeout(()=>{
   for(const s of spots){

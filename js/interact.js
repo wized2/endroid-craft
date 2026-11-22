@@ -57,17 +57,17 @@ function breakBlock(h){
  if(typeof hl!=='undefined')hl.visible=false;
  return true;
 }
-function drop(id,n){if(n<=0||!surv())return;inv[id]+=n}
+function giveDrop(id,n){if(n<=0||!surv())return;inv[id]+=n}
 const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 function killMob(m){
- if(m.type==='v'){drop(37,1);toast('Villager dropped an emerald',1200)}
+ if(m.type==='v'){giveDrop(37,1);toast('Villager dropped an emerald',1200)}
  else if(m.type==='z'){
   kills++;if(m.big)bruteKills++;
-  drop(25,m.big?rint(1,3):rint(0,2)); // rotten flesh
+  giveDrop(25,m.big?rint(1,3):rint(0,2)); // rotten flesh
   if(Math.random()<(m.big?.1:.025)){inv[13]++;toast('Zombie dropped gold!')} // rare, like Minecraft's iron
- }else if(m.type==='p'){drop(18,rint(1,3));toast('Raw Porkchop',900)}
- else if(m.type==='c'){drop(20,rint(1,3));drop(27,rint(0,2));toast('Raw Beef + leather',1000)}
- else{drop(26,1);drop(22,rint(1,2));toast('Wool + Raw Mutton',1000)}
+ }else if(m.type==='p'){giveDrop(18,rint(1,3));toast('Raw Porkchop',900)}
+ else if(m.type==='c'){giveDrop(20,rint(1,3));giveDrop(27,rint(0,2));toast('Raw Beef + leather',1000)}
+ else{giveDrop(26,1);giveDrop(22,rint(1,2));toast('Wool + Raw Mutton',1000)}
  spawnParticles(m.x,m.y+m.h*.5,m.z,m.type==='z'?[.35,.58,.29]:m.type==='c'?[.4,.3,.22]:m.type==='s'?[.9,.9,.9]:[.94,.63,.66],m.big?24:14);
  removeMob(mobs.indexOf(m));renderSlots();renderInfo();showMobHp(null);
 }
