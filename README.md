@@ -26,6 +26,9 @@ A browser voxel survival game built with [Three.js](https://threejs.org/). One H
 | 1-9, 0 or scroll select block | Tap a hotbar slot |
 | E crafting, Esc pause | Hammer button, menu button |
 
+## Goals
+- A guided objective list (10 goals: logs, planks, stone, pickaxe, sword, first night, zombies, gold, armor, Brute) shows under the info text in Survival. Progress is saved.
+
 ## Combat
 - Weapons: fists 2, Stone Sword 6, Gold Sword 9. Falling hits are critical (x1.5); sprint hits knock back further.
 - Armor: Stone (-25% melee damage) and Gold (-45%), shown next to your hearts.
@@ -59,7 +62,7 @@ js/boot.js        entry: loads Three.js, then the files below IN ORDER (edit FIL
 js/icons.js       Lucide icons as inline SVG: ico('name', size) or <i data-icon="name">
 js/config.js      constants, saved state, inventory
 js/touch.js       touch/mouse button helper, fullscreen
-js/templates.js  scripting.js  weather.js  settings.js  audio.js  noise.js  textures.js  scene.js  world.js
+js/objectives.js  templates.js  scripting.js  weather.js  settings.js  audio.js  noise.js  textures.js  scene.js  world.js
 js/hud.js  physics.js  player.js  mobs.js  playermodel.js  interact.js  crafting.js
 js/input.js  save.js  main.js (game loop)
 ```

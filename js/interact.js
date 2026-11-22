@@ -37,7 +37,7 @@ function breakBlock(h){
 }
 function killMob(m){
  if(m.type==='z'){
-  kills++;
+  kills++;if(m.big)bruteKills++;
   if(Math.random()<(m.big?.85:.3)){const n=m.big?1+(Math.random()<.5):1;inv[13]+=n;toast('Zombie dropped gold!')}else if(Math.random()<.4){inv[12]++}
  }else if(surv()&&hp<20){hp=Math.min(20,hp+4);renderHearts();toast('+2 \u2665',1200)}
  spawnParticles(m.x,m.y+m.h*.5,m.z,m.type==='z'?[.35,.58,.29]:[.94,.63,.66],m.big?24:14);
@@ -48,7 +48,9 @@ function attack(m){
  // falling hit = critical (x1.5); sprint hit = extra knockback
  const crit=surv()&&!P.onGround&&P.vy<-1&&!inWater&&!fly;
  let dmg=!surv()?30:weaponDmg();if(crit)dmg=Math.round(dmg*1.5);
- m.hp-=dmg;m.hurt=.35;m.wind=0;m.stun=.55; // hitting a zombie interrupts its attack wind-up
+ m.hp-=dmg;m.hurt=.35;
+ // swords interrupt a zombie's wind-up (brutes only with the gold sword); fists only nudge it
+ const wd=weaponDmg();if(wd>=6&&(!m.big||wd>=9)){m.wind=0;m.stun=.4}else m.stun=.12;
  sfxHit();vib(15);
  const dx=m.x-P.x,dz=m.z-P.z,dd=Math.hypot(dx,dz)||1,kb=(Math.hypot(P.vx,P.vz)>5.5?10:7)*(m.big?.6:1);
  m.vx=dx/dd*kb;m.vz=dz/dd*kb;m.vy=5;m.onGround=false;

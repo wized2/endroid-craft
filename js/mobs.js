@@ -6,7 +6,7 @@ function limb(w,h,d,col,x,y,z,par){const g=new THREE.Group();g.position.set(x,y,
 function makeMob(type,x,y,z){
  const g=new THREE.Group(),m={type,g,x,y,z,vx:0,vy:0,vz:0,onGround:false,wall:false,wallPrev:false,hurt:0,cd:1,yaw:Math.random()*6.28,ph:0,wt:0,dirx:0,dirz:0,flee:0,gT:3+Math.random()*4,legs:[],arms:[],burn:false};
  if(type==='z'){
-  m.hp=20;m.w=.3;m.h=1.8;m.spd=2.5;m.dmg=3;m.wind=0;m.stun=0;
+  m.hp=20;m.w=.3;m.h=1.8;m.spd=2.8;m.dmg=4;m.wind=0;m.stun=0;
   box(.5,.75,.25,0x2f6f9f,0,1.125,0,g);box(.5,.5,.5,0x5b9449,0,1.75,0,g);
   box(.1,.08,.03,0x111111,-.12,1.78,-.26,g);box(.1,.08,.03,0x111111,.12,1.78,-.26,g);
   m.arms.push(limb(.2,.7,.2,0x5b9449,-.35,1.47,0,g),limb(.2,.7,.2,0x5b9449,.35,1.47,0,g));
@@ -26,7 +26,7 @@ function removeMob(i){
  m.g.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose()}});mobs.splice(i,1);
 }
 // Brute zombies appear from day 3: bigger, tougher, hit harder, better drops
-function bigify(m){m.big=true;m.hp=m.maxhp=45;m.dmg=5;m.w=.4;m.h=2.3;m.spd=2.1;m.g.scale.setScalar(1.3);m.g.traverse(o=>{if(o.isMesh)o.userData.base.multiplyScalar(.72)})}
+function bigify(m){m.big=true;m.hp=m.maxhp=45;m.dmg=6;m.w=.4;m.h=2.3;m.spd=2.4;m.g.scale.setScalar(1.3);m.g.traverse(o=>{if(o.isMesh)o.userData.base.multiplyScalar(.72)})}
 function trySpawn(type){
  for(let t=0;t<6;t++){
   const a=Math.random()*Math.PI*2,r=type==='z'?18+Math.random()*12:14+Math.random()*14,x=Math.floor(P.x+Math.cos(a)*r),z=Math.floor(P.z+Math.sin(a)*r);
@@ -60,7 +60,7 @@ function updateMobs(dt){
    // attack: short wind-up you can dodge or interrupt by hitting it, then a swipe
    if(m.stun>0)m.stun-=dt;
    if(m.wind>0){m.wind-=dt;if(m.wind<=0){if(dist<1.9&&Math.abs(P.y-m.y)<1.7&&!dead)damagePlayer(m.dmg,m.x,m.z);m.cd=1.0}}
-   else if(dist<1.5&&Math.abs(P.y-m.y)<1.6&&m.cd<=0&&m.stun<=0&&!dead)m.wind=.5;
+   else if(dist<1.5&&Math.abs(P.y-m.y)<1.6&&m.cd<=0&&m.stun<=0&&!dead)m.wind=.42;
    if(m.wind>0||m.stun>0)m.dirx=m.dirz=0;
    m.burn=dayK>.5;
    if(m.burn){m.hp-=2.5*dt;if(m.hp<=0){spawnParticles(m.x,m.y+1,m.z,[.3,.3,.3],8);removeMob(i);continue}}

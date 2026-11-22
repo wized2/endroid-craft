@@ -36,6 +36,7 @@ function applyMode(){
  $('#mSurv').classList.toggle('sel',surv());$('#mCre').classList.toggle('sel',!surv());
  $('#bDown').style.display=(fly&&!surv()&&touch)?'block':'none';
  renderHearts();renderArmor();renderSlots();renderInfo();
+ if(typeof renderQuest==='function')renderQuest();
 }
 
 

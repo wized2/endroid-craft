@@ -3,7 +3,7 @@
 function save(){
  if(saveOff)return;
  try{
-  localStorage.setItem(SAVEKEY,JSON.stringify({v:2,s:SEED,mode,hp,clock,kills,inv,tools,spawn,
+  localStorage.setItem(SAVEKEY,JSON.stringify({v:2,s:SEED,mode,hp,clock,kills,inv,tools,spawn,o:objI,bk:bruteKills,
    e:Object.fromEntries([...edits].map(([k,m])=>[k,Object.fromEntries(m)])),
    p:dead?[spawn[0],spawn[1],spawn[2],0,0]:[P.x,P.y,P.z,yaw,pitch]}));
  }catch(e){}

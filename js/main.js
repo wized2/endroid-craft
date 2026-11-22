@@ -20,6 +20,7 @@ function frame(now){
  if(running){update(dt);clock+=dt;const dn=Math.floor(clock/DAY);if(dn!==lastDay){lastDay=dn;if(surv())toast('Day '+(dn+1)+' — you survived the night!',2600)}}
  updateChunks(touch?1:2);
 updateWeather(dt);
+if(running)updateObjectives(dt);
  placeCamera(dt);
  target=raycast(eye,dir,5.5);
  if(running){

@@ -25,3 +25,6 @@ body.creative .slot b{display:none}
 #mobhp{position:absolute;top:18%;left:50%;transform:translateX(-50%);width:min(200px,50vw);text-align:center;color:#fff;font-size:13px;font-weight:700;text-shadow:1px 1px 2px #000;opacity:0;transition:opacity .2s}
 #mobhp div{height:7px;background:rgba(0,0,0,.55);border:1px solid #000;margin-top:3px}
 #mobhp i{display:block;height:100%;width:100%;background:linear-gradient(#ff5a4d,#c0281f)}
+#quest{position:absolute;left:8px;top:80px;max-width:min(300px,60vw);color:#ffe9a6;font-size:12px;line-height:1.4;text-shadow:1px 1px 2px #000;display:none}#quest .icw{margin-right:3px}
+body.creative #quest{display:none!important}
+#quest .ic{display:inline-block;vertical-align:-2px;margin-right:4px}
