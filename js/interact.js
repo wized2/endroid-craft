@@ -38,16 +38,21 @@ function breakBlock(h){
 function killMob(m){
  if(m.type==='z'){
   kills++;
-  if(Math.random()<.3){inv[13]++;toast('Zombie dropped gold!')}else if(Math.random()<.4){inv[12]++}
- }else if(surv()&&hp<20){hp=Math.min(20,hp+4);renderHearts();toast('+2 ♥',1200)}
- spawnParticles(m.x,m.y+m.h*.5,m.z,m.type==='z'?[.35,.58,.29]:[.94,.63,.66],14);
- removeMob(mobs.indexOf(m));renderSlots();renderInfo();
+  if(Math.random()<(m.big?.85:.3)){const n=m.big?1+(Math.random()<.5):1;inv[13]+=n;toast('Zombie dropped gold!')}else if(Math.random()<.4){inv[12]++}
+ }else if(surv()&&hp<20){hp=Math.min(20,hp+4);renderHearts();toast('+2 \u2665',1200)}
+ spawnParticles(m.x,m.y+m.h*.5,m.z,m.type==='z'?[.35,.58,.29]:[.94,.63,.66],m.big?24:14);
+ removeMob(mobs.indexOf(m));renderSlots();renderInfo();showMobHp(null);
 }
 function attack(m){
- triggerSwing();sfxHit();vib(15);
- m.hp-=!surv()?30:(tools.sword?7:2);m.hurt=.35;
- const dx=m.x-P.x,dz=m.z-P.z,dd=Math.hypot(dx,dz)||1;
- m.vx=dx/dd*7;m.vz=dz/dd*7;m.vy=5;m.onGround=false;
+ triggerSwing();
+ // falling hit = critical (x1.5); sprint hit = extra knockback
+ const crit=surv()&&!P.onGround&&P.vy<-1&&!inWater&&!fly;
+ let dmg=!surv()?30:weaponDmg();if(crit)dmg=Math.round(dmg*1.5);
+ m.hp-=dmg;m.hurt=.35;m.wind=0;m.stun=.55; // hitting a zombie interrupts its attack wind-up
+ sfxHit();vib(15);
+ const dx=m.x-P.x,dz=m.z-P.z,dd=Math.hypot(dx,dz)||1,kb=(Math.hypot(P.vx,P.vz)>5.5?10:7)*(m.big?.6:1);
+ m.vx=dx/dd*kb;m.vz=dz/dd*kb;m.vy=5;m.onGround=false;
+ if(crit){spawnParticles(m.x,m.y+m.h*.7,m.z,[1,.9,.3],10);toast('Critical hit!',500);sfxHit()}
  if(m.type==='p')m.flee=3;
  if(m.hp<=0)killMob(m);
 }
@@ -56,6 +61,7 @@ function interact(dt){
  hoverMob=null;let best=3.6;
  if(target&&target.t<best)best=target.t;
  for(const m of mobs){const t=rayBox(eye,dir,m.x,m.y,m.z,m.w,m.h);if(t!==null&&t<best){best=t;hoverMob=m}}
+ showMobHp(hoverMob);
  if(!held.brk){mine=null;crack.visible=false;return}
  if(hoverMob){mine=null;crack.visible=false;if(atkCd<=0){attack(hoverMob);atkCd=.45}return}
  if(!target||target.t>5||target.y<=0){mine=null;crack.visible=false;return}

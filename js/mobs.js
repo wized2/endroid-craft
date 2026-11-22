@@ -6,7 +6,7 @@ function limb(w,h,d,col,x,y,z,par){const g=new THREE.Group();g.position.set(x,y,
 function makeMob(type,x,y,z){
  const g=new THREE.Group(),m={type,g,x,y,z,vx:0,vy:0,vz:0,onGround:false,wall:false,wallPrev:false,hurt:0,cd:1,yaw:Math.random()*6.28,ph:0,wt:0,dirx:0,dirz:0,flee:0,gT:3+Math.random()*4,legs:[],arms:[],burn:false};
  if(type==='z'){
-  m.hp=20;m.w=.3;m.h=1.8;m.spd=2.5;
+  m.hp=20;m.w=.3;m.h=1.8;m.spd=2.5;m.dmg=3;m.wind=0;m.stun=0;
   box(.5,.75,.25,0x2f6f9f,0,1.125,0,g);box(.5,.5,.5,0x5b9449,0,1.75,0,g);
   box(.1,.08,.03,0x111111,-.12,1.78,-.26,g);box(.1,.08,.03,0x111111,.12,1.78,-.26,g);
   m.arms.push(limb(.2,.7,.2,0x5b9449,-.35,1.47,0,g),limb(.2,.7,.2,0x5b9449,.35,1.47,0,g));
@@ -18,27 +18,34 @@ function makeMob(type,x,y,z){
   box(.06,.06,.02,0x111111,-.12,.78,-.83,g);box(.06,.06,.02,0x111111,.12,.78,-.83,g);
   for(const[px,pz]of[[-.17,-.3],[.17,-.3],[-.17,.3],[.17,.3]])m.legs.push(limb(.18,.35,.18,0xf0a0a8,px,.35,pz,g));
  }
+ m.maxhp=m.hp;
  g.position.set(x,y,z);scene.add(g);return m;
 }
 function removeMob(i){
  if(i<0)return;const m=mobs[i];scene.remove(m.g);
  m.g.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose()}});mobs.splice(i,1);
 }
+// Brute zombies appear from day 3: bigger, tougher, hit harder, better drops
+function bigify(m){m.big=true;m.hp=m.maxhp=45;m.dmg=5;m.w=.4;m.h=2.3;m.spd=2.1;m.g.scale.setScalar(1.3);m.g.traverse(o=>{if(o.isMesh)o.userData.base.multiplyScalar(.72)})}
 function trySpawn(type){
  for(let t=0;t<6;t++){
   const a=Math.random()*Math.PI*2,r=type==='z'?18+Math.random()*12:14+Math.random()*14,x=Math.floor(P.x+Math.cos(a)*r),z=Math.floor(P.z+Math.sin(a)*r);
   let y=-1;
   for(let yy=H-1;yy>0;yy--){const b=getBlock(x,yy,z);if(b===0||b>=14)continue;if(b===-1)break;if(b===1||b===2||b===6||b===11||b===3)y=yy+1;break}
   if(y<0)continue;
-  mobs.push(makeMob(type,x+.5,y,z+.5));return;
+  const nm=makeMob(type,x+.5,y,z+.5);
+  if(type==='z'&&Math.floor(clock/DAY)>=2&&Math.random()<.22)bigify(nm);
+  mobs.push(nm);return;
  }
 }
-let spawnT=0;
+let spawnT=0,warned=false;
 function spawnMobs(dt){
  spawnT-=dt;if(spawnT>0)return;spawnT=1.5;
  let nz=0;for(const m of mobs)if(m.type==='z')nz++;
  const np=mobs.length-nz,night=dayK<.32;
- if(surv()&&night&&nz<(touch?4:6))trySpawn('z');
+ const cap=(touch?3:5)+Math.min(4,Math.floor(clock/DAY));
+ if(surv()&&dayK<.45&&!warned){warned=true;toast('Night is falling - build a shelter or grab a sword!',3200)}else if(dayK>.6)warned=false;
+ if(surv()&&night&&nz<cap)trySpawn('z');
  else if(!night&&np<4&&Math.random()<.6)trySpawn('p');
 }
 function updateMobs(dt){
@@ -50,7 +57,11 @@ function updateMobs(dt){
   const ux=dx/dist,uz=dz/dist;let spd=0;
   if(m.type==='z'){
    if(dist<26&&dist>.9){m.dirx=ux;m.dirz=uz;spd=m.spd}else{m.dirx=m.dirz=0}
-   if(dist<1.25&&Math.abs(P.y-m.y)<1.6&&m.cd<=0&&!dead){m.cd=1.1;damagePlayer(3,m.x,m.z)}
+   // attack: short wind-up you can dodge or interrupt by hitting it, then a swipe
+   if(m.stun>0)m.stun-=dt;
+   if(m.wind>0){m.wind-=dt;if(m.wind<=0){if(dist<1.9&&Math.abs(P.y-m.y)<1.7&&!dead)damagePlayer(m.dmg,m.x,m.z);m.cd=1.0}}
+   else if(dist<1.5&&Math.abs(P.y-m.y)<1.6&&m.cd<=0&&m.stun<=0&&!dead)m.wind=.5;
+   if(m.wind>0||m.stun>0)m.dirx=m.dirz=0;
    m.burn=dayK>.5;
    if(m.burn){m.hp-=2.5*dt;if(m.hp<=0){spawnParticles(m.x,m.y+1,m.z,[.3,.3,.3],8);removeMob(i);continue}}
    m.gT-=dt;if(m.gT<=0){m.gT=4+Math.random()*5;if(dist<20)sfxGroan(.07*(1-dist/20))}
@@ -73,7 +84,7 @@ function updateMobs(dt){
   if(hs>.25){const ty=Math.atan2(-m.vx,-m.vz);let dy=ty-m.yaw;dy=Math.atan2(Math.sin(dy),Math.cos(dy));m.yaw+=dy*Math.min(1,dt*10)}
   m.ph+=hs*dt*4;
   const sw=Math.sin(m.ph)*Math.min(1,hs);
-  if(m.type==='z'){m.legs[0].rotation.x=sw*.7;m.legs[1].rotation.x=-sw*.7;m.arms[0].rotation.x=1.45+Math.sin(m.ph*.5)*.08;m.arms[1].rotation.x=1.45-Math.sin(m.ph*.5)*.08}
+  if(m.type==='z'){m.legs[0].rotation.x=sw*.7;m.legs[1].rotation.x=-sw*.7;const ar=m.wind>0?2.4:1.45;m.arms[0].rotation.x=ar+Math.sin(m.ph*.5)*.08;m.arms[1].rotation.x=ar-Math.sin(m.ph*.5)*.08}
   else{m.legs[0].rotation.x=m.legs[3].rotation.x=sw*.7;m.legs[1].rotation.x=m.legs[2].rotation.x=-sw*.7}
   m.g.position.set(m.x,m.y,m.z);m.g.rotation.y=m.yaw;
   const lm=Math.max(.35,L);

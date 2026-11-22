@@ -26,6 +26,13 @@ A browser voxel survival game built with [Three.js](https://threejs.org/). One H
 | 1-9, 0 or scroll select block | Tap a hotbar slot |
 | E crafting, Esc pause | Hammer button, menu button |
 
+## Combat
+- Weapons: fists 2, Stone Sword 6, Gold Sword 9. Falling hits are critical (x1.5); sprint hits knock back further.
+- Armor: Stone (-25% melee damage) and Gold (-45%), shown next to your hearts.
+- Zombies wind up before swiping (arms rise): dodge, back off, or hit them to interrupt. Walls 2 high stop them.
+- Brute zombies from day 3: bigger, 45 HP, hit for 5, better drops. More zombies as days pass.
+- Health bar for the mob you're aiming at, and a warning at dusk.
+
 ## More
 - Player character with walk/swing animation. Switch camera view (first person / behind / front) with `V`, `F5` or the person button.
 - Rain showers with darker skies and soft rain sound.

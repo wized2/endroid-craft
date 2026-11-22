@@ -20,3 +20,8 @@ body.creative #stats{display:none}
 body.creative .slot b{display:none}
 #dmg{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center,rgba(200,0,0,0) 40%,rgba(200,0,0,.65) 100%);opacity:0}
 #wet{position:fixed;inset:0;z-index:1;pointer-events:none;background:rgba(20,80,160,.35);display:none}
+
+#armor{display:flex;align-items:center;gap:3px;font-size:12px;color:#cfe6ff;text-shadow:1px 1px 2px #000}
+#mobhp{position:absolute;top:18%;left:50%;transform:translateX(-50%);width:min(200px,50vw);text-align:center;color:#fff;font-size:13px;font-weight:700;text-shadow:1px 1px 2px #000;opacity:0;transition:opacity .2s}
+#mobhp div{height:7px;background:rgba(0,0,0,.55);border:1px solid #000;margin-top:3px}
+#mobhp i{display:block;height:100%;width:100%;background:linear-gradient(#ff5a4d,#c0281f)}

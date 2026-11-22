@@ -6,6 +6,7 @@ function toggleFly(){if(surv())return;fly=!fly;P.vy=0;fallY=P.y;toast(fly?'Flyin
 function tapSpace(){const n=performance.now();if(!surv()&&n-lastSpace<300)toggleFly();lastSpace=n}
 function damagePlayer(n,fx,fz){
  if(!surv()||dead)return;
+ if(fx!==undefined)n=Math.max(1,Math.round(n*(1-DMGRED[armorLvl()]))); // armor only helps against melee
  hp=Math.max(0,hp-n);regenCd=7;flash=1;sfxHurt();vib(40);
  if(fx!==undefined){const dx=P.x-fx,dz=P.z-fz,dd=Math.hypot(dx,dz)||1;P.vx=dx/dd*6;P.vz=dz/dd*6;P.vy=Math.max(P.vy,4.5);kbT=.28}
  renderHearts();

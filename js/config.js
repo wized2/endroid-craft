@@ -14,7 +14,10 @@ let clock=(saved&&typeof saved.clock==='number')?saved.clock:DAY*.1;
 let hp=(saved&&saved.hp>0)?saved.hp:20,air=10,regenCd=0,regenT=0,flash=0,dead=false,fly=false,kills=(saved&&saved.kills)||0;
 const inv={};for(let i=0;i<=16;i++)inv[i]=0;
 if(saved&&saved.inv)for(const k in saved.inv)inv[k]=saved.inv[k]|0;
-const tools={pick:!!(saved&&saved.tools&&saved.tools.pick),sword:!!(saved&&saved.tools&&saved.tools.sword)};
+const tools={pick:!!(saved&&saved.tools&&saved.tools.pick),sword:!!(saved&&saved.tools&&saved.tools.sword),gsword:!!(saved&&saved.tools&&saved.tools.gsword),a1:!!(saved&&saved.tools&&saved.tools.a1),a2:!!(saved&&saved.tools&&saved.tools.a2)};
+// combat: weapon damage and armor damage reduction
+const weaponDmg=()=>tools.gsword?9:tools.sword?6:2;
+const armorLvl=()=>tools.a2?2:tools.a1?1:0,DMGRED=[0,.25,.45];
 
 
 // ---------- user settings (saved in localStorage) ----------
