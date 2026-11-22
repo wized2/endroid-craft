@@ -53,6 +53,15 @@
 </div></div>
 <div id="set-panel"><div class="box"><h2><span><i data-icon="settings" data-size="18"></i> Settings</span><button id="set-close"><i data-icon="x" data-size="14"></i> Close</button></h2><div id="set-rows"></div></div></div>
 <div id="craft"><div class="box"><h2><i data-icon="hammer" data-size="20"></i> Crafting</h2><div id="recs"></div><div style="text-align:center"><button class="mc small" id="craftClose" style="background:#555"><i data-icon="x" data-size="14"></i> Close (E)</button></div></div></div>
+<div id="furnace" style="display:none;position:fixed;inset:0;z-index:8;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff">
+<div class="box" style="max-width:340px;width:92%"><h2>Furnace</h2><p id="furnStatus"></p>
+<button class="mc small" id="furnFeed">Add fuel / input (selected)</button>
+<button class="mc small" id="furnTake">Take output</button>
+<button class="mc small" id="furnClose" style="background:#555">Close</button></div></div>
+<div id="chest" style="display:none;position:fixed;inset:0;z-index:8;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff">
+<div class="box" style="max-width:340px;width:92%"><h2>Chest</h2><div id="chestList"></div>
+<button class="mc small" id="chestDep">Deposit selected</button>
+<button class="mc small" id="chestClose" style="background:#555">Close</button></div></div>
 <div id="trade" style="display:none;position:fixed;inset:0;z-index:8;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff">
 <div class="box" style="max-width:340px;width:92%">
 <h2 id="tradeTitle">Villager</h2>

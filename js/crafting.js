@@ -3,6 +3,11 @@
 const tier=(k,l)=>({k,l});
 const RECIPES=[
  {ic:'layers',n:'Planks ×4',cost:{4:1},give(){inv[7]+=4}},
+ {ic:'layers',n:'Sticks ×4',cost:{7:2},give(){inv[42]=(inv[42]|0)+4},note:'For torches & tools'},
+ {ic:'flame',n:'Torch ×4',cost:{42:1,12:1},give(){inv[41]=(inv[41]|0)+4},note:'Stick + coal'},
+ {ic:'box',n:'Chest',cost:{7:8},give(){inv[40]=(inv[40]|0)+1},note:'Store items'},
+ {ic:'settings',n:'Furnace',cost:{3:8},give(){inv[39]=(inv[39]|0)+1},note:'Smelt food & ore'},
+ {ic:'sword',n:'Shears',cost:{3:2},give(){inv[43]=(inv[43]|0)+1},note:'Shear sheep'},
  {ic:'drumstick',n:'Bread ×1',cost:{33:3},give(){inv[34]=(inv[34]|0)+1},note:'3 seeds of wheat → bread'},
  {ic:'drumstick',n:'Bread ×4',cost:{33:10},give(){inv[34]=(inv[34]|0)+4},note:'Bake a loaf stack'},
  {ic:'pickaxe',n:'Wooden Pickaxe',cost:{7:5},tier:tier('pick',1),note:'Mines stone, coal'},

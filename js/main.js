@@ -23,6 +23,7 @@ updateWeather(dt);
 updateSleep(dt);
 updateHunger(dt);
 if(running&&typeof updateFarming==='function')updateFarming(dt);
+if(running&&typeof tickFurnaces==='function')tickFurnaces(dt);
 if(running)updateObjectives(dt);
  placeCamera(dt);
  refreshAim();target=raycast(eye,dir,REACH_B+.6);

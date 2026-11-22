@@ -114,7 +114,7 @@ addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.a
 
 
 // Creative block palette (phone-friendly)
-const PLACEABLE=[1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,26,29,30,32,33,38];
+const PLACEABLE=[1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,26,29,30,32,33,38,39,40,41];
 function buildPalette(){
  const g=$('#palGrid');if(!g)return;g.innerHTML='';
  for(const id of PLACEABLE){
@@ -152,3 +152,9 @@ function togglePalette(){if($('#palette').classList.contains('open'))closePalett
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&running){setRunning(false);toast('Paused',900)}});
 
 makeTouchBtn($('#tradeClose'),()=>{closeTrade();if(started)setRunning(true)});
+
+makeTouchBtn($('#furnClose'),()=>{closeFurnace();if(started)setRunning(true)});
+makeTouchBtn($('#furnFeed'),()=>furnFeed());
+makeTouchBtn($('#furnTake'),()=>furnTake());
+makeTouchBtn($('#chestClose'),()=>{closeChest();if(started)setRunning(true)});
+makeTouchBtn($('#chestDep'),()=>chestDeposit());

@@ -131,10 +131,14 @@ function doPlace(){
  const h=target;
  // Trade with villager under crosshair
  if(hoverMob&&hoverMob.type==='v'){openTrade(hoverMob);return}
+ if(hoverMob&&hoverMob.type==='s'&&tryShear(hoverMob))return
  if(hoverMob&&(hoverMob.type==='p'||hoverMob.type==='c'||hoverMob.type==='s')){if(feedMob(hoverMob))return}
  if(!h||h.t>REACH_B+.2||dead)return;
  if(typeof tryFarmUse==='function'&&tryFarmUse(h))return;
- if(getBlock(h.x,h.y,h.z)===17){useBed(h.x,h.y,h.z);return} // right-click a bed
+ const look=getBlock(h.x,h.y,h.z);
+ if(look===39){openFurnace(h.x,h.y,h.z);return}
+ if(look===40){openChest(h.x,h.y,h.z);return}
+ if(look===17){useBed(h.x,h.y,h.z);return} // right-click a bed
  const id=HB[si];
  if(surv()&&inv[id]<=0){toast('No '+NAMES[id]+' left',900);return}
  const x=h.x+h.f[0],y=h.y+h.f[1],z=h.z+h.f[2];if(y<0||y>=H)return;

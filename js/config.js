@@ -3,19 +3,19 @@ const $=s=>document.querySelector(s);
 const touch=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
 if(touch)document.body.classList.add('touch');
 const CS=16,H=64,SEA=17,HT=1.8,EYE=1.62,PW=0.3,DAY=1200; // one full day+night = 20 min, like Minecraft
-const isPlant=b=>(b>=14&&b<=16)||(b>=30&&b<=32); // flowers, grass, wheat stages
+const isPlant=b=>(b>=14&&b<=16)||(b>=30&&b<=32)||b===41; // flowers, grass, wheat stages
 const isCrop=b=>b>=30&&b<=32;
 const isFarmland=b=>b===29;
 const SAVEKEY='endroid-craft-v2';
 let saved=null;try{saved=JSON.parse(localStorage.getItem(SAVEKEY))}catch(e){}
-const NAMES=['','Grass','Dirt','Stone','Log','Leaves','Sand','Planks','Brick','Water','Glass','Snow','Coal','Gold','Rose','Dandelion','Tall grass','Bed','Raw Porkchop','Cooked Porkchop','Raw Beef','Steak','Raw Mutton','Cooked Mutton','Apple','Rotten Flesh','Wool','Leather','Golden Apple','Farmland','Wheat (young)','Wheat (mid)','Wheat (grown)','Seeds','Bread','Carrot','Potato','Emerald','Path'];
+const NAMES=['','Grass','Dirt','Stone','Log','Leaves','Sand','Planks','Brick','Water','Glass','Snow','Coal','Gold','Rose','Dandelion','Tall grass','Bed','Raw Porkchop','Cooked Porkchop','Raw Beef','Steak','Raw Mutton','Cooked Mutton','Apple','Rotten Flesh','Wool','Leather','Golden Apple','Farmland','Wheat (young)','Wheat (mid)','Wheat (grown)','Seeds','Bread','Carrot','Potato','Emerald','Path','Furnace','Chest','Torch','Stick','Shears'];
 const HARD=[0,.6,.5,1.5,2,.2,.5,2,2,0,.3,.2,3,3,.05,.05,.05,.2,0,0,0,0,0,0,0,0,0,0,0,0]; // hardness by block id
 const HB=[1,2,3,4,5,6,7,8,10,11,17];
 let mode=(saved&&saved.mode==='creative')?'creative':'survival';
 const surv=()=>mode==='survival';
 let clock=(saved&&typeof saved.clock==='number')?saved.clock:DAY*.1;
 let hp=(saved&&saved.hp>0)?saved.hp:20,air=10,regenCd=0,regenT=0,flash=0,dead=false,fly=false,kills=(saved&&saved.kills)||0;
-const inv={};for(let i=0;i<=40;i++)inv[i]=0;
+const inv={};for(let i=0;i<=48;i++)inv[i]=0;
 if(saved&&saved.inv)for(const k in saved.inv)inv[k]=saved.inv[k]|0;
 else{inv[33]=8;inv[2]=16;inv[1]=8} // new world: seeds + dirt starter
 // tool tiers: 0 none, 1 wood, 2 stone (old saves with a stone tool migrate)
