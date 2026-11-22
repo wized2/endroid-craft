@@ -1,6 +1,6 @@
 // player.js - player movement, fly, damage, death, respawn
 // ---------- player ----------
-const K={},joy={fx:0,fy:0},held={brk:false};
+const K={},joy={fx:0,fy:0},held={brk:false,sneak:false,sprint:false};
 let flyDown=false,lastSpace=0,fallY=P.y,airT=0,stepDist=0,wasInWater=false,inWater=false,walkClock=0,fovCur=75,kbT=0,bob=0;
 function toggleFly(){if(surv())return;fly=!fly;P.vy=0;fallY=P.y;toast(fly?'Flying on':'Flying off',900);$('#bDown').style.display=(fly&&touch)?'block':'none';renderInfo()}
 function tapSpace(){const n=performance.now();if(!surv()&&n-lastSpace<300)toggleFly();lastSpace=n}
@@ -28,23 +28,35 @@ function update(dt){
  let fwd=(K.KeyW||K.ArrowUp?1:0)-(K.KeyS||K.ArrowDown?1:0)+joy.fy,str=(K.KeyD||K.ArrowRight?1:0)-(K.KeyA||K.ArrowLeft?1:0)+joy.fx;
  if(sleepT>0){fwd=0;str=0}
  const mag=Math.hypot(fwd,str);if(mag>1){fwd/=mag;str/=mag}
- const shift=K.ShiftLeft||K.ShiftRight,sprint=!fl&&(!surv()||food>6)&&(shift||Math.hypot(joy.fx,joy.fy)>.92)&&fwd>.1;
- let sp=fl?8:(touch?4.8:4.3);if(sprint)sp*=1.3;if(inWater&&!fl)sp*=.55;
+ const shift=K.ShiftLeft||K.ShiftRight;
+ const sneaking=!fl&&(held.sneak||K.ControlLeft||K.ControlRight);
+ const sprint=!fl&&!sneaking&&(!surv()||food>6)&&(shift||held.sprint||Math.hypot(joy.fx,joy.fy)>.92)&&fwd>.1;
+ let sp=fl?8:(touch?4.8:4.3);if(sprint)sp*=1.3;if(sneaking)sp*=.3;if(inWater&&!fl)sp*=.55;
  const sy=Math.sin(yaw),cy=Math.cos(yaw),tx=(-sy*fwd+cy*str)*sp,tz=(-cy*fwd-sy*str)*sp,k=Math.min(1,dt*(P.onGround||fl?12:4));
  kbT=Math.max(0,kbT-dt);
  if(kbT<=0){P.vx+=(tx-P.vx)*k;P.vz+=(tz-P.vz)*k}
+ // Sneak: don't walk off edges (Minecraft)
+ if(sneaking&&P.onGround&&!fl){
+  const nx=P.x+P.vx*dt,nz=P.z+P.vz*dt;
+  if(!hitBox(nx,P.y-.05,P.z,PW*.9,.1))P.vx=0;
+  if(!hitBox(P.x,P.y-.05,nz,PW*.9,.1))P.vz=0;
+ }
  inWater=getBlock(Math.floor(P.x),Math.floor(P.y+.5),Math.floor(P.z))===9;
  camInWater=getBlock(Math.floor(P.x),Math.floor(P.y+EYE),Math.floor(P.z))===9;
  wetEl.style.display=camInWater?'block':'none';
  if(inWater&&!wasInWater){sfxSplash();vib(20)}
  if(inWater&&surv())addExh(.01*Math.hypot(P.vx,P.vz)*dt);
  wasInWater=inWater;
- if(fl){P.vy=((K.Space)?6.5:0)-((shift||K.KeyC||flyDown)?6.5:0)}
+ if(fl){P.vy=((K.Space)?6.5:0)-((shift||K.KeyC||flyDown||held.sneak)?6.5:0)}
  else if(inWater){P.vy=Math.max(P.vy-12*dt,-4);if(K.Space)P.vy=Math.min(P.vy+30*dt,P.wall?7:3.6)}
- else{P.vy=Math.max(P.vy-28*dt,-40);if(K.Space&&P.onGround){P.vy=8.6;sfxJump();vib(10);addExh(sprint?.2:.05)}}
+ else{P.vy=Math.max(P.vy-28*dt,-40);if(K.Space&&P.onGround&&!sneaking){P.vy=8.6;sfxJump();vib(10);addExh(sprint?.2:.05)}}
  P.onGround=false;P.wall=false;
  for(let i=0;i<3;i++)stepBody(P,dt/3,PW,HT);
- if(fl&&P.onGround&&(shift||K.KeyC||flyDown)){fly=false;$('#bDown').style.display='none';renderInfo()}
+ // Auto-jump (Bedrock-style) when walking into a 1-block step
+ if(SET.autoJump&&!fl&&!sneaking&&P.onGround&&P.wall&&(fwd*fwd+str*str)>.04&&!hitBox(P.x,P.y+1.05,P.z,PW,HT)){
+  P.vy=8.6;P.wall=false;sfxJump();
+ }
+ if(fl&&P.onGround&&(shift||K.KeyC||flyDown||held.sneak)){fly=false;$('#bDown').style.display='none';renderInfo()}
  if(P.onGround){
   const fd=fallY-P.y;
   if(fd>3.2&&!inWater){if(surv())damagePlayer(Math.ceil(fd-3));sfxLand()}

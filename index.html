@@ -26,7 +26,19 @@
 <div id="stats"><div id="hearts"></div><div id="armor"></div><div id="food"></div><div id="air"></div></div><div id="bar"></div></div>
 <div id="dmg"></div><div id="wet"></div>
 <div id="joy" class="ctl"><div id="knob"></div></div>
-<div id="btns" class="ctl"><button id="bJump" class="ctl"><i data-icon="arrow-up" data-size="22"></i>JUMP</button><button id="bBreak" class="ctl"><i data-icon="pickaxe" data-size="22"></i>BREAK</button><button id="bPlace" class="ctl"><i data-icon="box" data-size="22"></i>PLACE</button><button id="bEat" class="ctl"><i data-icon="drumstick" data-size="20"></i>EAT</button><button id="bDown" class="ctl"><i data-icon="arrow-down" data-size="22"></i>DOWN</button></div>
+<div id="btns" class="ctl">
+<button id="bJump" class="ctl"><i data-icon="arrow-up" data-size="22"></i>JUMP</button>
+<button id="bBreak" class="ctl"><i data-icon="pickaxe" data-size="22"></i>BREAK</button>
+<button id="bPlace" class="ctl"><i data-icon="box" data-size="22"></i>PLACE</button>
+<button id="bEat" class="ctl"><i data-icon="drumstick" data-size="20"></i>EAT</button>
+<button id="bSneak" class="ctl"><i data-icon="arrow-down" data-size="20"></i>SNEAK</button>
+<button id="bSprint" class="ctl"><i data-icon="sparkles" data-size="18"></i>SPRINT</button>
+<button id="bDrop" class="ctl"><i data-icon="rotate-ccw" data-size="18"></i>DROP</button>
+<button id="bInv" class="ctl creative-only"><i data-icon="box" data-size="18"></i>BLOCKS</button>
+<button id="bDown" class="ctl"><i data-icon="arrow-down" data-size="22"></i>DOWN</button>
+</div>
+<div id="palette"><div class="pal-head"><span>Blocks</span><button id="palClose" type="button">Close</button></div><div id="palGrid"></div></div>
+<button id="pauseBtn" class="ctl" title="Pause"><i data-icon="x" data-size="18"></i></button>
 <button id="fs" class="ctl" title="Fullscreen"><i data-icon="maximize"></i></button>
 <button id="snd" class="ctl" title="Sound"></button>
 <button id="craftBtn" class="ctl" title="Craft"><i data-icon="hammer"></i></button>
@@ -50,8 +62,8 @@
 <h1>ENDROID CRAFT</h1>
 <p>Infinite world &bull; caves &amp; ores &bull; zombies at night &bull; saves in your browser</p>
 <div><button class="mc" id="mSurv"><i data-icon="sword" data-size="18"></i> Survival</button><button class="mc" id="mCre"><i data-icon="sparkles" data-size="18"></i> Creative</button></div>
-<p class="desk">WASD move &bull; Space jump / swim &bull; Shift sprint<br>Hold left click mine / attack &bull; Right click place<br>1-9, 0 or scroll pick block &bull; E craft &bull; Esc pause<br>Creative: double-tap Space to fly (Shift = down) · middle-click pick block</p>
-<p class="mob">Left stick move (push far to sprint) &bull; Drag right side to look<br>Hold BREAK to mine / attack &bull; PLACE to build &bull; hammer = crafting<br>Creative: double-tap JUMP to fly · hold PLACE to pick block</p>
+<p class="desk">WASD move &bull; Space jump / swim &bull; Shift sprint &bull; Ctrl sneak<br>Hold left click mine / attack &bull; Right click place &bull; Q drop<br>1-9, 0 or scroll pick block &bull; E craft &bull; Esc pause<br>Creative: double-tap Space to fly · middle-click pick block</p>
+<p class="mob">Stick move (push far / SPRINT) &bull; Drag to look &bull; SNEAK edge-safe<br>BREAK mine &bull; PLACE build &bull; auto-jump on by default<br>Creative: double-tap JUMP to fly · BLOCKS palette · hold PLACE to pick</p>
 <button class="mc" id="play">Loading...</button>
 <button class="mc small" id="set-menu"><i data-icon="settings" data-size="14"></i> Settings</button>
 <button class="mc small" id="shot-menu"><i data-icon="camera" data-size="14"></i> Screenshot (F2)</button>

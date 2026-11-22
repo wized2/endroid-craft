@@ -1,7 +1,7 @@
 // main.js - game loop (runs last)
 // ---------- main loop ----------
 let shotReq=false;
-applyMode();renderAir();sel(0);
+applyMode();document.body.classList.toggle('bigctl',!!SET.bigCtl);renderAir();sel(0);
 updateChunks(40);
 // make sure the player starts somewhere sensible (not inside a tree / underwater / in rock)
 {

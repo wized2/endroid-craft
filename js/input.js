@@ -13,6 +13,7 @@ addEventListener('keydown',e=>{
  if(e.code==='KeyF'&&!e.repeat&&started){startEat();return}
  if((e.code==='F5'||e.code==='KeyV')&&!e.repeat&&started){e.preventDefault();cycleView();return}
  if(e.code==='KeyE'&&!e.repeat&&started){if(craftOpen)closeCraft();else if(running)openCraft();return}
+ if(e.code==='KeyQ'&&!e.repeat&&started&&running){dropHeld();return}
  K[e.code]=true;
  if(/^Digit[0-9]$/.test(e.code)){const n=+e.code.slice(5);sel(n===0?9:n-1)}
  if(e.code==='Minus')sel(10);
@@ -96,6 +97,13 @@ addEventListener('touchend',tend);addEventListener('touchcancel',tend);
 bind('#bJump',()=>{K.Space=true;tapSpace()},()=>{K.Space=false});
 bind('#bDown',()=>{flyDown=true},()=>{flyDown=false});
 bind('#bBreak',()=>{held.brk=true;mineCd=0;atkCd=0;if(!surv())creativeBreakOnce()},()=>{held.brk=false});
+bind('#bSneak',()=>{held.sneak=true;document.body.classList.add('sneaking')},()=>{held.sneak=false;document.body.classList.remove('sneaking')});
+bind('#bSprint',()=>{held.sprint=true;document.body.classList.add('sprinting')},()=>{held.sprint=false;document.body.classList.remove('sprinting')});
+bind('#bDrop',()=>dropHeld());
+makeTouchBtn($('#bInv'),()=>togglePalette());
+makeTouchBtn($('#pauseBtn'),()=>{if(running){setRunning(false);toast('Paused',900)}else if(started)setRunning(true)});
+makeTouchBtn($('#palClose'),()=>closePalette());
+
 (function(){
  let placeTimer=0;
  bind('#bPlace',()=>{
@@ -108,3 +116,41 @@ bind('#bBreak',()=>{held.brk=true;mineCd=0;atkCd=0;if(!surv())creativeBreakOnce(
 })();
 addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()});
 
+
+// Creative block palette (phone-friendly)
+const PLACEABLE=[1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,26];
+function buildPalette(){
+ const g=$('#palGrid');if(!g)return;g.innerHTML='';
+ for(const id of PLACEABLE){
+  const b=document.createElement('button');
+  b.style.backgroundImage='url('+icon(id)+')';
+  b.title=NAMES[id]||('#'+id);
+  b.className=HB[si]===id?'sel':'';
+  makeTouchBtn(b,()=>{
+   let idx=HB.indexOf(id);
+   if(idx<0){HB[si]=id;idx=si;const slots=bar.children;if(slots[si])slots[si].querySelector('i').style.backgroundImage='url('+icon(id)+')'}
+   if(!surv())inv[id]=Math.max(inv[id]|0,64);
+   sel(idx);closePalette();
+  });
+  g.appendChild(b);
+ }
+}
+function openPalette(){if(surv())return;buildPalette();$('#palette').classList.add('open')}
+function closePalette(){$('#palette').classList.remove('open')}
+function togglePalette(){if($('#palette').classList.contains('open'))closePalette();else openPalette()}
+
+// Hotbar swipe to change slot (touch)
+(function(){
+ const el=$('#bar');if(!el)return;
+ let x0=0,i0=0,active=false;
+ el.addEventListener('touchstart',e=>{if(!e.changedTouches[0])return;active=true;x0=e.changedTouches[0].clientX;i0=si},{passive:true});
+ el.addEventListener('touchmove',e=>{
+  if(!active||!e.changedTouches[0])return;
+  const dx=e.changedTouches[0].clientX-x0;
+  if(Math.abs(dx)>28){const n=i0+(dx>0?-1:1);sel(n);x0=e.changedTouches[0].clientX;i0=si;vib(6)}
+ },{passive:true});
+ el.addEventListener('touchend',()=>{active=false});
+})();
+
+// Pause when app backgrounded (phones)
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&running){setRunning(false);toast('Paused',900)}});

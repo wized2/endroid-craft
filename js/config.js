@@ -28,7 +28,7 @@ const REACH_B=touch?5:4.5,REACH_M=touch?3.6:3; // Minecraft reach: block 4.5, en
 
 // ---------- user settings (saved in localStorage) ----------
 const SETKEY='endroid-craft-settings';
-const SET={rd:touch?4:6,sens:1,fov:75,vol:1,info:true};
+const SET={rd:touch?4:6,sens:1,fov:75,vol:1,info:true,autoJump:!!touch,bigCtl:!!touch};
 try{Object.assign(SET,JSON.parse(localStorage.getItem(SETKEY)))}catch(e){}
 let R=Math.max(2,Math.min(10,SET.rd|0));
 function saveSettings(){try{localStorage.setItem(SETKEY,JSON.stringify(SET))}catch(e){}}

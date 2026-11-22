@@ -16,11 +16,19 @@ function buildSettings(){
   inp.addEventListener('input',()=>{SET[s.id]=+inp.value;out.textContent=s.fmt(SET[s.id]);if(s.apply)s.apply();saveSettings();renderInfo()});
   box.appendChild(row);
  }
- const c=document.createElement('label');c.className='srow chk';
- c.innerHTML='<span>Show info text (fps, seed)</span><input type="checkbox">';
- const ci=c.querySelector('input');ci.checked=SET.info;
- ci.addEventListener('change',()=>{SET.info=ci.checked;saveSettings();renderInfo()});
- box.appendChild(c);
+ const checks=[
+  {k:'info',label:'Show info text (fps, seed)',fn(){renderInfo()}},
+  {k:'autoJump',label:'Auto-jump (Bedrock-style)',fn(){}},
+  {k:'bigCtl',label:'Larger touch buttons',fn(){document.body.classList.toggle('bigctl',!!SET.bigCtl)}}
+ ];
+ for(const ch of checks){
+  const c=document.createElement('label');c.className='srow chk';
+  c.innerHTML='<span>'+ch.label+'</span><input type="checkbox">';
+  const ci=c.querySelector('input');ci.checked=!!SET[ch.k];
+  ci.addEventListener('change',()=>{SET[ch.k]=ci.checked;saveSettings();ch.fn()});
+  box.appendChild(c);
+ }
+ document.body.classList.toggle('bigctl',!!SET.bigCtl);
 }
 function openSettings(){buildSettings();setPanel.classList.add('open')}
 function closeSettings(){setPanel.classList.remove('open')}

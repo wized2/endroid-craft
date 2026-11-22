@@ -150,3 +150,17 @@ function pickBlock(){
  sel(idx);
  toast(NAMES[id]||('Block '+id),800);
 }
+
+// Drop one item from selected hotbar (Minecraft Q)
+function dropHeld(){
+ if(!running||dead)return;
+ const id=HB[si];
+ if(surv()){
+  if(inv[id]<=0){toast('Nothing to drop',800);return}
+  inv[id]--;renderSlots();renderInfo();
+ }
+ // visual: toss particles of that block color
+ const rgb=tileAvg[tileFor(id,4)]||[.7,.7,.7];
+ spawnParticles(P.x-Math.sin(yaw)*.8,P.y+EYE*.7,P.z-Math.cos(yaw)*.8,rgb,8);
+ toast('Dropped '+(NAMES[id]||'item'),700);vib(10);
+}
