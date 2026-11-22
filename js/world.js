@@ -131,13 +131,18 @@ const lazyDirty=new Set();
 function flushChunks(){for(const c of lazyDirty)rebuild(c);lazyDirty.clear()}
 function setBlock(x,y,z,id,lazy){
  const cx=x>>4,cz=z>>4,c=chunks.get(ck(cx,cz));if(!c||y<0||y>=H)return;
- const lx=x&15,lz=z&15,i=lx+CS*(lz+CS*y);c.d[i]=id;
+ const lx=x&15,lz=z&15,i=lx+CS*(lz+CS*y);
+ // skip no-op to avoid useless rebuilds, but still allow air→air? no
+ c.d[i]=id;
  if(y+1>c.top)c.top=Math.min(H-1,y+1);
  let m=edits.get(ck(cx,cz));if(!m){m=new Map();edits.set(ck(cx,cz),m)}m.set(i,id);dirtySave=true;
  if(lazy){lazyDirty.add(c);const nb=(a,b)=>{const n=chunks.get(ck(a,b));if(n)lazyDirty.add(n)};
   if(lx===0)nb(cx-1,cz);if(lx===15)nb(cx+1,cz);if(lz===0)nb(cx,cz-1);if(lz===15)nb(cx,cz+1);return}
+ // Immediate mesh rebuild so creative break/place is visible right away
  rebuild(c);
  if(lx===0)nbRebuild(cx-1,cz);if(lx===15)nbRebuild(cx+1,cz);if(lz===0)nbRebuild(cx,cz-1);if(lz===15)nbRebuild(cx,cz+1);
+ // Always refresh edge neighbors when block on chunk border (faces shared)
+ if(lx===0||lx===15||lz===0||lz===15){/* already above */}
 }
 let spawn=saved&&saved.spawn?saved.spawn.slice():null;
 if(!spawn){let s=0;for(let r=0;r<600;r+=4){const h=heightAt(r,r);if(h>SEA+1&&h<38){s=r;break}}spawn=[s+.5,heightAt(s,s)+3,s+.5]}

@@ -97,10 +97,6 @@ addEventListener('touchend',tend);addEventListener('touchcancel',tend);
 bind('#bJump',()=>{K.Space=true;tapSpace()},()=>{K.Space=false});
 bind('#bDown',()=>{flyDown=true},()=>{flyDown=false});
 bind('#bBreak',()=>{held.brk=true;mineCd=0;atkCd=0;if(!surv())creativeBreakOnce()},()=>{held.brk=false});
-bind('#bSneak',()=>{held.sneak=true;document.body.classList.add('sneaking')},()=>{held.sneak=false;document.body.classList.remove('sneaking')});
-bind('#bSprint',()=>{held.sprint=true;document.body.classList.add('sprinting')},()=>{held.sprint=false;document.body.classList.remove('sprinting')});
-bind('#bDrop',()=>dropHeld());
-makeTouchBtn($('#bInv'),()=>togglePalette());
 makeTouchBtn($('#pauseBtn'),()=>{if(running){setRunning(false);toast('Paused',900)}else if(started)setRunning(true)});
 makeTouchBtn($('#palClose'),()=>closePalette());
 

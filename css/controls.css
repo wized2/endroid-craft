@@ -1,33 +1,26 @@
-/* Mobile / touch controls */
+/* Mobile / touch controls — compact (jump, break, place, eat, fly-down) */
 .ctl{pointer-events:auto}
 #joy{display:none;position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));width:120px;height:120px;border-radius:50%;background:rgba(0,0,0,.28);border:2px solid rgba(255,255,255,.25);z-index:4;touch-action:none}
 #knob{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:rgba(255,255,255,.35);border:2px solid rgba(255,255,255,.5)}
 .touch #joy{display:block}
-#btns{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));width:210px;height:210px;z-index:4}
+#btns{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));width:160px;height:160px;z-index:4}
 .touch #btns{display:block}
 #btns button{
  position:absolute;width:64px;height:64px;border:0;border-radius:16px;
  background:rgba(0,0,0,.42);color:#fff;font-weight:700;font-size:10px;letter-spacing:.02em;
  box-shadow:0 2px 0 rgba(0,0,0,.35);touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
-#btns button:active,body.sneaking #bSneak,body.sprinting #bSprint{background:rgba(255,255,255,.28);transform:scale(.96)}
+#btns button:active{background:rgba(255,255,255,.28);transform:scale(.96)}
 #bJump{right:0;bottom:0}
 #bBreak{right:72px;bottom:4px}
 #bPlace{right:34px;bottom:74px}
 #bEat{right:110px;bottom:74px}
-#bSneak{right:148px;bottom:4px}
-#bSprint{right:148px;bottom:74px}
-#bDrop{right:110px;bottom:4px}
-#bInv{right:0;bottom:74px}
 #bDown{right:34px;bottom:144px;display:none}
 body.bigctl #joy{width:140px;height:140px}
 body.bigctl #knob{width:60px;height:60px;margin:-30px 0 0 -30px}
-body.bigctl #btns{width:230px;height:230px}
+body.bigctl #btns{width:180px;height:180px}
 body.bigctl #btns button{width:70px;height:70px;font-size:11px}
 body.bigctl #bBreak{right:78px}
-body.bigctl #bSneak,body.bigctl #bSprint{right:160px}
-body.bigctl #bEat,body.bigctl #bDrop{right:120px}
-/* top utility buttons */
 #fs,#snd,#craftBtn,#viewBtn,#pauseBtn{position:fixed;top:max(8px,env(safe-area-inset-top));z-index:4;width:42px;height:42px;border:0;border-radius:12px;background:rgba(0,0,0,.4);color:#fff;display:flex;align-items:center;justify-content:center}
 #fs{right:max(8px,env(safe-area-inset-right))}
 #snd{right:max(56px,calc(env(safe-area-inset-right) + 48px))}
@@ -36,7 +29,6 @@ body.bigctl #bEat,body.bigctl #bDrop{right:120px}
 #pauseBtn{left:max(8px,env(safe-area-inset-left));display:none}
 .touch #pauseBtn{display:flex}
 body:not(.creative) .creative-only{display:none!important}
-/* Creative block palette */
 #palette{display:none;position:fixed;left:0;right:0;bottom:0;z-index:7;background:rgba(20,20,24,.94);padding:10px 10px max(12px,env(safe-area-inset-bottom));border-top:2px solid #555;max-height:45vh;flex-direction:column}
 #palette.open{display:flex}
 .pal-head{display:flex;justify-content:space-between;align-items:center;color:#fff;font-weight:700;margin-bottom:8px}
@@ -44,6 +36,5 @@ body:not(.creative) .creative-only{display:none!important}
 #palGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;overflow:auto;-webkit-overflow-scrolling:touch}
 #palGrid button{aspect-ratio:1;border:2px solid #555;border-radius:8px;background:rgba(0,0,0,.45);background-size:70%;background-repeat:no-repeat;background-position:center;image-rendering:pixelated;color:#fff;font-size:10px}
 #palGrid button.sel{border-color:#fff}
-/* Hotbar safer on phones */
 .touch #bar{bottom:max(10px,env(safe-area-inset-bottom));padding-bottom:2px}
 .touch .slot{width:min(44px,9vw);height:min(44px,9vw)}
