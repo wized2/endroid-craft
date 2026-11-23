@@ -1,11 +1,35 @@
-// villages.js - plains villages (per-chunk), villagers, emerald trades
-const villagesDone=new Set();
-
-function villageChance(cx,cz){
- return hsh(cx*17+3,cz*13+9,7)<.05;
+// villages.js - Minecraft-style villages: region-placed clusters (well, paths, houses, farms), villagers
+const villagesDone=new Set(),spawnedPlots=new Set(),announced=new Set();
+const VR=6; // region size in chunks
+const vCache=new Map();
+function villageAt(rx,rz){
+ const k=rx+','+rz;if(vCache.has(k))return vCache.get(k);
+ let v=null;
+ if(hsh(rx*7+1,rz*11+5,23)<.5&&!(rx===0&&rz===0)){
+  const vx=rx*VR+1+Math.floor(hsh(rx,rz,21)*4),vz=rz*VR+1+Math.floor(hsh(rx,rz,22)*4);
+  const x=vx*CS+8,z=vz*CS+8,h=heightAt(x,z);
+  if(h>SEA+2&&h<34)v={cx:vx,cz:vz,x,z,y:h};
+ }
+ vCache.set(k,v);return v;
+}
+function villageOfChunk(cx,cz){
+ const rx=Math.floor(cx/VR),rz=Math.floor(cz/VR);
+ for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){
+  const v=villageAt(rx+a,rz+b);
+  if(v&&Math.abs(cx-v.cx)<=1&&Math.abs(cz-v.cz)<=1)return v;
+ }
+ return null;
+}
+function nearestVillage(x,z,maxD){
+ const rx=Math.floor(x/CS/VR),rz=Math.floor(z/CS/VR);let best=null,bd=maxD;
+ for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){
+  const v=villageAt(rx+a,rz+b);if(!v)continue;
+  const d=Math.hypot(v.x-x,v.z-z);if(d<bd){bd=d;best=v}
+ }
+ return best;
 }
 function vSurfaceY(x,z){
- for(let y=H-2;y>0;y--){const b=getBlock(x,y,z);if(b>0&&b!==9&&!isPlant(b)&&b!==-1)return y}
+ for(let y=H-2;y>0;y--){const b=getBlock(x,y,z);if(b>0&&b!==9&&b!==4&&b!==5&&!isPlant(b)&&b!==-1)return y}
  return SEA;
 }
 function putV(x,y,z,b){
@@ -13,60 +37,131 @@ function putV(x,y,z,b){
  if(getBlock(x,y,z)===-1)return;
  setBlock(x,y,z,b,true);
 }
-function buildHouseInChunk(cx,cz,lx,lz){
- // lx,lz local 0-11 so house fits in chunk
- const x0=cx*CS+lx,z0=cz*CS+lz;
- const y0=Math.min(H-6,Math.max(SEA+1,vSurfaceY(x0+1,z0+1)));
- for(let dx=0;dx<=3;dx++)for(let dz=0;dz<=3;dz++){
-  const x=x0+dx,z=z0+dz;
-  for(let yy=y0-2;yy<=y0;yy++)if(yy>0)putV(x,yy,z,yy===y0?7:2);
-  for(let yy=y0+1;yy<=y0+4;yy++)putV(x,yy,z,0);
- }
- for(let dx=0;dx<=3;dx++)for(let dz=0;dz<=3;dz++){
-  if(dx===0||dx===3||dz===0||dz===3){
-   for(let h=1;h<=2;h++)putV(x0+dx,y0+h,z0+dz,(dx%3===0&&dz%3===0)?4:7);
-  }
- }
- putV(x0+1,y0+1,z0,0);putV(x0+1,y0+2,z0,0);
- putV(x0+2,y0+1,z0,0);putV(x0+2,y0+2,z0,0);
- for(let dx=0;dx<=3;dx++)for(let dz=0;dz<=3;dz++)putV(x0+dx,y0+3,z0+dz,4);
- putV(x0+2,y0+1,z0+2,17);
- putV(x0+3,y0+2,z0+1,10);
- return [x0+1.5,y0+1,z0+1.5];
+// frame helper: a along village axis, b across; swap for z-axis chunks
+function mkFrame(cx,cz,swap){
+ return (a,b)=>swap?[cx*CS+b,cz*CS+a]:[cx*CS+a,cz*CS+b];
 }
-function buildFarmInChunk(cx,cz,lx,lz){
- const x0=cx*CS+lx,z0=cz*CS+lz;
- const y0=Math.min(H-4,Math.max(SEA+1,vSurfaceY(x0+2,z0+1)));
- for(let dx=0;dx<=4;dx++)for(let dz=0;dz<=3;dz++){
-  if(lx+dx>15||lz+dz>15)continue;
-  const x=x0+dx,z=z0+dz;
-  for(let yy=y0-1;yy<=y0;yy++)if(yy>0)putV(x,yy,z,2);
-  if(dz===1&&dx>=1&&dx<=3){putV(x,y0,z,9);putV(x,y0+1,z,0)}
-  else{putV(x,y0,z,29);putV(x,y0+1,z,Math.random()<.75?(30+((Math.random()*3)|0)):0)}
+function buildHouse(F,a0,b0,y0,kind,prof){
+ // 5x5 house, door on low-b side
+ const P=(a,b,y,id)=>{const[x,z]=F(a,b);putV(x,y,z,id)};
+ for(let da=0;da<5;da++)for(let db=0;db<5;db++){
+  const a=a0+da,b=b0+db;
+  for(let yy=y0-1;yy>y0-7;yy--){const [x,z]=F(a,b);if(getBlock(x,yy,z)>0&&getBlock(x,yy,z)!==9)break;P(a,b,yy,3)}
+  P(a,b,y0,7);
+  for(let yy=y0+1;yy<=y0+7;yy++)P(a,b,yy,0);
  }
+ for(let da=0;da<5;da++)for(let db=0;db<5;db++){
+  if(da&&da<4&&db&&db<4)continue;
+  const corner=(da%4===0&&db%4===0);
+  for(let h=1;h<=3;h++)P(a0+da,b0+db,y0+h,corner?4:7);
+ }
+ // door (2 tall) and windows
+ P(a0+2,b0,y0+1,0);P(a0+2,b0,y0+2,0);
+ P(a0+2,b0,y0,38);
+ P(a0,b0+2,y0+2,10);P(a0+4,b0+2,y0+2,10);P(a0+2,b0+4,y0+2,10);
+ // roof
+ for(let da=-1;da<=5;da++)for(let db=-1;db<=5;db++)if(da>=0&&da<5&&db>=0&&db<5||(da===-1||da===5)&&db>=0&&db<5||(db===-1||db===5)&&da>=0&&da<5)P(a0+da,b0+db,y0+4,(da<0||da>4||db<0||db>4)?4:7);
+ for(let da=1;da<4;da++)for(let db=1;db<4;db++)P(a0+da,b0+db,y0+5,7);
+ P(a0+2,b0+2,y0+6,4);
+ // interior
+ P(a0+3,b0+3,y0+1,17);P(a0+1,b0+3,y0+1,41);
+ if(prof==='farmer')P(a0+1,b0+1,y0+1,40);
+ else if(prof==='mason')P(a0+1,b0+1,y0+1,39);
+ else P(a0+1,b0+1,y0+1,40);
+ const[ax,az]=F(a0+2,b0+2);
+ return[ax+.5,y0+1,az+.5];
+}
+function buildFarm(F,a0,b0,y0,cx,cz){
+ const P=(a,b,y,id)=>{const[x,z]=F(a,b);putV(x,y,z,id)};
+ for(let da=0;da<7;da++)for(let db=0;db<5;db++){
+  const a=a0+da,b=b0+db;
+  const [x,z]=F(a,b);
+  for(let yy=y0-1;yy>y0-6;yy--){if(getBlock(x,yy,z)>0&&getBlock(x,yy,z)!==9)break;P(a,b,yy,2)}
+  P(a,b,y0-1,2);
+  for(let yy=y0+1;yy<=y0+3;yy++)P(a,b,yy,0);
+  const edge=da===0||da===6||db===0||db===4;
+  if(edge){P(a,b,y0,4);continue}
+  if(db===2){P(a,b,y0,9);continue}
+  P(a,b,y0,29);
+  const r=hsh(x,z,31);
+  P(a,b,y0+1,r<.12?0:r<.4?30:r<.7?31:32);
+ }
+ P(a0,b0,y0+1,41);P(a0+6,b0+4,y0+1,41);
+}
+function buildWell(cx,cz,y0){
+ const bx=cx*CS+6,bz=cz*CS+6;
+ for(let dx=0;dx<5;dx++)for(let dz=0;dz<5;dz++){
+  const x=bx+dx,z=bz+dz;
+  for(let yy=y0-1;yy>y0-6;yy--){if(getBlock(x,yy,z)>0&&getBlock(x,yy,z)!==9)break;putV(x,yy,z,3)}
+  for(let yy=y0+1;yy<=y0+6;yy++)putV(x,yy,z,0);
+  putV(x,y0,z,38);
+ }
+ for(let dx=1;dx<4;dx++)for(let dz=1;dz<4;dz++)putV(bx+dx,y0,bz+dz,3);
+ putV(bx+2,y0,bz+2,9);putV(bx+2,y0-1,bz+2,9);
+ for(const[dx,dz]of[[1,1],[3,1],[1,3],[3,3]]){putV(bx+dx,y0+1,bz+dz,4);putV(bx+dx,y0+2,bz+dz,4)}
+ for(let dx=1;dx<4;dx++)for(let dz=1;dz<4;dz++)putV(bx+dx,y0+3,bz+dz,7);
+ putV(bx+2,y0+4,bz+2,4);
 }
 function tryGenVillage(cx,cz){
  const key=ck(cx,cz);if(villagesDone.has(key))return;villagesDone.add(key);
- if(!villageChance(cx,cz))return;
- const ox=cx*CS+2,oz=cz*CS+2;
- const h=heightAt(ox+4,oz+4);
- if(h<=SEA+2||h>=36)return;
+ const V=villageOfChunk(cx,cz);if(!V)return;
+ const dx=cx-V.cx,dz=cz-V.cz;
+ const hc=heightAt(cx*CS+8,cz*CS+8);
+ if(Math.abs(hc-V.y)>4||hc<=SEA+1)return;
+ const fresh=!edits.has(key); // already built (edits stored) → do not rebuild
+ const y0=Math.min(H-9,Math.max(SEA+1,hc));
  const spots=[];
- spots.push(buildHouseInChunk(cx,cz,2,8));
- if(CS>=16)spots.push(buildHouseInChunk(cx,cz,9,9));
- buildFarmInChunk(cx,cz,3,2);
- // path strip
- for(let i=2;i<=12;i++){const x=cx*CS+i,z=cz*CS+7;const y=vSurfaceY(x,z);putV(x,y,z,38)}
+ if(dx===0&&dz===0){
+  if(fresh){
+   buildWell(cx,cz,y0);
+   for(let i=0;i<CS;i++){for(const[x,z]of[[cx*CS+i,cz*CS+7],[cx*CS+i,cz*CS+8],[cx*CS+7,cz*CS+i],[cx*CS+8,cz*CS+i]]){if(i>=5&&i<=10&&((x>=cx*CS+6&&x<=cx*CS+10)&&(z>=cz*CS+6&&z<=cz*CS+10)))continue;putV(x,vSurfaceY(x,z),z,38)}}
+  }
+  spots.push([cx*CS+4.5,y0+1,cz*CS+4.5,'farmer']);
+ }else if(dx===0||dz===0){
+  const swap=dx===0; // chunk above/below center: axis is z
+  const F=mkFrame(cx,cz,swap);
+  const flip=(swap?dz:dx)>0; // path runs from chunk edge nearest center
+  const prof=['farmer','shepherd','mason'][Math.floor(hsh(cx,cz,41)*3)];
+  const fa=(a)=>flip?a:15-a; // map so that a increases away from center in frame? keep symmetric
+  if(fresh){
+   for(let a=0;a<CS;a++)for(const b of[7,8]){const[x,z]=F(a,b);putV(x,vSurfaceY(x,z),z,38)}
+   buildFarm(F,fa(2)<fa(8)?2:2,1,y0,cx,cz);
+  }
+  const hy=y0;
+  if(fresh)buildHouse(F,6,10,hy,'house',prof);
+  const[hx,hz]=F(8,12);
+  spots.push([hx+.5,hy+1,hz+.5,prof]);
+  const[fx,fz]=F(5,3);
+  spots.push([fx+.5,y0+1,fz+.5,'farmer']);
+ }else{
+  const F=mkFrame(cx,cz,false);
+  const farm=hsh(cx,cz,43)<.45;
+  if(farm){
+   if(fresh)buildFarm(F,4,4,y0,cx,cz);
+   const[fx,fz]=F(7,7);spots.push([fx+.5,y0+1,fz+.5,'farmer']);
+  }else{
+   const prof=['shepherd','mason','farmer'][Math.floor(hsh(cx,cz,44)*3)];
+   if(fresh)buildHouse(F,5,5,y0,'house',prof);
+   const[hx,hz]=F(7,7);spots.push([hx+.5,y0+1,hz+.5,prof]);
+  }
+ }
  flushChunks();
  setTimeout(()=>{
   for(const s of spots){
-   if(!s)continue;
+   const sk=key+':'+s[0]+':'+s[2];if(spawnedPlots.has(sk))continue;spawnedPlots.add(sk);
    const m=spawnMob('v',s[0],s[1],s[2]);
-   if(m){m.home=s;m.prof=['farmer','shepherd','mason'][(Math.random()*3)|0]}
+   if(m){m.home=[s[0],s[1],s[2]];m.prof=s[3]}
   }
-  toast('You found a village!',2200);
  },80);
 }
+// announce when the player really gets near a village
+setInterval(()=>{
+ if(typeof P==='undefined'||typeof dead==='undefined')return;
+ const v=nearestVillage(P.x,P.z,34);
+ if(!v)return;
+ const k=v.cx+','+v.cz;if(announced.has(k))return;
+ announced.add(k);toast('You found a village!',2200);
+},1500);
 
 let tradeOpen=false,tradeMob=null;
 const TRADES={

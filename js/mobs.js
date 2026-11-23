@@ -94,6 +94,27 @@ function updateMobs(dt){
    if(m.dirx||m.dirz)spd=m.spd;
    // stay near home if set
    if(m.home&&Math.hypot(m.x-m.home[0],m.z-m.home[2])>14){m.dirx=Math.sign(m.home[0]-m.x);m.dirz=Math.sign(m.home[2]-m.z);spd=m.spd}
+   if(m.home){
+    const hd=Math.hypot(m.x-m.home[0],m.z-m.home[2]);
+    if(dayK<.3){ // night: go home and stay put
+     if(hd>1.2){const ux2=(m.home[0]-m.x)/hd,uz2=(m.home[2]-m.z)/hd;m.dirx=ux2;m.dirz=uz2;spd=m.spd}else{m.dirx=m.dirz=0;spd=0}
+    }else if(m.prof==='farmer'){
+     m.ft=(m.ft||0)-dt;
+     if(m.ft<=0){ // look for ripe wheat near home
+      m.ft=2.5;m.crop=null;let bd=99;
+      const hx=Math.floor(m.home[0]),hy=Math.floor(m.home[1]),hz=Math.floor(m.home[2]);
+      for(let x=hx-9;x<=hx+9;x++)for(let z=hz-9;z<=hz+9;z++)for(let y=hy-2;y<=hy+1;y++){
+       if(getBlock(x,y,z)===32){const d=Math.hypot(x+.5-m.x,z+.5-m.z);if(d<bd){bd=d;m.crop=[x,y,z]}}
+      }
+     }
+     if(m.crop){
+      const[cx2,cy2,cz2]=m.crop,d=Math.hypot(cx2+.5-m.x,cz2+.5-m.z);
+      if(getBlock(cx2,cy2,cz2)!==32)m.crop=null;
+      else if(d<1.3){setBlock(cx2,cy2,cz2,30,true);spawnParticles(cx2+.5,cy2+.5,cz2+.5,[.85,.75,.3],6);m.crop=null;m.ft=1.2;m.dirx=m.dirz=0}
+      else{m.dirx=(cx2+.5-m.x)/d;m.dirz=(cz2+.5-m.z)/d;spd=m.spd}
+     }
+    }
+   }
   }else{
    m.wt-=dt;
    if(m.wt<=0){m.wt=2+Math.random()*4;if(Math.random()<.4){m.dirx=m.dirz=0}else{const a=Math.random()*6.28;m.dirx=Math.cos(a);m.dirz=Math.sin(a)}}

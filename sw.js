@@ -1,4 +1,4 @@
-const CACHE_NAME = 'endroid-craft-v17';
+const CACHE_NAME = 'endroid-craft-v18';
 const ASSETS = [
   './',
   './index.html',
