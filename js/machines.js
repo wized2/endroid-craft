@@ -1,6 +1,6 @@
 // machines.js - furnace smelting + chest storage (Minecraft-like)
 // Block ids: 39 furnace, 40 chest, 41 torch
-const SMELT={12:/*coal stays*/null,18:19,20:21,22:23,13:37,44:46}; // raw meats -> cooked; gold ore -> emerald (stand-in for ingot)
+const SMELT={12:/*coal stays*/null,18:19,20:21,22:23,13:37,44:46,6:10,4:12}; // raw meats -> cooked; gold ore -> emerald (stand-in for ingot)
 // gold ore to emerald is a simplification for "valuable smelt"
 const furnaces=new Map(); // key "x,y,z" -> {fuel,prog,inId,outId}
 const chests=new Map();
@@ -36,6 +36,10 @@ function furnFeed(){
  if(id===12){ // coal as fuel
   if(surv()&&inv[12]<=0){toast('No coal',900);return}
   if(surv())inv[12]--;f.fuel+=40;renderSlots();toast('Fueled furnace',900);return;
+ }
+ if(id===7){ // planks burn briefly
+  if(surv()&&inv[7]<=0)return;
+  if(surv())inv[7]--;f.fuel+=7.5;renderSlots();toast('Fueled furnace',900);return;
  }
  if(SMELT[id]){
   if(f.inId){toast('Furnace busy',900);return}

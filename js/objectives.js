@@ -14,6 +14,10 @@ const OBJECTIVES=[
  {t:'Defeat 3 zombies',ok:()=>kills>=3},
  {t:'Craft armor (leather from cows, or gold)',ok:()=>tools.a1||tools.a2},
  {t:'Defeat a Brute zombie (from day 3)',ok:()=>bruteKills>=1},
+ {t:'Mine iron ore and smelt an ingot (furnace)',ok:()=>(inv[46]|0)>=1||tools.pick>=3},
+ {t:'Craft an Iron Pickaxe',ok:()=>tools.pick>=3},
+ {t:'Find a diamond deep underground',ok:()=>(inv[47]|0)>=1||tools.pick>=4},
+ {t:'Craft TNT (gunpowder from creepers) and light it',ok:()=>(inv[48]|0)>=1},
 ];
 let objI=(saved&&saved.o|0)||0,bruteKills=(saved&&saved.bk|0)||0,objT=0;
 const questEl=$('#quest');
