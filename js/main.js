@@ -20,12 +20,13 @@ function frame(now){
  if(running){update(dt);clock+=dt;const dn=Math.floor(clock/DAY);if(dn!==lastDay){lastDay=dn;if(surv())toast('Day '+(dn+1)+' — you survived the night!',2600)}}
  updateChunks(touch?1:2);
 updateWeather(dt);
+if(typeof updateFeatures==='function')updateFeatures(dt);
 updateSleep(dt);
 updateHunger(dt);
 if(running&&typeof updateFarming==='function')updateFarming(dt);
 if(running&&typeof tickFurnaces==='function')tickFurnaces(dt);
 if(running)updateObjectives(dt);
- placeCamera(dt);
+ placeCamera(dt);if(typeof applyShake==='function')applyShake(dt);
  refreshAim();target=raycast(eye,dir,REACH_B+.6);
  if(running){
   interact(dt);updateMobs(dt);spawnMobs(dt);

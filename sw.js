@@ -1,9 +1,9 @@
-const CACHE_NAME = 'endroid-craft-v18';
+const CACHE_NAME = 'endroid-craft-v19';
 const ASSETS = [
   './',
   './index.html',
   './css/base.css','./css/hud.css','./css/controls.css','./css/menus.css','./css/icons.css','./css/script.css','./css/settings.css',
-  './js/boot.js','./js/icons.js','./js/config.js','./js/touch.js','./js/audio.js','./js/seed.js','./js/noise.js','./js/textures.js','./js/scene.js','./js/world.js','./js/hud.js','./js/physics.js','./js/player.js','./js/mobs.js','./js/playermodel.js','./js/farming.js','./js/villages.js','./js/machines.js','./js/interact.js','./js/crafting.js','./js/hunger.js','./js/sleep.js','./js/objectives.js','./js/templates.js','./js/scripting.js','./js/weather.js','./js/settings.js','./js/input.js','./js/save.js','./js/main.js',
+  './js/boot.js','./js/icons.js','./js/config.js','./js/touch.js','./js/audio.js','./js/seed.js','./js/noise.js','./js/textures.js','./js/scene.js','./js/world.js','./js/hud.js','./js/physics.js','./js/player.js','./js/mobs.js','./js/playermodel.js','./js/farming.js','./js/villages.js','./js/machines.js','./js/interact.js','./js/crafting.js','./js/hunger.js','./js/sleep.js','./js/objectives.js','./js/templates.js','./js/scripting.js','./js/weather.js','./js/features.js','./js/settings.js','./js/input.js','./js/save.js','./js/main.js',
   './manifest.json',
   './icon.svg',
   'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'

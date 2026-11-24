@@ -25,10 +25,10 @@ function refreshAim(){
  dir.set(-sy*cp,sp,-cy*cp);
 }
 // what a block drops (Minecraft-like): glass/leaves/plants drop nothing, grass gives dirt, leaves 0.5% apple
-function dropOf(b){if(b===1)return 2;if(b===5)return Math.random()<.005?24:0;if(isPlant(b)||b===9||b===10)return 0;return b}
+function dropOf(b){if(b===1)return 2;if(b===45)return 47;if(b===51||b===41)return b;if(b===5){const r=Math.random();return r<.06?51:r<.07?24:0}if(isPlant(b)||b===9||b===10)return 0;return b}
 // needs a pickaxe tier to drop anything: stone/brick/coal need wood (1), gold ore needs stone (2)
-const NEEDPICK={3:1,8:1,12:1,13:2},AXEB={4:1,7:1,17:1};
-const TIERSPD=[1,2,4];
+const NEEDPICK={3:1,8:1,12:1,13:2,44:2,45:3},AXEB={4:1,7:1,17:1};
+const TIERSPD=[1,2,4,6,8],PICKN=['','wooden','stone','iron','diamond'];
 function canHarvest(b){return !NEEDPICK[b]||tools.pick>=NEEDPICK[b]}
 function hardness(b){
  const h=(HARD[b]!=null)?HARD[b]:1;
@@ -38,7 +38,7 @@ function hardness(b){
 }
 function breakBlock(h){
  if(!h||h.b<=0)return false;
- if(h.y<=0)return false;
+ if(h.y<=0||h.b===50)return false;
  if(typeof isCrop==='function'&&isCrop(h.b)){harvestCrop(h.x,h.y,h.z);triggerSwing();mine=null;crack.visible=false;if(target&&target.x===h.x&&target.y===h.y&&target.z===h.z)target=null;if(typeof hl!=='undefined')hl.visible=false;return true}
  const bx=h.x,by=h.y,bz=h.z,bb=h.b;
  triggerSwing();
@@ -48,9 +48,9 @@ function breakBlock(h){
  const ab=getBlock(bx,by+1,bz);if(isPlant(ab))setBlock(bx,by+1,bz,0);
  if(surv()){
   addExh(.005);
-  if(!canHarvest(bb))toast(bb===13?'Needs a stone pickaxe':'Needs a pickaxe',1300);
+  if(!canHarvest(bb))toast('Needs a '+PICKN[NEEDPICK[bb]||1]+' pickaxe',1300);
   const dr=canHarvest(bb)?dropOf(bb):0;
-  if(dr){inv[dr]++;if(bb===13)toast('Gold!',1200);renderSlots();renderInfo()}
+  if(dr){inv[dr]++;if(bb===13)toast('Gold!',1200);if(bb===45)toast('Diamond!',1400);renderSlots();renderInfo()}
  }
  mine=null;crack.visible=false;
  if(target&&target.x===bx&&target.y===by&&target.z===bz)target=null;
@@ -65,10 +65,12 @@ function killMob(m){
   kills++;if(m.big)bruteKills++;
   giveDrop(25,m.big?rint(1,3):rint(0,2)); // rotten flesh
   if(Math.random()<(m.big?.1:.025)){inv[13]++;toast('Zombie dropped gold!')} // rare, like Minecraft's iron
- }else if(m.type==='p'){giveDrop(18,rint(1,3));toast('Raw Porkchop',900)}
+ }else if(m.type==='k'){giveDrop(52,rint(0,2));kills++;toast('Creeper dropped gunpowder',1100)}
+ else if(m.type==='h'){giveDrop(53,1);toast('Raw Chicken',900)}
+ else if(m.type==='p'){giveDrop(18,rint(1,3));toast('Raw Porkchop',900)}
  else if(m.type==='c'){giveDrop(20,rint(1,3));giveDrop(27,rint(0,2));toast('Raw Beef + leather',1000)}
  else{giveDrop(26,1);giveDrop(22,rint(1,2));toast('Wool + Raw Mutton',1000)}
- spawnParticles(m.x,m.y+m.h*.5,m.z,m.type==='z'?[.35,.58,.29]:m.type==='c'?[.4,.3,.22]:m.type==='s'?[.9,.9,.9]:[.94,.63,.66],m.big?24:14);
+ spawnParticles(m.x,m.y+m.h*.5,m.z,m.type==='k'?[.37,.69,.29]:m.type==='z'?[.35,.58,.29]:m.type==='c'?[.4,.3,.22]:m.type==='s'?[.9,.9,.9]:[.94,.63,.66],m.big?24:14);
  removeMob(mobs.indexOf(m));renderSlots();renderInfo();showMobHp(null);
 }
 function attack(m){
@@ -84,7 +86,7 @@ function attack(m){
  const dx=m.x-P.x,dz=m.z-P.z,dd=Math.hypot(dx,dz)||1,kb=(Math.hypot(P.vx,P.vz)>5.5?10:7)*(m.big?.6:1);
  m.vx=dx/dd*kb;m.vz=dz/dd*kb;m.vy=5;m.onGround=false;
  if(crit){spawnParticles(m.x,m.y+m.h*.7,m.z,[1,.9,.3],10);toast('Critical hit!',500);sfxHit()}
- if(m.type!=='z')m.flee=3;
+ if(m.type!=='z'&&m.type!=='k')m.flee=3;
  if(m.hp<=0)killMob(m);
 }
 // Instant creative break (Minecraft: one click destroys). Also used for held continuous break.
@@ -139,11 +141,13 @@ function doPlace(){
  if(look===39){openFurnace(h.x,h.y,h.z);return}
  if(look===40){openChest(h.x,h.y,h.z);return}
  if(look===17){useBed(h.x,h.y,h.z);return} // right-click a bed
+ if(look===48&&(!surv()||inv[55]>0)){igniteTnt(h.x,h.y,h.z,3);return}
  const id=HB[si];
  if(surv()&&inv[id]<=0){toast('No '+NAMES[id]+' left',900);return}
  const x=h.x+h.f[0],y=h.y+h.f[1],z=h.z+h.f[2];if(y<0||y>=H)return;
  const b=getBlock(x,y,z);if(b!==0&&b!==9&&!isPlant(b))return;
  if(x+1>P.x-PW&&x<P.x+PW&&y+1>P.y&&y<P.y+HT&&z+1>P.z-PW&&z<P.z+PW)return;
+ if(id===51){const bl=getBlock(x,y-1,z);if(bl!==1&&bl!==2){toast('Plant on grass or dirt',1000);return}}
  triggerSwing();sfxPlace();vib(14);
  setBlock(x,y,z,id);
  if(surv()){inv[id]--;renderSlots();nameEl.textContent=NAMES[id]+' ×'+inv[id];nameEl.style.opacity=1;clearTimeout(nameT);nameT=setTimeout(()=>nameEl.style.opacity=0,1000)}

@@ -5,7 +5,7 @@ const ck=(x,z)=>((x&0xffff)<<16)|(z&0xffff);
 const edits=new Map();
 if(saved&&saved.e)for(const k in saved.e)edits.set(+k,new Map(Object.entries(saved.e[k]).map(([i,v])=>[+i,v])));
 function getBlock(x,y,z){if(y<0)return 3;if(y>=H)return 0;const c=chunks.get(ck(x>>4,z>>4));if(!c)return -1;return c.d[(x&15)+CS*((z&15)+CS*y)]}
-const solidB=b=>b===-1||(b>0&&b!==9&&!isPlant(b));
+const solidB=b=>b===-1||(b>0&&b!==9&&b!==50&&!isPlant(b));
 function treeAt(wx,wz,h){
  if(h<=SEA+1||h>=40)return 0;
  const fd=fbm(wx*.02+SX+777,wz*.02+SZ-555),prob=fd>.58?.035:.004;
@@ -28,10 +28,14 @@ function genChunk(cx,cz){
    const a=n3(wx*.06,y*.09,wz*.06),b2=n3(wx*.06+100,y*.09+50,wz*.06+100);
    if(Math.abs(a-.5)<.05&&Math.abs(b2-.5)<.05)d[I(x,y,z)]=0;
   }
+  if(!beach)for(let y=6;y<h-5;y++){ // big caverns
+   if(n3(wx*.035+300,y*.055,wz*.035-200)>.74)d[I(x,y,z)]=0;
+  }
+  for(let y=1;y<=5;y++)if(d[I(x,y,z)]===0&&y<h-1)d[I(x,y,z)]=50; // lava pools deep underground
   for(let y=1;y<h-2;y++){
    if(d[I(x,y,z)]!==3)continue;
    const r=hsh(wx*3+y,wz*5+y*7,1);
-   if(r<.003&&y<26)d[I(x,y,z)]=13;else if(r<.02&&y<46)d[I(x,y,z)]=12;
+   if(r<.0015&&y<14)d[I(x,y,z)]=45;else if(r<.0045&&y<26)d[I(x,y,z)]=13;else if(r<.012&&y<44)d[I(x,y,z)]=44;else if(r<.03&&y<46)d[I(x,y,z)]=12;
   }
   for(let y=h+1;y<=SEA;y++)d[I(x,y,z)]=9;
  }

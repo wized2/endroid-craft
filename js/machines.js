@@ -1,6 +1,6 @@
 // machines.js - furnace smelting + chest storage (Minecraft-like)
 // Block ids: 39 furnace, 40 chest, 41 torch
-const SMELT={12:/*coal stays*/null,18:19,20:21,22:23,13:37}; // raw meats -> cooked; gold ore -> emerald (stand-in for ingot)
+const SMELT={12:/*coal stays*/null,18:19,20:21,22:23,13:37,44:46}; // raw meats -> cooked; gold ore -> emerald (stand-in for ingot)
 // gold ore to emerald is a simplification for "valuable smelt"
 const furnaces=new Map(); // key "x,y,z" -> {fuel,prog,inId,outId}
 const chests=new Map();
