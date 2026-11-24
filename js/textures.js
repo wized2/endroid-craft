@@ -4,7 +4,7 @@ const TS=16,AC=8,ac=document.createElement('canvas');ac.width=ac.height=TS*AC;
 const tc=ac.getContext('2d');
 let rs=987654321;const rnd=()=>{rs=(Math.imul(rs,1664525)+1013904223)>>>0;return rs/4294967296};
 const tileAvg=[];
-const TI={grassTop:0,grassSide:1,dirt:2,stone:3,logSide:4,logTop:5,leaves:6,sand:7,planks:8,brick:9,water:10,glass:11,snow:12,coal:13,gold:14,flowerR:15,flowerY:16,tall:17,bedTop:18,bedSide:19,farmland:20,wheat0:21,wheat1:22,wheat2:23,path:24,emerald:25,furnace:26,chest:27,torch:28,iron:29,diamond:30,tntSide:31,tntTop:32,gravel:33,lava:34,sapling:35};
+const TI={grassTop:0,grassSide:1,dirt:2,stone:3,logSide:4,logTop:5,leaves:6,sand:7,planks:8,brick:9,water:10,glass:11,snow:12,coal:13,gold:14,flowerR:15,flowerY:16,tall:17,bedTop:18,bedSide:19,farmland:20,wheat0:21,wheat1:22,wheat2:23,path:24,emerald:25,furnace:26,chest:27,torch:28,iron:29,diamond:30,tntSide:31,tntTop:32,gravel:33,lava:34,sapling:35,ladder:36};
 function paint(i,fn){
  const im=tc.createImageData(TS,TS);let r=0,g=0,b=0,n=0;
  for(let y=0;y<TS;y++)for(let x=0;x<TS;x++){
@@ -62,6 +62,7 @@ paint(TI.tntTop,(x,y)=>{const d=Math.max(Math.abs(x-7.5),Math.abs(y-7.5));if(d<1
 paint(TI.gravel,()=>{const r=rnd();return r<.25?vr([96,92,92],20):r<.5?vr([150,146,144],24):vr([124,120,118],26)});
 paint(TI.lava,()=>{const r=rnd();return r<.18?vr([255,214,70],30):r<.55?vr([240,120,24],40):vr([206,70,10],40)});
 paint(TI.sapling,(x,y)=>{if((x===7||x===8)&&y>=9)return vr([100,70,40],14);const d=Math.hypot(x-7.5,y-6);if(d<4.2&&rnd()>.15)return vr([54,140,44],30);return null});
+paint(TI.ladder,(x,y)=>{if(x===3||x===4||x===11||x===12)return vr([130,92,52],14);if((y===2||y===6||y===10||y===14)&&x>4&&x<11)return vr([150,108,62],14);return null});
 const EP=.0008;
 function tileUV(i){const c=i%AC,r=(i/AC)|0;return[c/AC+EP,1-(r+1)/AC+EP,(c+1)/AC-EP,1-r/AC-EP]}
 function tileFor(b,f){
@@ -76,7 +77,7 @@ function tileFor(b,f){
   case 29:return TI.farmland;case 30:return TI.wheat0;case 31:return TI.wheat1;case 32:return TI.wheat2;
   case 38:return TI.path;
   case 33:return TI.wheat0;case 34:return TI.wheat2;case 35:return TI.flowerR;case 36:return TI.flowerY;case 37:return TI.emerald;
-  case 44:return TI.iron;case 45:return TI.diamond;case 48:return(f===2||f===3)?TI.tntTop:TI.tntSide;case 49:return TI.gravel;case 50:return TI.lava;case 51:return TI.sapling;
+  case 44:return TI.iron;case 45:return TI.diamond;case 48:return(f===2||f===3)?TI.tntTop:TI.tntSide;case 49:return TI.gravel;case 50:return TI.lava;case 51:return TI.sapling;case 57:return TI.ladder;
   case 39:return TI.furnace;case 40:return TI.chest;case 41:return TI.torch;case 42:return TI.planks;case 43:return TI.stone;
  }
  return 0;

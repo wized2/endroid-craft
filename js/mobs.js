@@ -28,6 +28,18 @@ function makeMob(type,x,y,z){
   box(.4,.35,.55,0xf4f4f0,0,.5,0,g);box(.22,.28,.22,0xf4f4f0,0,.8,-.28,g);box(.1,.08,.14,0xe89a2c,0,.78,-.44,g);box(.06,.1,.06,0xcc2222,0,.68,-.4,g);
   box(.06,.06,.02,0x111111,-.07,.86,-.39,g);box(.06,.06,.02,0x111111,.07,.86,-.39,g);
   const l1=limb(.06,.3,.06,0xe8b030,-.1,.3,0,g),l2=limb(.06,.3,.06,0xe8b030,.1,.3,0,g);m.legs.push(l1,l2,l2,l1);
+ }else if(type==='w'){
+  m.hp=8;m.maxhp=8;m.w=.3;m.h=.85;m.spd=2.4;m.dmg=3;m.tamed=false;m.wt=0;const C=0xd8d4cc;
+  box(.36,.36,.72,C,0,.62,0,g);box(.3,.3,.3,C,0,.82,-.46,g);box(.16,.14,.18,0xe8e4dc,0,.76,-.66,g);box(.07,.07,.02,0x111111,-.08,.86,-.62,g);box(.07,.07,.02,0x111111,.08,.86,-.62,g);
+  box(.08,.12,.06,C,-.1,1.04,-.44,g);box(.08,.12,.06,C,.1,1.04,-.44,g);box(.08,.08,.36,C,0,.8,.52,g);
+  for(const[px,pz]of[[-.11,-.26],[.11,-.26],[-.11,.26],[.11,.26]])m.legs.push(limb(.12,.45,.12,C,px,.45,pz,g));
+ }else if(type==='g'){
+  m.hp=m.maxhp=100;m.w=.7;m.h=2.7;m.spd=2.2;m.dmg=15;m.wt=0;const C=0xc9c4b8;
+  box(1.1,1.0,.6,C,0,1.7,0,g);box(.7,.6,.6,0xb8b3a6,0,1.4,0,g);box(.5,.5,.5,C,0,2.45,-.05,g);box(.12,.2,.12,0x8a7a6a,0,2.4,-.32,g);
+  box(.1,.06,.02,0x992222,-.12,2.52,-.31,g);box(.1,.06,.02,0x992222,.12,2.52,-.31,g);
+  box(.18,.5,.1,0x4a8a3a,.3,1.6,.31,g);
+  m.arms.push(limb(.28,1.5,.3,C,-.7,2.1,0,g),limb(.28,1.5,.3,C,.7,2.1,0,g));
+  m.legs.push(limb(.34,.9,.34,0xb8b3a6,-.25,.9,0,g),limb(.34,.9,.34,0xb8b3a6,.25,.9,0,g));
  }else if(type==='s'){
   m.hp=8;m.w=.45;m.h=1.1;m.spd=1.1;const Wl=0xe8e6e0;
   box(.7,.65,1,Wl,0,.9,0,g);box(.4,.4,.4,0xc9a98a,0,1.05,-.68,g);box(.44,.14,.44,Wl,0,1.3,-.66,g);
@@ -78,11 +90,14 @@ function spawnMobs(dt){
  const cap=(touch?3:5)+Math.min(4,Math.floor(clock/DAY));
  if(surv()&&dayK<.45&&!warned){warned=true;toast('Night is falling - build a shelter or grab a sword!',3200)}else if(dayK>.6)warned=false;
  if(surv()&&night&&nz<cap)trySpawn(Math.random()<.25?'k':'z');
- else if(!night&&np<8&&Math.random()<.6){const r=Math.random();trySpawn(r<.25?'p':r<.5?'c':r<.75?'s':'h')}
+ else if(!night&&np<8&&Math.random()<.6){const r=Math.random();trySpawn(r<.22?'p':r<.44?'c':r<.66?'s':r<.92?'h':'w')}
 }
+function nearestHostile(m,range){let b=null,bd=range;for(const o of mobs){if(o.type!=='z'&&o.type!=='k'||o.dead)continue;const d=Math.hypot(o.x-m.x,o.z-m.z);if(d<bd&&Math.abs(o.y-m.y)<3){bd=d;b=o}}return b}
+function mobStrike(m,t,dmg){t.hp-=dmg;t.hurt=.4;const dx=t.x-m.x,dz=t.z-m.z,dd=Math.hypot(dx,dz)||1;t.vx=dx/dd*6;t.vz=dz/dd*6;t.vy=m.type==='g'?9:5;if(t.hp<=0)t.dead=true}
 function updateMobs(dt){
  for(let i=mobs.length-1;i>=0;i--){
   const m=mobs[i],dx=P.x-m.x,dz=P.z-m.z,dist=Math.hypot(dx,dz)||.001;
+  if(m.dead){spawnParticles(m.x,m.y+1,m.z,[.4,.4,.4],8);removeMob(i);continue}
   if(dist>80||(!surv()&&(m.type==='z'||m.type==='k'))){removeMob(i);continue}
   if(getBlock(Math.floor(m.x),Math.floor(m.y),Math.floor(m.z))===-1)continue;
   m.hurt=Math.max(0,m.hurt-dt);m.cd-=dt;
@@ -105,6 +120,27 @@ function updateMobs(dt){
    m.burn=dayK>.5;
    if(m.burn){m.hp-=2.5*dt;if(m.hp<=0){spawnParticles(m.x,m.y+1,m.z,[.3,.3,.3],8);removeMob(i);continue}}
    m.gT-=dt;if(m.gT<=0){m.gT=4+Math.random()*5;if(dist<20)sfxGroan(.07*(1-dist/20))}
+  }else if(m.type==='w'||m.type==='g'){
+   m.wt-=dt;m.cd=m.cd||0;
+   const gol=m.type==='g',tame=m.tamed;
+   const tg=(gol||tame)?nearestHostile(m,gol?16:14):null;
+   let chase=null;
+   if(tg)chase=tg;
+   if(chase){
+    const cx=chase.x-m.x,cz=chase.z-m.z,cd=Math.hypot(cx,cz)||1;
+    m.dirx=cx/cd;m.dirz=cz/cd;spd=m.spd*1.4;
+    if(cd<(gol?2:1.5)&&m.cd<=0){mobStrike(m,chase,gol?m.dmg:4);m.cd=gol?1.2:1;if(gol)m.arms[0].rotation.x=-2}
+   }else if(m.aggro&&!tame&&!gol){
+    if(dist<20&&dist>.9){m.dirx=ux;m.dirz=uz;spd=m.spd*1.3}else{m.dirx=m.dirz=0}
+    if(dist<1.4&&m.cd<=0&&!dead&&Math.abs(P.y-m.y)<1.6){damagePlayer(m.dmg,m.x,m.z);m.cd=1}
+   }else if(tame){
+    if(dist>26){m.x=P.x+Math.cos(Math.random()*6.28)*2;m.z=P.z+Math.sin(Math.random()*6.28)*2;m.y=P.y+1}
+    if(dist>5){m.dirx=ux;m.dirz=uz;spd=dist>10?m.spd*1.5:m.spd}else{m.dirx=m.dirz=0}
+   }else{
+    if(m.wt<=0){m.wt=2+Math.random()*3;if(Math.random()<.4){m.dirx=m.dirz=0}else{const a=Math.random()*6.28;m.dirx=Math.cos(a);m.dirz=Math.sin(a)}}
+    if(m.dirx||m.dirz)spd=m.spd*.7;
+    if(gol&&m.home&&Math.hypot(m.x-m.home[0],m.z-m.home[2])>16){m.dirx=Math.sign(m.home[0]-m.x);m.dirz=Math.sign(m.home[2]-m.z);spd=m.spd}
+   }
   }else if(m.type==='v'){
    m.wt-=dt;m.love=Math.max(0,(m.love||0)-dt);
    if(m.wt<=0){m.wt=2+Math.random()*3;if(Math.random()<.35){m.dirx=m.dirz=0}else{const a=Math.random()*6.28;m.dirx=Math.cos(a);m.dirz=Math.sin(a)}}
@@ -155,6 +191,8 @@ function updateMobs(dt){
   m.ph+=hs*dt*4;
   const sw=Math.sin(m.ph)*Math.min(1,hs);
   if(m.type==='z'){m.legs[0].rotation.x=sw*.7;m.legs[1].rotation.x=-sw*.7;const ar=m.wind>0?2.4:1.45;m.arms[0].rotation.x=ar+Math.sin(m.ph*.5)*.08;m.arms[1].rotation.x=ar-Math.sin(m.ph*.5)*.08}
+  else if(m.type==='w'){m.legs[0].rotation.x=m.legs[3].rotation.x=sw*.8;m.legs[1].rotation.x=m.legs[2].rotation.x=-sw*.8}
+  else if(m.type==='g'){m.legs[0].rotation.x=sw*.5;m.legs[1].rotation.x=-sw*.5;m.arms[0].rotation.x*=.9;m.arms[1].rotation.x=-sw*.2}
   else if(m.type==='k'){m.legs[0].rotation.x=m.legs[3].rotation.x=sw*.7;m.legs[1].rotation.x=m.legs[2].rotation.x=-sw*.7}
   else if(m.type==='v'){m.legs[0].rotation.x=sw*.6;m.legs[1].rotation.x=-sw*.6;if(m.arms[0]){m.arms[0].rotation.x=sw*.3;m.arms[1].rotation.x=-sw*.3}}
   else{m.legs[0].rotation.x=m.legs[3].rotation.x=sw*.7;m.legs[1].rotation.x=m.legs[2].rotation.x=-sw*.7}
@@ -181,7 +219,14 @@ function rayBox(o,d,cx,cy,cz,hw,h){
 // Feed passive mobs (wheat 34? seeds 33 for chickens-we use pigs/cows/sheep with wheat bread or seeds)
 // Wheat item is harvested as bread ingredient; use seeds 33 or bread 34 or wheat-like: seeds work for all for simplicity
 function feedMob(m){
- if(!m||m.type==='z'||m.type==='v')return false;
+ if(m&&m.type==='w'){
+  if(m.tamed||!(inv[56]>0||!surv()))return false;
+  if(surv())inv[56]--;
+  if(Math.random()<.4){m.tamed=true;m.aggro=false;m.maxhp=20;m.hp=20;box(.32,.1,.32,0xcc2222,0,.72,-.3,m.g);spawnParticles(m.x,m.y+m.h,m.z,[1,.4,.5],10);toast('You tamed the wolf!',1500);vib(30)}
+  else{spawnParticles(m.x,m.y+m.h,m.z,[.6,.6,.6],5);toast('The wolf is not convinced...',900)}
+  return true;
+ }
+ if(!m||m.type==='z'||m.type==='v'||m.type==='k'||m.type==='g')return false;
  const id=HB[si];
  if(id!==33&&id!==34&&id!==35)return false;
  if(surv()&&inv[id]<=0)return false;

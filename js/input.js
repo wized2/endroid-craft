@@ -114,7 +114,7 @@ addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.a
 
 
 // Creative block palette (phone-friendly)
-const PLACEABLE=[1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,26,29,30,32,33,38,39,40,41,44,45,48,49,50,51];
+const PLACEABLE=[1,2,3,4,5,6,7,8,10,11,12,13,14,15,16,17,26,29,30,32,33,38,39,40,41,44,45,48,49,50,51,57];
 function buildPalette(){
  const g=$('#palGrid');if(!g)return;g.innerHTML='';
  for(const id of PLACEABLE){

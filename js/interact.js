@@ -64,8 +64,11 @@ function killMob(m){
  else if(m.type==='z'){
   kills++;if(m.big)bruteKills++;
   giveDrop(25,m.big?rint(1,3):rint(0,2)); // rotten flesh
+  if(Math.random()<.3){giveDrop(56,1);toast('Bone',700)}
   if(Math.random()<(m.big?.1:.025)){inv[13]++;toast('Zombie dropped gold!')} // rare, like Minecraft's iron
  }else if(m.type==='k'){giveDrop(52,rint(0,2));kills++;toast('Creeper dropped gunpowder',1100)}
+ else if(m.type==='g'){giveDrop(46,rint(3,5));giveDrop(14,rint(0,2));toast('Iron Golem dropped iron',1300)}
+ else if(m.type==='w'){}
  else if(m.type==='h'){giveDrop(53,1);toast('Raw Chicken',900)}
  else if(m.type==='p'){giveDrop(18,rint(1,3));toast('Raw Porkchop',900)}
  else if(m.type==='c'){giveDrop(20,rint(1,3));giveDrop(27,rint(0,2));toast('Raw Beef + leather',1000)}
@@ -86,7 +89,7 @@ function attack(m){
  const dx=m.x-P.x,dz=m.z-P.z,dd=Math.hypot(dx,dz)||1,kb=(Math.hypot(P.vx,P.vz)>5.5?10:7)*(m.big?.6:1);
  m.vx=dx/dd*kb;m.vz=dz/dd*kb;m.vy=5;m.onGround=false;
  if(crit){spawnParticles(m.x,m.y+m.h*.7,m.z,[1,.9,.3],10);toast('Critical hit!',500);sfxHit()}
- if(m.type!=='z'&&m.type!=='k')m.flee=3;
+ if(m.type==='w'){if(!m.tamed)m.aggro=true}else if(m.type!=='z'&&m.type!=='k'&&m.type!=='g')m.flee=3;
  if(m.hp<=0)killMob(m);
 }
 // Instant creative break (Minecraft: one click destroys). Also used for held continuous break.
@@ -134,7 +137,7 @@ function doPlace(){
  // Trade with villager under crosshair
  if(hoverMob&&hoverMob.type==='v'){openTrade(hoverMob);return}
  if(hoverMob&&hoverMob.type==='s'&&tryShear(hoverMob))return
- if(hoverMob&&(hoverMob.type==='p'||hoverMob.type==='c'||hoverMob.type==='s')){if(feedMob(hoverMob))return}
+ if(hoverMob&&(hoverMob.type==='p'||hoverMob.type==='c'||hoverMob.type==='s'||hoverMob.type==='w')){if(feedMob(hoverMob))return}
  if(!h||h.t>REACH_B+.2||dead)return;
  if(typeof tryFarmUse==='function'&&tryFarmUse(h))return;
  const look=getBlock(h.x,h.y,h.z);

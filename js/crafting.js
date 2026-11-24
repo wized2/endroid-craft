@@ -26,6 +26,7 @@ const RECIPES=[
  {ic:'shield',n:'Iron Armor',cost:{46:8},once:'a3',give(){tools.a3=true},note:'-60% melee damage'},
  {ic:'shield',n:'Diamond Armor',cost:{47:8},once:'a4',give(){tools.a4=true},note:'-80% melee damage'},
  {ic:'torch',n:'Flint & Steel',cost:{46:1,49:1},give(){inv[55]=(inv[55]|0)+1},note:'Right-click TNT to light it'},
+ {ic:'box',n:'Ladder x3',cost:{42:7},give(){inv[57]=(inv[57]|0)+3},note:'Hold JUMP to climb'},
  {ic:'box',n:'TNT',cost:{52:5,6:4},give(){inv[48]=(inv[48]|0)+1},note:'5 gunpowder + 4 sand'},
  {ic:'steak',n:'Cook 2 Chicken',cost:{53:2,12:1},give(){inv[54]=(inv[54]|0)+2},note:'Coal as fuel. Heals 6 food'},
  {ic:'porkchop',n:'Cook 2 Porkchops',cost:{18:2,12:1},give(){inv[19]+=2},note:'Coal as fuel. Heals 8 food'},
@@ -42,7 +43,7 @@ const craftEl=$('#craft'),recsEl=$('#recs');
 let craftOpen=false;
 const owns=r=>(r.once&&tools[r.once])||(r.tier&&tools[r.tier.k]>=r.tier.l);
 const canCraft=r=>Object.entries(r.cost).every(([id,n])=>inv[id]>=n)&&!owns(r);
-const BAG=[[12,'Coal','box'],[13,'Gold','gem'],[37,'Emerald','emerald'],[26,'Wool','wool'],[27,'Leather','leather'],[33,'Seeds','seeds'],[34,'Bread','bread'],[18,'Raw Pork','porkchop'],[19,'Cooked Pork','porkchop'],[20,'Raw Beef','steak'],[21,'Steak','steak'],[22,'Raw Mutton','mutton'],[23,'Mutton','mutton'],[24,'Apple','apple'],[28,'Golden Apple','golden-apple'],[25,'Rotten Flesh','drumstick'],[42,'Sticks','stick'],[41,'Torch','torch'],[39,'Furnace','furnace'],[40,'Chest','chest'],[43,'Shears','shears'],[44,'Iron Ore','gem'],[46,'Iron Ingot','gem'],[47,'Diamond','gem'],[52,'Gunpowder','box'],[48,'TNT','box'],[49,'Gravel','box'],[51,'Sapling','apple'],[53,'Raw Chicken','drumstick'],[54,'Cooked Chicken','drumstick'],[55,'Flint & Steel','torch']];
+const BAG=[[12,'Coal','box'],[13,'Gold','gem'],[37,'Emerald','emerald'],[26,'Wool','wool'],[27,'Leather','leather'],[33,'Seeds','seeds'],[34,'Bread','bread'],[18,'Raw Pork','porkchop'],[19,'Cooked Pork','porkchop'],[20,'Raw Beef','steak'],[21,'Steak','steak'],[22,'Raw Mutton','mutton'],[23,'Mutton','mutton'],[24,'Apple','apple'],[28,'Golden Apple','golden-apple'],[25,'Rotten Flesh','drumstick'],[42,'Sticks','stick'],[41,'Torch','torch'],[39,'Furnace','furnace'],[40,'Chest','chest'],[43,'Shears','shears'],[44,'Iron Ore','gem'],[46,'Iron Ingot','gem'],[47,'Diamond','gem'],[52,'Gunpowder','box'],[48,'TNT','box'],[49,'Gravel','box'],[51,'Sapling','apple'],[53,'Raw Chicken','drumstick'],[54,'Cooked Chicken','drumstick'],[55,'Flint & Steel','torch'],[56,'Bone','box'],[57,'Ladder','box']];
 function backpackHTML(){
  const T=['','Wooden','Stone','Iron','Diamond'],gear=[];
  if(tools.pick)gear.push(ico('pickaxe',14)+T[tools.pick]);if(tools.axe)gear.push(ico('axe',14)+T[tools.axe]);if(tools.sword)gear.push(ico('sword',14)+T[tools.sword]);if(armorLvl())gear.push(ico('shield',14)+['','Leather','Gold','Iron','Diamond'][armorLvl()]);

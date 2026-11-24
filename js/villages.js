@@ -117,6 +117,7 @@ function tryGenVillage(cx,cz){
    for(let i=0;i<CS;i++){for(const[x,z]of[[cx*CS+i,cz*CS+7],[cx*CS+i,cz*CS+8],[cx*CS+7,cz*CS+i],[cx*CS+8,cz*CS+i]]){if(i>=5&&i<=10&&((x>=cx*CS+6&&x<=cx*CS+10)&&(z>=cz*CS+6&&z<=cz*CS+10)))continue;putV(x,vSurfaceY(x,z),z,38)}}
   }
   spots.push([cx*CS+4.5,y0+1,cz*CS+4.5,'farmer']);
+  spots.push([cx*CS+10.5,y0+1,cz*CS+10.5,'golem']);
  }else if(dx===0||dz===0){
   const swap=dx===0; // chunk above/below center: axis is z
   const F=mkFrame(cx,cz,swap);
@@ -149,7 +150,7 @@ function tryGenVillage(cx,cz){
  setTimeout(()=>{
   for(const s of spots){
    const sk=key+':'+s[0]+':'+s[2];if(spawnedPlots.has(sk))continue;spawnedPlots.add(sk);
-   const m=spawnMob('v',s[0],s[1],s[2]);
+   const gol=s[3]==='golem',m=spawnMob(gol?'g':'v',s[0],s[1],s[2]);
    if(m){m.home=[s[0],s[1],s[2]];m.prof=s[3]}
   }
  },80);

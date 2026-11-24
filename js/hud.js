@@ -10,7 +10,8 @@ function renderInfo(){
  let l3='';
  if(!surv()&&fly)l3='\nFlying';
  info.style.display=SET.info?'block':'none';
- info.textContent=fpsTxt+(weather.rain>.3?' | Rain':'')+'\n'+(surv()?'Survival':'Creative')+' · '+ph+' '+day+' · seed '+SEEDL+l3;
+ const tm=((clock/DAY%1)*24+6)%24,clk=String(Math.floor(tm)).padStart(2,'0')+':'+String(Math.floor(tm%1*60)).padStart(2,'0');
+ info.textContent=fpsTxt+' | '+clk+(weather.rain>.3?' | Rain':'')+'\n'+(surv()?'Survival':'Creative')+' · '+ph+' '+day+' · seed '+SEEDL+l3;
 }
 let si=0;
 const bar=$('#bar');
@@ -43,6 +44,6 @@ function renderArmor(){const e=$('#armor'),l=armorLvl();e.innerHTML=(l&&surv())?
 const mobhpEl=$('#mobhp'),mobhpBar=mobhpEl.querySelector('i'),mobhpTxt=mobhpEl.querySelector('span');
 function showMobHp(m){
  if(!m){mobhpEl.style.opacity=0;return}
- mobhpEl.style.opacity=1;mobhpTxt.textContent=(m.type==='k'?'Creeper':m.type==='h'?'Chicken':m.type==='p'?'Pig':m.type==='c'?'Cow':m.type==='s'?'Sheep':m.big?'Brute Zombie':'Zombie')+'  '+Math.max(0,Math.ceil(m.hp));
+ mobhpEl.style.opacity=1;mobhpTxt.textContent=(m.type==='w'?(m.tamed?'Wolf (tamed)':'Wolf'):m.type==='g'?'Iron Golem':m.type==='k'?'Creeper':m.type==='h'?'Chicken':m.type==='p'?'Pig':m.type==='c'?'Cow':m.type==='s'?'Sheep':m.big?'Brute Zombie':'Zombie')+'  '+Math.max(0,Math.ceil(m.hp));
  mobhpBar.style.width=Math.max(0,Math.min(100,m.hp/(m.maxhp||m.hp)*100))+'%';
 }

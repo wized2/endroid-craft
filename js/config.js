@@ -3,13 +3,13 @@ const $=s=>document.querySelector(s);
 const touch=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
 if(touch)document.body.classList.add('touch');
 const CS=16,H=64,SEA=17,HT=1.8,EYE=1.62,PW=0.3,DAY=1200; // one full day+night = 20 min, like Minecraft
-const isPlant=b=>(b>=14&&b<=16)||(b>=30&&b<=32)||b===41||b===51; // flowers, grass, wheat stages
+const isPlant=b=>(b>=14&&b<=16)||(b>=30&&b<=32)||b===41||b===51||b===57; // flowers, grass, wheat stages
 const isCrop=b=>b>=30&&b<=32;
 const isFarmland=b=>b===29;
 const SAVEKEY='endroid-craft-v2';
 let saved=null;try{saved=JSON.parse(localStorage.getItem(SAVEKEY))}catch(e){}
-const NAMES=['','Grass','Dirt','Stone','Log','Leaves','Sand','Planks','Brick','Water','Glass','Snow','Coal','Gold','Rose','Dandelion','Tall grass','Bed','Raw Porkchop','Cooked Porkchop','Raw Beef','Steak','Raw Mutton','Cooked Mutton','Apple','Rotten Flesh','Wool','Leather','Golden Apple','Farmland','Wheat (young)','Wheat (mid)','Wheat (grown)','Seeds','Bread','Carrot','Potato','Emerald','Path','Furnace','Chest','Torch','Stick','Shears','Iron Ore','Diamond Ore','Iron Ingot','Diamond','TNT','Gravel','Lava','Sapling','Gunpowder','Raw Chicken','Cooked Chicken','Flint & Steel'];
-const HARD=[0,.6,.5,1.5,2,.2,.5,2,2,0,.3,.2,3,3,.05,.05,.05,.2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,.6,999,.05]; // by block id // hardness by block id
+const NAMES=['','Grass','Dirt','Stone','Log','Leaves','Sand','Planks','Brick','Water','Glass','Snow','Coal','Gold','Rose','Dandelion','Tall grass','Bed','Raw Porkchop','Cooked Porkchop','Raw Beef','Steak','Raw Mutton','Cooked Mutton','Apple','Rotten Flesh','Wool','Leather','Golden Apple','Farmland','Wheat (young)','Wheat (mid)','Wheat (grown)','Seeds','Bread','Carrot','Potato','Emerald','Path','Furnace','Chest','Torch','Stick','Shears','Iron Ore','Diamond Ore','Iron Ingot','Diamond','TNT','Gravel','Lava','Sapling','Gunpowder','Raw Chicken','Cooked Chicken','Flint & Steel','Bone','Ladder'];
+const HARD=[0,.6,.5,1.5,2,.2,.5,2,2,0,.3,.2,3,3,.05,.05,.05,.2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,.6,999,.05,0,0,.4]; // by block id // hardness by block id
 const HB=[1,2,3,4,5,6,7,8,10,11,17];
 let mode=(saved&&saved.mode==='creative')?'creative':'survival';
 const surv=()=>mode==='survival';

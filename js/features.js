@@ -120,7 +120,7 @@ function updateLightning(dt){
  if(thunderAt>0&&performance.now()>=thunderAt){thunderAt=-1;playNoise(1.6,.35,260);playTone(55,'sawtooth',.9,.18,30)}
 }
 // ---------- hotbar: crafted/collected placeables get a slot ----------
-const HB_PLACE=[39,40,41,48,49,51];
+const HB_PLACE=[39,40,41,48,49,51,57];
 function ensureHotbar(){
  if(!surv())return;
  for(const id of HB_PLACE){
@@ -134,7 +134,16 @@ function ensureHotbar(){
 }
 const _renderSlots=renderSlots;
 renderSlots=function(){ensureHotbar();_renderSlots()};
+function updateLadder(dt){
+ if(dead||!surv()&&fly)return;
+ const fx=Math.floor(P.x),fz=Math.floor(P.z);
+ if(getBlock(fx,Math.floor(P.y+.3),fz)===57||getBlock(fx,Math.floor(P.y+1.2),fz)===57){
+  if(K.Space)P.vy=4.2;else if(K.KeyC||held.sneak||typeof flyDown!=='undefined'&&flyDown)P.vy=-4;else P.vy=Math.max(P.vy,-1.2);
+  fallY=P.y;
+ }
+}
 function updateFeatures(dt){
+ updateLadder(dt);
  updateFalling(dt);updateBooms(dt);updateLava(dt);
  if(running){randomTicks();updateLightning(dt)}
 }
