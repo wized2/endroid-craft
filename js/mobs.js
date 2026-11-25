@@ -111,7 +111,11 @@ function updateMobs(dt){
    if(m.fuse>=1.5){pendingBooms.push([m.x,m.y+.7,m.z,3,18]);removeMob(i);continue}
    m.burn=false;m.flash=m.fuse>0&&Math.floor(m.fuse*8)%2===0;
   }else if(m.type==='z'){
-   if(dist<26&&dist>.9){m.dirx=ux;m.dirz=uz;spd=m.spd}else{m.dirx=m.dirz=0}
+   let vt=null,vd=12;for(const o of mobs)if(o.type==='v'&&!o.dead){const d=Math.hypot(o.x-m.x,o.z-m.z);if(d<vd){vd=d;vt=o}}
+   if(vt&&(vd<dist||dist>=26)){ // zombies go for villagers too
+    const cx=vt.x-m.x,cz=vt.z-m.z,cd=Math.hypot(cx,cz)||1;m.dirx=cx/cd;m.dirz=cz/cd;spd=m.spd;
+    if(cd<1.4&&m.cd<=0){mobStrike(m,vt,3);m.cd=1}
+   }else if(dist<26&&dist>.9){m.dirx=ux;m.dirz=uz;spd=m.spd}else{m.dirx=m.dirz=0}
    // attack: short wind-up you can dodge or interrupt by hitting it, then a swipe
    if(m.stun>0)m.stun-=dt;
    if(m.wind>0){m.wind-=dt;if(m.wind<=0){if(dist<1.9&&Math.abs(P.y-m.y)<1.7&&!dead)damagePlayer(m.dmg,m.x,m.z);m.cd=1.0}}
@@ -147,7 +151,9 @@ function updateMobs(dt){
    if(m.dirx||m.dirz)spd=m.spd;
    // stay near home if set
    if(m.home&&Math.hypot(m.x-m.home[0],m.z-m.home[2])>14){m.dirx=Math.sign(m.home[0]-m.x);m.dirz=Math.sign(m.home[2]-m.z);spd=m.spd}
-   if(m.home){
+   const thr=nearestHostile(m,9);const fl=!!thr;
+   if(thr){const fx=m.x-thr.x,fz=m.z-thr.z,fd=Math.hypot(fx,fz)||1;m.dirx=fx/fd;m.dirz=fz/fd;spd=m.spd*1.5}
+   if(m.home&&!fl){
     const hd=Math.hypot(m.x-m.home[0],m.z-m.home[2]);
     if(dayK<.3){ // night: go home and stay put
      if(hd>1.2){const ux2=(m.home[0]-m.x)/hd,uz2=(m.home[2]-m.z)/hd;m.dirx=ux2;m.dirz=uz2;spd=m.spd}else{m.dirx=m.dirz=0;spd=0}

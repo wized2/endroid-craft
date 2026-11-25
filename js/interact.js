@@ -141,6 +141,10 @@ function doPlace(){
  if(!h||h.t>REACH_B+.2||dead)return;
  if(typeof tryFarmUse==='function'&&tryFarmUse(h))return;
  const look=getBlock(h.x,h.y,h.z);
+ if(HB[si]===56&&(!surv()||inv[56]>0)){ // bone meal
+  if(look===51){if(growTree(h.x,h.y,h.z)){if(surv())inv[56]--;renderSlots();toast('Tree grown',900);return}}
+  else if(look>=30&&look<32){setBlock(h.x,h.y,h.z,32,true);flushChunks();if(surv())inv[56]--;renderSlots();toast('Crop grown',900);return}
+ }
  if(look===39){openFurnace(h.x,h.y,h.z);return}
  if(look===40){openChest(h.x,h.y,h.z);return}
  if(look===17){useBed(h.x,h.y,h.z);return} // right-click a bed

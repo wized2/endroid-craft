@@ -10,6 +10,7 @@ const scrPanel=$('#scr-panel'),scrText=$('#scr-textarea'),scrStatus=$('#scr-stat
 
 function openScr(){
  if(!started)return;
+ if(surv()){toast('Script console is creative-only',1500);return}
  scrPanel.classList.add('open');
  if(document.pointerLockElement)document.exitPointerLock();
  if(running){setRunning(false,false)}
@@ -21,6 +22,7 @@ function closeScr(){
 makeTouchBtn($('#scr-menu'),openScr);
 makeTouchBtn(scrClose,closeScr);
 addEventListener('keydown',e=>{
+ if(e.code==='Backquote'&&surv()&&!scrPanel.classList.contains('open'))return;
  if(e.code==='Backquote'&&!(e.target&&e.target.tagName==='TEXTAREA')){e.preventDefault();scrPanel.classList.contains('open')?closeScr():openScr()}
  else if(e.code==='Escape'&&scrPanel.classList.contains('open')){closeScr()}
 });
