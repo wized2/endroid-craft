@@ -1,0 +1,24 @@
+{
+  "name": "endroid-craft-desktop",
+  "version": "1.0.0",
+  "description": "Endroid Craft - desktop edition",
+  "main": "electron/main.js",
+  "author": "wized2",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.endroid.craft.desktop",
+    "productName": "Endroid Craft",
+    "files": ["electron/**", "js/**", "css/**", "icons/**", "index.html", "icon.svg", "manifest.json", "package.json"],
+    "win": { "target": ["portable", "nsis"], "icon": "icons/icon-512.png" },
+    "linux": { "target": ["AppImage"], "icon": "icons/icon-512.png", "category": "Game" },
+    "artifactName": "EndroidCraft-${version}-${os}.${ext}"
+  }
+}
