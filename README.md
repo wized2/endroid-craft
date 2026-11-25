@@ -94,3 +94,13 @@ Static site, deploys as-is on [Vercel](https://vercel.com/).
 - Tools: wood/stone tiers for pickaxe, axe, sword; break time = hardness × (1.5 if harvestable else 5) / tool speed. Stone/coal need a pickaxe to drop, gold needs stone.
 - Mobs: pigs, cows, sheep drop meat, leather, wool. Bed = 3 wool + 3 planks. Day = 20 min.
 - Not Minecraft-identical: terrain generator, no iron/furnace/diamond yet.
+
+## Desktop edition (`desktop` branch)
+
+A windowed PC build of the game using Electron (Windows .exe installer/portable, Linux AppImage). Download from the repo's Releases (`desktop-v*`), or run it yourself:
+
+```
+npm install
+npm start      # opens the game in a window (F11 fullscreen)
+npm run dist   # builds installers into dist/
+```
