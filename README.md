@@ -104,3 +104,5 @@ npm install
 npm start      # opens the game in a window (F11 fullscreen)
 npm run dist   # builds installers into dist/
 ```
+
+**Offline browser zip:** `EndroidCraft-Offline.zip` in the same release — unzip and double-click `index.html` (no install, no internet). Build it yourself with `npm install && npm run offline`.
