@@ -176,115 +176,184 @@ async function aiAsk(goal){
   return aiParse(txt)
  }finally{clearTimeout(tm)}
 }
+function aiFmtAct(a){
+ if(!a)return '…';
+ let s=a.a||'?';
+ if(a.block)s+=' '+a.block;else if(a.name)s+=' '+a.name;else if(a.type)s+=' '+a.type;
+ if(a.x!=null)s+=' @'+Math.floor(a.x)+','+Math.floor(a.y??0)+','+Math.floor(a.z);
+ if(a.n>1)s+=' ×'+a.n;
+ return s
+}
 async function aiLoop(goal){
- aiRun=true;aiStep=0;aiHist=[];aiResults=[];aiUI(true);aiStatus('Running…');
+ aiRun=true;aiStep=0;aiHist=[];aiResults=[];aiUI(true);
+ aiNow('Starting','Sending your goal to Aariz…');
+ aiLog('Goal: '+goal,'meta');
  try{
   while(aiRun&&aiStep<40){
-   if(dead){aiLog('You died — stopping.');break}
+   if(dead){aiLog('You died — stopping.',true);aiNow('Stopped','Player died');break}
    if(!running&&started)setRunning(true);
-   aiStep++;aiStatus('Thinking · step '+aiStep);
+   aiStep++;
+   aiNow('Thinking','Step '+aiStep+' · asking the model…');
+   aiLog('Step '+aiStep+' · thinking…','meta');
    let plan;
    try{plan=await aiAsk(goal)}catch(e){
-    aiLog('AI error: '+e.message,true);aiStatus('Error');
+    aiLog('AI error: '+e.message,true);
+    aiNow('Error',e.message);
     await aiSleep(2500);
-    if(aiStep>3&&/worker|Failed|abort/i.test(e.message)){aiLog('Cannot reach the AI worker.',true);break}
+    if(aiStep>3&&/worker|Failed|abort/i.test(e.message)){aiLog('Cannot reach the AI worker.',true);aiNow('Offline','Worker unreachable');break}
     continue
    }
-   aiLog((plan.thought||'…'));aiResults=[];aiStatus('Acting · step '+aiStep);
-   for(const a of (plan.actions||[]).slice(0,4)){
+   const thought=(plan.thought||'').trim()||'(no thought)';
+   aiLog('Thought: '+thought);
+   aiResults=[];
+   const acts=(plan.actions||[]).slice(0,4);
+   if(!acts.length){
+    aiLog(plan.done?'No more actions.':'Model returned no actions.','meta');
+    aiNow(plan.done?'Done':('Step '+aiStep),thought);
+   }
+   for(let i=0;i<acts.length;i++){
     if(!aiRun)break;
+    const a=acts[i];
+    const label=aiFmtAct(a);
+    aiNow('Acting','Step '+aiStep+' · '+label+(acts.length>1?' ('+(i+1)+'/'+acts.length+')':''));
+    aiLog('→ '+label+' …','meta');
     let r;try{r=await aiDo(a)}catch(e){r='error: '+e.message}
     aiResults.push(JSON.stringify(a)+' -> '+r);
-    aiLog('› '+(a.a||'?')+(a.block?' '+a.block:a.type?' '+a.type:a.name?' '+a.name:a.x!=null?' '+a.x+','+a.y+','+a.z:'')+': '+r);
-    if(r!=='ok'&&!/^ok/.test(r))break;
+    const ok=r==='ok'||/^ok/.test(r);
+    aiLog((ok?'✓ ':'✗ ')+label+': '+r,ok?false:true);
+    if(!ok)break;
    }
-   if(plan.done){aiLog('Done: '+(plan.thought||''));break}
+   if(plan.done){aiLog('Done: '+thought);aiNow('Done',thought);break}
   }
- }finally{aiRun=false;aiSetKeys(0,0);held.brk=false;aiUI(false);aiStatus('Idle')}
+  if(aiRun&&aiStep>=40){aiLog('Stopped after 40 steps.','meta');aiNow('Stopped','Step limit reached')}
+ }finally{
+  aiRun=false;aiSetKeys(0,0);held.brk=false;aiUI(false);
+  if(aiStatEl&&!/Done|Stopped|Offline|Error/.test(aiStatEl.textContent))aiNow('Idle','Edit the goal and press Start');
+ }
 }
 // ----- panel -----
-let aiPanel,aiLogEl,aiGoal,aiBtn,aiStatEl;
-function aiLog(t,err){
+let aiPanel,aiLogEl,aiGoal,aiBtn,aiStatEl,aiNowEl;
+function aiLog(t,kind){
  if(!aiLogEl)return;
- const d=document.createElement('div');d.textContent=t;if(err)d.className='err';
- aiLogEl.appendChild(d);while(aiLogEl.children.length>50)aiLogEl.firstChild.remove();aiLogEl.scrollTop=1e9
+ const d=document.createElement('div');
+ d.textContent=t;
+ if(kind===true||kind==='err')d.className='err';
+ else if(kind==='meta')d.className='meta';
+ else if(kind==='ok')d.className='ok';
+ aiLogEl.appendChild(d);
+ while(aiLogEl.children.length>60)aiLogEl.firstChild.remove();
+ aiLogEl.scrollTop=1e9
 }
-function aiStatus(t){if(aiStatEl)aiStatEl.textContent=t}
+function aiNow(phase,detail){
+ if(aiStatEl)aiStatEl.textContent=phase||'Idle';
+ if(aiNowEl){
+  aiNowEl.innerHTML='';
+  const b=document.createElement('b');b.textContent=(phase||'Idle')+'. ';
+  aiNowEl.appendChild(b);
+  aiNowEl.appendChild(document.createTextNode(detail||''));
+ }
+ if(aiPanel)aiPanel.dataset.phase=(phase||'Idle').toLowerCase();
+}
 function aiUI(on){
- if(aiBtn){aiBtn.textContent=on?'Stop':'Start';aiBtn.classList.toggle('stop',!!on)}
- if(aiGoal)aiGoal.disabled=!!on;
+ if(aiBtn){aiBtn.textContent=on?'Stop':'Start';aiBtn.classList.toggle('stop',!!on);aiBtn.setAttribute('aria-pressed',on?'true':'false')}
+ // Goal stays editable — change it anytime; Start uses the current text
  if(aiPanel)aiPanel.classList.toggle('running',!!on)
 }
 function aiBuild(){
+ if(document.getElementById('ai-lab'))return;
  const s=document.createElement('style');
  s.textContent=`
 #ai-lab{position:fixed;left:max(8px,env(safe-area-inset-left));right:max(8px,env(safe-area-inset-right));
-  bottom:max(72px,calc(env(safe-area-inset-bottom) + 64px));width:auto;max-width:380px;
-  max-height:min(48vh,420px);background:rgba(14,18,28,.92);color:#e8eefc;
+  bottom:max(72px,calc(env(safe-area-inset-bottom) + 64px));width:auto;max-width:400px;
+  max-height:min(56vh,480px);background:rgba(14,18,28,.94);color:#e8eefc;
   border:2px solid #5bb8f5;border-radius:12px;z-index:80;font:13px/1.35 system-ui,-apple-system,sans-serif;
   display:flex;flex-direction:column;backdrop-filter:blur(6px);box-shadow:0 8px 28px #0008}
-#ai-lab header{padding:10px 12px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;user-select:none}
-#ai-lab header .ttl{display:flex;align-items:center;gap:8px;min-width:0}
-#ai-lab header .ttl span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#ai-lab #ai-stat{font-weight:600;font-size:11px;color:#9ad;margin-left:auto;padding-right:6px}
+#ai-lab header{padding:10px 12px 6px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;user-select:none}
+#ai-lab header .ttl{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ai-lab #ai-stat{font-weight:700;font-size:12px;color:#9ad;flex:0 0 auto;padding:2px 8px;border-radius:999px;background:#ffffff12}
+#ai-lab[data-phase="thinking"] #ai-stat{color:#9cf;background:#3a7bd422}
+#ai-lab[data-phase="acting"] #ai-stat,#ai-lab[data-phase="starting"] #ai-stat{color:#8f8;background:#2e7d3228}
+#ai-lab[data-phase="done"] #ai-stat{color:#b8f;background:#6a5acd28}
+#ai-lab[data-phase="error"] #ai-stat,#ai-lab[data-phase="offline"] #ai-stat,#ai-lab[data-phase="stopped"] #ai-stat{color:#f99;background:#c6282822}
 #ai-lab.running{border-color:#7dcea0}
-#ai-lab.running #ai-stat{color:#8f8}
+#ai-lab .now{margin:0 10px 6px;padding:8px 10px;border-radius:8px;background:#00000066;border:1px solid #ffffff14;font-size:12px;color:#cde;min-height:2.6em}
+#ai-lab .now b{color:#fff;font-weight:700}
 #ai-lab .bd{padding:0 10px 10px;display:flex;flex-direction:column;gap:8px;min-height:0}
-#ai-lab .lg{overflow:auto;-webkit-overflow-scrolling:touch;max-height:22vh;line-height:1.4;background:#0008;border-radius:8px;padding:8px;font-size:12px}
+#ai-lab .lg{overflow:auto;-webkit-overflow-scrolling:touch;max-height:20vh;line-height:1.4;background:#0008;border-radius:8px;padding:8px;font-size:12px}
 #ai-lab .lg .err{color:#ff9a9a}
+#ai-lab .lg .meta{color:#9ab}
+#ai-lab .lg .ok{color:#9d9}
+#ai-lab .chips{display:flex;flex-wrap:wrap;gap:6px}
+#ai-lab .chips button{min-height:32px;padding:6px 10px;border-radius:999px;border:1px solid #456;background:#152038;color:#dce;font-size:12px;font-weight:600;touch-action:manipulation}
 #ai-lab .row{display:flex;gap:8px;align-items:stretch}
-#ai-lab input{flex:1;min-width:0;min-height:44px;padding:10px 12px;border-radius:8px;border:1px solid #456;background:#0b1020;color:#fff;font-size:15px}
-#ai-lab button{min-height:44px;min-width:72px;padding:10px 14px;border-radius:8px;border:0;background:#2e7d32;color:#fff;font-weight:700;font-size:14px;touch-action:manipulation}
-#ai-lab button.stop{background:#c62828}
+#ai-lab textarea{
+  flex:1;min-width:0;min-height:56px;max-height:120px;padding:10px 12px;border-radius:8px;border:1px solid #456;
+  background:#0b1020;color:#fff;font-size:15px;resize:vertical;font-family:inherit;line-height:1.3}
+#ai-lab button#ai-go{min-height:44px;min-width:76px;padding:10px 14px;border-radius:8px;border:0;background:#2e7d32;color:#fff;font-weight:700;font-size:14px;touch-action:manipulation}
+#ai-lab button#ai-go.stop{background:#c62828}
 #ai-lab .hint{font-size:11px;color:#9ab;padding:0 2px}
-#ai-lab.min .bd{display:none}
+#ai-lab.min .bd,#ai-lab.min .now{display:none}
 #ai-lab.min{max-height:none}
 @media (max-width:520px){
   #ai-lab{max-width:none;bottom:max(88px,calc(env(safe-area-inset-bottom) + 80px))}
-  #menu:not([style*="display: none"]) ~ #ai-lab, body:has(#menu:not([hidden])) #ai-lab{/* keep above fold when menu open */}
 }
-/* keep game keys from firing while typing a goal */
 body.ai-typing #stick,body.ai-typing #pad{pointer-events:none;opacity:.35}
 `;
  document.head.appendChild(s);
- aiPanel=document.createElement('div');aiPanel.id='ai-lab';
+ aiPanel=document.createElement('div');aiPanel.id='ai-lab';aiPanel.dataset.phase='idle';
  aiPanel.innerHTML=`
 <header>
-  <div class="ttl"><span>Aariz Lab · AI plays</span></div>
+  <span class="ttl">Aariz Lab · AI plays</span>
   <span id="ai-stat">Idle</span>
   <span id="ai-min" aria-label="Minimize">–</span>
 </header>
+<div class="now" id="ai-now"><b>Waiting.</b> Press Play, edit the goal below, then Start.</div>
 <div class="bd">
-  <div class="hint">Press Play, set a goal, then Start. The AI sees the world as text and acts with the same physics you do.</div>
-  <div class="lg" id="ai-log"></div>
+  <div class="hint">Goal is always editable. Start runs the text below; Stop cancels. Ctrl+Enter also starts.</div>
+  <div class="lg" id="ai-log" aria-live="polite"></div>
+  <div class="chips" id="ai-chips">
+    <button type="button" data-g="Collect 3 logs">3 logs</button>
+    <button type="button" data-g="Gather 5 logs, craft planks and sticks, then a wooden pickaxe">Wooden pickaxe</button>
+    <button type="button" data-g="Explore nearby and stay alive">Explore</button>
+  </div>
   <div class="row">
-    <input id="ai-goal" enterkeyhint="go" autocomplete="off" placeholder="Goal, e.g. collect 5 logs and craft a pickaxe" value="Gather 5 logs, craft planks and sticks, then a wooden pickaxe">
+    <textarea id="ai-goal" rows="2" enterkeyhint="go" autocomplete="off" placeholder="Type what the AI should do…">Gather 5 logs, craft planks and sticks, then a wooden pickaxe</textarea>
     <button id="ai-go" type="button">Start</button>
   </div>
 </div>`;
  document.body.appendChild(aiPanel);
- aiLogEl=aiPanel.querySelector('#ai-log');aiGoal=aiPanel.querySelector('#ai-goal');aiBtn=aiPanel.querySelector('#ai-go');aiStatEl=aiPanel.querySelector('#ai-stat');
- const toggleMin=()=>aiPanel.classList.toggle('min');
- aiPanel.querySelector('header').addEventListener('click',e=>{if(e.target.closest('#ai-go'))return;toggleMin()});
+ aiLogEl=aiPanel.querySelector('#ai-log');
+ aiGoal=aiPanel.querySelector('#ai-goal');
+ aiBtn=aiPanel.querySelector('#ai-go');
+ aiStatEl=aiPanel.querySelector('#ai-stat');
+ aiNowEl=aiPanel.querySelector('#ai-now');
+ aiPanel.querySelector('header').addEventListener('click',e=>{if(e.target.closest('#ai-go'))return;aiPanel.classList.toggle('min')});
  const startOrStop=()=>{
-  if(aiRun){aiRun=false;aiLog('Stopping…');aiStatus('Stopping…');return}
-  if(!started){aiLog('Press Play first, then Start.',true);return}
+  if(aiRun){aiRun=false;aiLog('Stopping…','meta');aiNow('Stopping','Finishing current action…');return}
+  if(!started){aiLog('Press Play on the main menu first, then Start.',true);aiNow('Need Play','Open the menu, press Play, then Start');return}
+  const goal=(aiGoal.value||'').trim()||'Explore and survive';
   aiPanel.classList.remove('min');
-  aiLoop(aiGoal.value.trim()||'Explore and survive')
+  aiLoop(goal)
  };
  aiBtn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();startOrStop()});
  aiGoal.addEventListener('keydown',e=>{
   e.stopPropagation();
-  if(e.key==='Enter'){e.preventDefault();startOrStop()}
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();startOrStop()}
  });
- // stop WASD / hotkeys while the goal field is focused
+ aiGoal.addEventListener('keyup',e=>e.stopPropagation());
+ aiGoal.addEventListener('keypress',e=>e.stopPropagation());
  const setTyping=on=>document.body.classList.toggle('ai-typing',!!on);
  aiGoal.addEventListener('focus',()=>setTyping(true));
  aiGoal.addEventListener('blur',()=>setTyping(false));
- // prevent touch scroll of the page from eating the log panel
+ aiPanel.querySelector('#ai-chips').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-g]');if(!b)return;
+  e.preventDefault();e.stopPropagation();
+  aiGoal.value=b.getAttribute('data-g');
+  aiGoal.focus();
+  aiNow('Goal set',aiGoal.value+(aiRun?' · applies on next Start':' · press Start'));
+ });
  aiLogEl.addEventListener('touchmove',e=>e.stopPropagation(),{passive:true});
- aiLog('AI Lab ready. Press Play, then Start.');
- // mark body so CSS can adapt
+ aiLog('AI Lab ready. Edit the goal (or tap a chip), press Play, then Start.','meta');
  document.body.classList.add('ai-mode');
 }
 if(AI_ON){
