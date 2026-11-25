@@ -44,6 +44,6 @@ function renderArmor(){const e=$('#armor'),l=armorLvl();e.innerHTML=(l&&surv())?
 const mobhpEl=$('#mobhp'),mobhpBar=mobhpEl.querySelector('i'),mobhpTxt=mobhpEl.querySelector('span');
 function showMobHp(m){
  if(!m){mobhpEl.style.opacity=0;return}
- mobhpEl.style.opacity=1;mobhpTxt.textContent=(m.type==='w'?(m.tamed?'Wolf (tamed)':'Wolf'):m.type==='g'?'Iron Golem':m.type==='k'?'Creeper':m.type==='h'?'Chicken':m.type==='p'?'Pig':m.type==='c'?'Cow':m.type==='s'?'Sheep':m.big?'Brute Zombie':'Zombie')+'  '+Math.max(0,Math.ceil(m.hp));
+ mobhpEl.style.opacity=1;mobhpTxt.textContent=(m.type==='w'?(m.tamed?'Wolf (tamed)':'Wolf'):m.type==='g'?'Iron Golem':m.type==='k'?'Creeper':m.type==='x'?'Skeleton':m.type==='h'?'Chicken':m.type==='p'?'Pig':m.type==='c'?'Cow':m.type==='s'?'Sheep':m.big?'Brute Zombie':'Zombie')+'  '+Math.max(0,Math.ceil(m.hp));
  mobhpBar.style.width=Math.max(0,Math.min(100,m.hp/(m.maxhp||m.hp)*100))+'%';
 }

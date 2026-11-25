@@ -74,6 +74,7 @@ function killMob(m){
   if(Math.random()<.3){giveDrop(56,1);toast('Bone',700)}
   if(Math.random()<(m.big?.1:.025)){inv[13]++;toast('Zombie dropped gold!')} // rare, like Minecraft's iron
  }else if(m.type==='k'){giveDrop(52,rint(0,2));kills++;toast('Creeper dropped gunpowder',1100)}
+ else if(m.type==='x'){giveDrop(56,rint(0,2));kills++;toast('Skeleton dropped bones',1100)}
  else if(m.type==='g'){giveDrop(46,rint(3,5));giveDrop(14,rint(0,2));toast('Iron Golem dropped iron',1300)}
  else if(m.type==='w'){}
  else if(m.type==='h'){giveDrop(53,1);toast('Raw Chicken',900)}
@@ -97,7 +98,7 @@ function attack(m){
  const dx=m.x-P.x,dz=m.z-P.z,dd=Math.hypot(dx,dz)||1,kb=(Math.hypot(P.vx,P.vz)>5.5?10:7)*(m.big?.6:1);
  m.vx=dx/dd*kb;m.vz=dz/dd*kb;m.vy=5;m.onGround=false;
  if(crit){spawnParticles(m.x,m.y+m.h*.7,m.z,[1,.9,.3],10);toast('Critical hit!',500);sfxHit()}
- if(m.type==='w'){if(!m.tamed)m.aggro=true}else if(m.type!=='z'&&m.type!=='k'&&m.type!=='g')m.flee=3;
+ if(m.type==='w'){if(!m.tamed)m.aggro=true}else if(m.type!=='z'&&m.type!=='k'&&m.type!=='g'&&m.type!=='x')m.flee=3;
  if(m.hp<=0)killMob(m);
 }
 // Instant creative break (Minecraft: one click destroys). Also used for held continuous break.
