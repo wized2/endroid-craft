@@ -144,7 +144,7 @@ function updateLadder(dt){
 }
 function updateFeatures(dt){
  updateLadder(dt);
- updateFalling(dt);updateBooms(dt);updateLava(dt);
+ updateFalling(dt);updateBooms(dt);updateLava(dt);updateArrows(dt);
  if(running){randomTicks();updateLightning(dt)}
 }
 
@@ -157,8 +157,27 @@ function addXp(n){
  renderInfo();
 }
 const _killMob=killMob;
-killMob=function(m){_killMob(m);addXp(m.type==='z'?(m.big?9:5):m.type==='k'?6:m.type==='v'?0:2)};
+killMob=function(m){_killMob(m);addXp(m.type==='z'?(m.big?9:5):m.type==='x'?6:m.type==='k'?6:m.type==='v'?0:2)};
 const _setBlockXp=setBlock;
 setBlock=function(x,y,z,id,lazy){const o=getBlock(x,y,z);_setBlockXp(x,y,z,id,lazy);if(id===0&&(o===44||o===45||o===12||o===13))addXp(o===45?7:o===13?4:o===44?3:2)};
 const _renderInfo=renderInfo;
 renderInfo=function(){_renderInfo();if(surv())info.textContent+=' · XP '+xpLvl+' ('+xp+'/'+xpNeed(xpLvl)+')'};
+
+// ----- skeleton arrows -----
+const arrows=[];
+function fireArrow(m,ux,uz,dist){
+ const mesh=new THREE.Mesh(new THREE.BoxGeometry(.06,.06,.5),new THREE.MeshBasicMaterial({color:0x8a6a3a}));
+ const sx=m.x,sy=m.y+1.5,sz=m.z,t=dist/14,dy=(P.y+1.2-sy)/t+4.9*t*.5;
+ mesh.position.set(sx,sy,sz);scene.add(mesh);
+ arrows.push({mesh,x:sx,y:sy,z:sz,vx:ux*14,vy:dy,vz:uz*14,life:3});
+ playTone(520,'triangle',.08,.08,260);
+}
+function updateArrows(dt){
+ for(let i=arrows.length-1;i>=0;i--){
+  const a=arrows[i];a.vy-=9.8*.5*dt;a.x+=a.vx*dt;a.y+=a.vy*dt;a.z+=a.vz*dt;a.life-=dt;
+  a.mesh.position.set(a.x,a.y,a.z);a.mesh.lookAt(a.x+a.vx,a.y+a.vy,a.z+a.vz);
+  let done=a.life<=0||getBlock(Math.floor(a.x),Math.floor(a.y),Math.floor(a.z))>0&&!isPlant(getBlock(Math.floor(a.x),Math.floor(a.y),Math.floor(a.z)))&&getBlock(Math.floor(a.x),Math.floor(a.y),Math.floor(a.z))!==9;
+  if(!done&&Math.abs(a.x-P.x)<.45&&Math.abs(a.z-P.z)<.45&&a.y>P.y&&a.y<P.y+1.8){damagePlayer(3,a.vx,a.vz);done=true}
+  if(done){scene.remove(a.mesh);a.mesh.geometry.dispose();a.mesh.material.dispose();arrows.splice(i,1)}
+ }
+}

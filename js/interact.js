@@ -48,6 +48,7 @@ function breakBlock(h){
  const ab=getBlock(bx,by+1,bz);if(isPlant(ab))setBlock(bx,by+1,bz,0);
  if(surv()){
   addExh(.005);
+  wearTool(bb);
   if(!canHarvest(bb))toast('Needs a '+PICKN[NEEDPICK[bb]||1]+' pickaxe',1300);
   const dr=canHarvest(bb)?dropOf(bb):0;
   if(dr){inv[dr]++;if(bb===13)toast('Gold!',1200);if(bb===45)toast('Diamond!',1400);renderSlots();renderInfo()}
@@ -56,6 +57,12 @@ function breakBlock(h){
  if(target&&target.x===bx&&target.y===by&&target.z===bz)target=null;
  if(typeof hl!=='undefined')hl.visible=false;
  return true;
+}
+// ----- tool durability (wood 59, stone 131, iron 250, diamond 1561 uses, like Minecraft) -----
+const DUR=[0,59,131,250,1561],wear={pick:0,axe:0,sword:0};
+function wearTool(bb){
+ const k=NEEDPICK[bb]?'pick':AXEB[bb]?'axe':null;if(!k||!tools[k])return;
+ if(++wear[k]>=DUR[tools[k]]){tools[k]=0;wear[k]=0;toast('Your '+(k==='pick'?'pickaxe':k)+' broke!',1800);if(typeof sfxHurt==='function')sfxHurt();renderSlots();renderInfo()}
 }
 function giveDrop(id,n){if(n<=0||!surv())return;inv[id]+=n}
 const rint=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
@@ -67,6 +74,7 @@ function killMob(m){
   if(Math.random()<.3){giveDrop(56,1);toast('Bone',700)}
   if(Math.random()<(m.big?.1:.025)){inv[13]++;toast('Zombie dropped gold!')} // rare, like Minecraft's iron
  }else if(m.type==='k'){giveDrop(52,rint(0,2));kills++;toast('Creeper dropped gunpowder',1100)}
+ else if(m.type==='x'){giveDrop(56,rint(0,2));kills++;toast('Skeleton dropped bones',1100)}
  else if(m.type==='g'){giveDrop(46,rint(3,5));giveDrop(14,rint(0,2));toast('Iron Golem dropped iron',1300)}
  else if(m.type==='w'){}
  else if(m.type==='h'){giveDrop(53,1);toast('Raw Chicken',900)}
@@ -83,13 +91,14 @@ function attack(m){
  const crit=surv()&&!P.onGround&&P.vy<-1&&!inWater&&!fly;
  let dmg=!surv()?30:weaponDmg();if(crit)dmg=Math.round(dmg*1.5);
  m.hp-=dmg;m.hurt=.35;addExh(.1);
+ if(surv()&&tools.sword&&++wear.sword>=DUR[tools.sword]){tools.sword=0;wear.sword=0;toast('Your sword broke!',1800)}
  // swords interrupt a zombie's wind-up (brutes only with the gold sword); fists only nudge it
  const wd=weaponDmg();if(wd>=4&&(!m.big||wd>=5)){m.wind=0;m.stun=.4}else m.stun=.12;
  sfxHit();vib(15);
  const dx=m.x-P.x,dz=m.z-P.z,dd=Math.hypot(dx,dz)||1,kb=(Math.hypot(P.vx,P.vz)>5.5?10:7)*(m.big?.6:1);
  m.vx=dx/dd*kb;m.vz=dz/dd*kb;m.vy=5;m.onGround=false;
  if(crit){spawnParticles(m.x,m.y+m.h*.7,m.z,[1,.9,.3],10);toast('Critical hit!',500);sfxHit()}
- if(m.type==='w'){if(!m.tamed)m.aggro=true}else if(m.type!=='z'&&m.type!=='k'&&m.type!=='g')m.flee=3;
+ if(m.type==='w'){if(!m.tamed)m.aggro=true}else if(m.type!=='z'&&m.type!=='k'&&m.type!=='g'&&m.type!=='x')m.flee=3;
  if(m.hp<=0)killMob(m);
 }
 // Instant creative break (Minecraft: one click destroys). Also used for held continuous break.
