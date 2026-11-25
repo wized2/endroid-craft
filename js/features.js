@@ -147,3 +147,18 @@ function updateFeatures(dt){
  updateFalling(dt);updateBooms(dt);updateLava(dt);
  if(running){randomTicks();updateLightning(dt)}
 }
+
+// ----- experience: kills and ores give XP; every level heals a little -----
+let xp=0,xpLvl=0;
+function xpNeed(l){return 8+l*5}
+function addXp(n){
+ if(!surv()||!n)return;xp+=n;
+ while(xp>=xpNeed(xpLvl)){xp-=xpNeed(xpLvl);xpLvl++;hp=Math.min(20,hp+4);toast('Level '+xpLvl+'!',1400);if(typeof sfxPlace==='function')sfxPlace()}
+ renderInfo();
+}
+const _killMob=killMob;
+killMob=function(m){_killMob(m);addXp(m.type==='z'?(m.big?9:5):m.type==='k'?6:m.type==='v'?0:2)};
+const _setBlockXp=setBlock;
+setBlock=function(x,y,z,id,lazy){const o=getBlock(x,y,z);_setBlockXp(x,y,z,id,lazy);if(id===0&&(o===44||o===45||o===12||o===13))addXp(o===45?7:o===13?4:o===44?3:2)};
+const _renderInfo=renderInfo;
+renderInfo=function(){_renderInfo();if(surv())info.textContent+=' · XP '+xpLvl+' ('+xp+'/'+xpNeed(xpLvl)+')'};
