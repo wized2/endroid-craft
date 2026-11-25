@@ -147,10 +147,16 @@ function aiObserve(){
   nearbyBlocks:here,mobs:aiNearMobs().map(o=>o.type+' '+o.d.toFixed(0)+'m'),lastResults:aiResults}
 }
 function aiParse(t){
- t=String(t).replace(/```json|```/g,'').trim();
+ // Models sometimes emit markdown fences or raw control chars inside strings.
+ t=String(t).replace(/```json|```/g,'').replace(/[\u0000-\u001F]+/g,' ').trim();
  const i=t.indexOf('{'),j=t.lastIndexOf('}');
  if(i<0||j<=i)throw new Error('no JSON in reply');
- const o=JSON.parse(t.slice(i,j+1));
+ let raw=t.slice(i,j+1);
+ // Fix illegal newlines inside JSON string values by collapsing whitespace runs outside braces carefully:
+ try{var o=JSON.parse(raw)}catch(e1){
+  raw=raw.replace(/\n/g,' ').replace(/\r/g,' ');
+  try{o=JSON.parse(raw)}catch(e2){throw new Error('bad JSON: '+e2.message)}
+ }
  if(Array.isArray(o.actions))o.actions=o.actions.map(aiNorm).filter(Boolean);
  return o
 }
