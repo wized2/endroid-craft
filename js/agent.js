@@ -33,17 +33,19 @@ function aiFace(x,y,z){
 }
 function aiDist(x,y,z){return Math.hypot(x+.5-P.x,y+.5-(P.y+1),z+.5-P.z)}
 async function aiWalkTo(x,z,maxS=8,stopD=1.2){
- let t=0;
+ let t=0,stuck=0,lx=P.x,lz=P.z;
  while(t<maxS&&aiRun&&!dead){
   const d=Math.hypot(x-P.x,z-P.z);if(d<stopD)break;
   aiFace(x,P.y+1.6,z);pitch=0;aiSetKeys(1,0);held.sprint=d>6&&(!surv()||food>8);
   await aiSleep(150);t+=.15;
+  if(Math.hypot(P.x-lx,P.z-lz)<.05){if(++stuck>2){K.Space=true;setTimeout(()=>K.Space=false,220);stuck=0}}else stuck=0; // auto-jump when blocked
+  lx=P.x;lz=P.z;
  }
  aiSetKeys(0,0);held.sprint=false;return Math.hypot(x-P.x,z-P.z)
 }
 async function aiMine(x,y,z){
  x=Math.floor(x);y=Math.floor(y);z=Math.floor(z);
- const id=getBlock(x,y,z);if(!id)return 'air / already gone';
+ const id=getBlock(x,y,z);if(id<=0||id===9)return 'nothing to mine there';
  if(aiDist(x,y,z)>REACH_B-.4){await aiWalkTo(x+.5,z+.5,8,REACH_B-1.2)}
  if(aiDist(x,y,z)>REACH_B)return 'too far';
  let t=0;
@@ -59,9 +61,17 @@ function aiFind(id,r=14){
  }
  return best
 }
+const MOBN={z:'zombie',x:'skeleton',k:'creeper',p:'pig',c:'cow',s:'sheep',h:'chicken',w:'wolf',v:'villager',g:'golem'};
 function aiNearMobs(){
- return (mobs||[]).map(m=>({m,type:(m.type||m.kind||'').toLowerCase(),d:Math.hypot(m.x-P.x,m.y-P.y,m.z-P.z)}))
+ return (mobs||[]).filter(m=>!m.dead).map(m=>({m,type:MOBN[m.type]||String(m.type),d:Math.hypot(m.x-P.x,m.y-P.y,m.z-P.z)}))
   .filter(o=>o.d<18).sort((a,b)=>a.d-b.d)
+}
+function aiCraft(r){
+ if(!surv())return 'crafting only in survival';
+ if(!canCraft(r))return 'missing: '+Object.entries(r.cost).map(([i,n])=>n+' '+NAMES[i]).join(', ');
+ for(const[id,n]of Object.entries(r.cost))inv[id]-=n;
+ if(r.tier)tools[r.tier.k]=r.tier.l;else r.give();
+ renderArmor();renderSlots();renderInfo();sfxCraft();return 'ok, crafted '+r.n
 }
 /** Normalize model output into the fixed action schema. */
 function aiNorm(a){
@@ -116,8 +126,7 @@ async function aiDo(raw){
    const q=String(a.name||'').toLowerCase();
    const r=RECIPES.find(x=>x.n.toLowerCase().includes(q));
    if(!r)return 'no recipe matching '+a.name;
-   if(typeof tryCraft==='function'){const ok=tryCraft(r);return ok?'ok':'missing materials'}
-   return 'craft unavailable'}
+   return aiCraft(r)}
   case 'place':{
    const id=aiBlockId(a.block);const x=Math.floor(a.x),y=Math.floor(a.y),z=Math.floor(a.z);
    if(id<=0)return 'unknown block';if(aiDist(x,y,z)>5.5)return 'too far (>5)';
@@ -292,8 +301,15 @@ function aiBuild(){
 #ai-lab button#ai-go{min-height:44px;min-width:76px;padding:10px 14px;border-radius:8px;border:0;background:#2e7d32;color:#fff;font-weight:700;font-size:14px;touch-action:manipulation}
 #ai-lab button#ai-go.stop{background:#c62828}
 #ai-lab .hint{font-size:11px;color:#9ab;padding:0 2px}
-#ai-lab.min .bd,#ai-lab.min .now{display:none}
+#ai-lab.min .bd{display:none}#ai-lab.min .now{margin-bottom:8px}
 #ai-lab.min{max-height:none}
+@media (pointer:coarse) and (min-width:700px){
+  #ai-lab{top:max(8px,env(safe-area-inset-top));bottom:auto;left:50%;right:auto;transform:translateX(-50%);width:min(440px,calc(100vw - 340px));max-height:calc(100vh - 16px)}
+  #ai-lab .lg{max-height:16vh}
+}
+@media (pointer:coarse) and (max-width:699px){
+  #ai-lab{top:auto;bottom:max(190px,calc(env(safe-area-inset-bottom) + 180px));left:8px;right:8px;width:auto;max-width:none}
+}
 @media (max-width:520px){
   #ai-lab{max-width:none;bottom:max(88px,calc(env(safe-area-inset-bottom) + 80px))}
 }
@@ -307,7 +323,7 @@ body.ai-typing #stick,body.ai-typing #pad{pointer-events:none;opacity:.35}
   <span id="ai-stat">Idle</span>
   <span id="ai-min" aria-label="Minimize">–</span>
 </header>
-<div class="now" id="ai-now"><b>Waiting.</b> Press Play, edit the goal below, then Start.</div>
+<div class="now" id="ai-now"><b>Ready.</b> Edit the goal below, then Start.</div>
 <div class="bd">
   <div class="hint">Goal is always editable. Start runs the text below; Stop cancels. Ctrl+Enter also starts.</div>
   <div class="lg" id="ai-log" aria-live="polite"></div>
@@ -332,7 +348,7 @@ body.ai-typing #stick,body.ai-typing #pad{pointer-events:none;opacity:.35}
   if(aiRun){aiRun=false;aiLog('Stopping…','meta');aiNow('Stopping','Finishing current action…');return}
   if(!started){aiLog('Press Play on the main menu first, then Start.',true);aiNow('Need Play','Open the menu, press Play, then Start');return}
   const goal=(aiGoal.value||'').trim()||'Explore and survive';
-  aiPanel.classList.remove('min');
+  if(matchMedia('(pointer:coarse)').matches)aiPanel.classList.add('min');else aiPanel.classList.remove('min');
   aiLoop(goal)
  };
  aiBtn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();startOrStop()});
@@ -353,8 +369,12 @@ body.ai-typing #stick,body.ai-typing #pad{pointer-events:none;opacity:.35}
   aiNow('Goal set',aiGoal.value+(aiRun?' · applies on next Start':' · press Start'));
  });
  aiLogEl.addEventListener('touchmove',e=>e.stopPropagation(),{passive:true});
- aiLog('AI Lab ready. Edit the goal (or tap a chip), press Play, then Start.','meta');
+ aiLog('AI Lab ready. Edit the goal (or tap a chip), then Start.','meta');
  document.body.classList.add('ai-mode');
+ // keep the panel out of the way of the main menu (it used to cover the Play button on phones)
+ const sync=()=>{let on=false;try{on=started&&getComputedStyle(menu).display==='none'&&!dead}catch(e){} // game scripts may not be ready yet
+  aiPanel.style.display=on?'flex':'none'};
+ sync();setInterval(sync,250);
 }
 if(AI_ON){
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',aiBuild);
