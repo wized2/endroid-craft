@@ -79,10 +79,10 @@ addEventListener('touchstart',e=>{
  for(const t of e.changedTouches){
   const el=t.target&&t.target.closest?t.target:null;
   if(el&&el.closest('#joy')){joyId=t.identifier;updJoy(t)}
-  else if(el&&(el.closest('.ctl')||el.closest('#bar'))){}
+  else if(el&&(el.closest('.ctl')||el.closest('#bar')||el.closest('#ai-lab'))){}
   else if(running&&lookId===null){lookId=t.identifier;lx0=t.clientX;ly0=t.clientY}
  }
- const isCtl=e.target&&e.target.closest&&(e.target.closest('.ctl')||e.target.closest('#bar'));
+ const isCtl=e.target&&e.target.closest&&(e.target.closest('.ctl')||e.target.closest('#bar')||e.target.closest('#ai-lab'));
  if(running&&!isCtl)e.preventDefault();
 },{passive:false});
 addEventListener('touchmove',e=>{
@@ -90,7 +90,7 @@ addEventListener('touchmove',e=>{
   if(t.identifier===joyId)updJoy(t);
   else if(t.identifier===lookId){yaw-=(t.clientX-lx0)*.0055*SET.sens;pitch=Math.max(-1.55,Math.min(1.55,pitch-(t.clientY-ly0)*.0055*SET.sens));lx0=t.clientX;ly0=t.clientY}
  }
- if(running)e.preventDefault();
+ if(running&&!(e.target&&e.target.closest&&e.target.closest('#ai-lab')))e.preventDefault();
 },{passive:false});
 function tend(e){for(const t of e.changedTouches){if(t.identifier===joyId){joyId=null;joy.fx=joy.fy=0;kn.style.transform=''}if(t.identifier===lookId)lookId=null}}
 addEventListener('touchend',tend);addEventListener('touchcancel',tend);
